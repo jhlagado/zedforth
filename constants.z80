@@ -1,0 +1,23 @@
+ROM_SIZE        equ     $2000
+RAM_SIZE        equ     $10000 - ROM_SIZE
+RET_STACK_SIZE  equ     $80                 ; return stack
+DATA_STACK_SIZE equ     $80                ; parameter stack
+PAD_SIZE        equ     $80                 ; user scratch pad
+
+SER_BUFSIZE     equ     $3F
+LINE_BUFSIZE    equ     $80
+
+START_ROM       equ     $0
+START_RAM       equ     START_ROM + ROM_SIZE
+END_RAM         equ     START_RAM + RAM_SIZE
+RET_STACK       equ     END_RAM             ; return stack, grows down
+
+IMMED           equ     $40
+HIDE            equ     $80
+
+FALSE           equ     0
+TRUE            equ     -1
+
+CALL_OPCODE     equ     $CD
+JP_OPCODE       equ     $C3
+RET_OPCODE      equ     $C9

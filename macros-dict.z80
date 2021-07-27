@@ -1,0 +1,29 @@
+backLink: .set 0                            ; assembler var, link to previous word
+
+.macro _CODE, name, flags, label
+HEADER_label:
+    DW backLink                             ; link to previous word
+backLink: .set HEADER_label
+    DB flags                                ; flags
+    .pstr name                              ; name string
+label:                                      ; body
+.endm
+
+.macro CODE, name, label
+    _CODE name, 0, label
+.endm
+
+.macro ICODE, name, label                   ; immediately executed code
+    _CODE name, IMMED, label
+.endm
+
+.macro CONST, name, label, value
+    CODE name, label
+    call dup
+    ld BC, value
+    ret
+.endm
+
+.macro VAR, name, label, variable
+    CONST name, label, variable
+.endm

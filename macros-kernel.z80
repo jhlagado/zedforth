@@ -1,0 +1,13 @@
+; IX = RTOS
+; BC = RP
+; HL = TOS
+
+.macro ENTER        ; 53t		ret --      5 bytes 
+    _rdup
+    pop IX		    		    
+.endm
+
+.macro EXIT         ; 53t       --          5 bytes
+    _rdrop          ; 26t  
+    JP (IX)		    ; 4t		HL = TOS (SP) = TOS
+.endm

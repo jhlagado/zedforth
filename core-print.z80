@@ -1,0 +1,6 @@
+CODE "emit", emit                            ; --
+    ENTER
+    ld A,C
+    call putc
+    _drop
+    EXIT

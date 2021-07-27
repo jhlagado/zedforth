@@ -1,0 +1,34 @@
+CODE 'c@',cat                                 ; ptr -- n
+    ENTER
+    LD HL,BC
+    ld C,(HL)
+    ld B,0
+    EXIT
+
+CODE 'c!',cstore                              ; n ptr --
+    ENTER
+    ld HL,BC
+    _drop
+    ld (HL),C
+    _drop
+    EXIT
+
+; ! ( a -- n )
+CODE "@",at 
+    ld E,(HL)
+    inc HL
+    ld D,(HL)
+    ex DE,HL
+    ret
+
+; ! ( n a -- )
+CODE "!",store 
+    ex DE,HL        ; n rp  DE = a
+    ex (SP),HL      ; rp n 
+    ex DE,HL        ; rp a  DE = n
+    ld (HL),E
+    inc HL
+    ld (HL),D       ; rp a+1
+    pop DE          ; a+1
+    pop HL    
+    ret

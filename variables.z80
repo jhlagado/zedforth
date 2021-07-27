@@ -1,0 +1,23 @@
+                    ds DATA_STACK_SIZE
+dataStack:                                      ; grows down          
+                    ds RET_STACK_SIZE
+retStack:                                      ; grows down          
+
+serInPtr:           dw 0
+serRdPtr:           dw 0
+serBufUsed:         dw 0
+serBuf:             ds SER_BUFSIZE
+
+lineBufStart        dw 0
+lineBufSize         dw 0
+currkey:            dw 0
+lineBufTop:         dw 0
+lineBuf:            ds LINE_BUFSIZE
+
+wordBuf1:           ds 64
+wordBuf2:           ds 64
+
+var_base:           dw 0
+var_here:           dw 0
+var_latest:         dw 0
+var_state:          dw FALSE
