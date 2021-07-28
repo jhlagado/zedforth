@@ -1,0 +1,10 @@
+;   COUNT       ( b -- b +n )
+;               Return count byte of a string and add 1 to byte address.
+CODE 'COUNT',count
+    ENTER
+    _dup
+    _onePlus
+    _swap
+    _cat
+    EXIT
+

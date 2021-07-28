@@ -1,12 +1,10 @@
 initKernel:
     ENTER
-    ld SP, dataStack
-    _push FALSE
-    _store state
-    _push 10
-    _store base
-    ld BC, (initialLatest)
-    _store latest
-    _push START_USER
-    _store here
+    _initKernel
     EXIT
+
+exit:
+    _rdrop          ; 26t  
+    JP (IX)		    ; 4t		HL = TOS (SP) = TOS
+
+

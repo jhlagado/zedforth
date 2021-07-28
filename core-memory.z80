@@ -15,20 +15,21 @@ CODE 'c!',cstore                              ; n ptr --
 
 ; ! ( a -- n )
 CODE "@",at 
+    ENTER
     ld E,(HL)
     inc HL
     ld D,(HL)
     ex DE,HL
-    ret
+    EXIT
 
 ; ! ( n a -- )
 CODE "!",store 
-    ex DE,HL        ; n rp  DE = a
-    ex (SP),HL      ; rp n 
-    ex DE,HL        ; rp a  DE = n
+    ENTER
+    ex DE,HL        ; DE = a
+    _drop           ; HL = n
+    ex DE,HL        ; HL = a  DE = n
     ld (HL),E
     inc HL
     ld (HL),D       ; rp a+1
-    pop DE          ; a+1
-    pop HL    
-    ret
+    _drop    
+    EXIT

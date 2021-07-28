@@ -1,0 +1,80 @@
+.macro _plus                         
+    ex DE,HL
+    _drop
+    add HL,DE    
+.endm
+
+.macro _minus                         
+    ex DE,HL
+    _drop
+    ex DE,HL
+    sbc HL,DE
+.endm
+
+.macro _cellPlus
+    add HL,2	; 11t		; n1 -- n2
+.endm
+
+.macro _onePlus
+    inc HL 
+.endm
+
+.macro _oneMinus
+    dec HL
+.endm
+
+.macro _isZero
+    ld A, L
+    or H
+    _drop
+.endm
+
+.macro _fetch0, name
+    _dup
+    ld HL,name
+    call at
+.endm
+
+.macro _store0, name
+    _dup
+    ld HL,name
+    call store
+.endm
+
+.macro _fetch, name
+    _dup
+    ld HL,var_name
+    call at
+.endm
+
+.macro _store, name
+    _dup
+    ld HL,var_name
+    call store
+.endm
+
+.macro _printString, s1
+    _pushString s1
+    call printStr
+.endm    
+
+.macro _pushString, s1
+    call litString
+    .pstr s1
+.endm    
+
+.macro _push, src                           ; put src (value or memory) location on top of param stack
+    _dup
+    ld HL, src
+.endm
+
+.macro _pop, dest                           ; put top of param stack into dest
+    ld dest, HL
+    _drop
+.endm
+
+.macro _pushc, src                           ; put src (value or memory) location on top of param stack
+    _dup
+    ld L, src
+    ld H,0
+.endm

@@ -2,12 +2,26 @@
 ; BC = RP
 ; HL = TOS
 
+.macro _initKernel
+    ld SP,dStack
+    ld BC,rStack 
+    ld IY,exit
+    _push FALSE
+    _store state
+    _push 10
+    _store base
+    _fetch0 initialLatest
+    _store latest
+    _push START_USER
+    _store here
+.endm
+
 .macro ENTER        ; 53t		ret --      5 bytes 
     _rdup
     pop IX		    		    
 .endm
 
 .macro EXIT         ; 53t       --          5 bytes
-    _rdrop          ; 26t  
-    JP (IX)		    ; 4t		HL = TOS (SP) = TOS
+    _rdrop
+    JP (IY)		    ; 4t		HL = TOS (SP) = TOS
 .endm

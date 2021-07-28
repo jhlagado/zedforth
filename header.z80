@@ -2,6 +2,7 @@
 .include "macros-dict.z80"
 .include "macros-kernel.z80"
 .include "macros-stack.z80"
+.include "macros-util.z80"
 
 .org START_ROM
 RST00:                                      ; Reset
@@ -22,9 +23,10 @@ RST38:                                      ; rst 38
 .include "core-tester.z80"
 .include "core-serial.z80"
 .include "core-stack.z80"
+.include "core-util.z80"
 
 CODE "ok", OK
-    _printString "OK"
+    ; _printString "OK"
     ret
 
 initialLatest:

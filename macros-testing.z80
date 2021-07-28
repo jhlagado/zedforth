@@ -1,0 +1,35 @@
+.macro TEST_SET_TEXT, s1
+    _fetch0 lineBufStart
+    _store0 lineBufTop
+    _store0 currkey
+    call litString
+    .pstr "\r\n",-1,"\r\n"
+    _store charPtr
+.endm
+
+.macro expect, expectVal, failTxt
+    _dup
+    call dot
+    _push expectVal
+    _dup
+    call dot
+    ex DE,HL
+    _drop
+    or A
+    sbc HL,BC
+    call drop
+    _compareZero H,L
+    jp z, tf_done%%M            
+    _printString "\r\rFailed: "
+    _printString failTxt
+    halt
+tf_done%%M:
+    call cr
+.endm
+
+.macro _printDepth
+    call depth
+    call dot
+    halt
+.endm
+

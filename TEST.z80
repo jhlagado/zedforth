@@ -1,13 +1,16 @@
-.engine mycomputer
+; .engine mycomputer
 
 TESTMODE equ 1
 
     ; .include "header.z80"
 
+;===============================================================================
+
 .include "constants.z80"
 .include "macros-dict.z80"
 .include "macros-kernel.z80"
 .include "macros-stack.z80"
+.include "macros-util.z80"
 
 .org START_ROM
 RST00:                                      ; Reset
@@ -28,22 +31,18 @@ RST38:                                      ; rst 38
 .include "core-tester.z80"
 .include "core-serial.z80"
 .include "core-stack.z80"
-
-CODE "ok", OK
-    _printString "OK"
-    ret
+.include "core-util.z80"
 
 initialLatest:
     dw backLink
 
 start:
-    ld SP, RET_STACK                        ; Initialise the return stack.
-    call initInput
+    _initKernel
     call initSerial
-    call initKernel
+    ; call initInput
     
     
-; end header    
+; end header  ============================================================  
     
 
     jp TESTS_START
@@ -56,27 +55,32 @@ org START_RAM
     tesDepth:   dw 0            ; core-tester
 
 TESTS_START:
-    call initKernel
-
     _push 16
     _store base
 
-    call tesStart
-    call tesEnter
+    _push 1
+    _push 2
+    _plus 
+    _push 3
+    _minus
+    call dot
+
+    ; call tesStart
+    ; call tesEnter
     
-    _push 1 
-    _dup 
+    ; _push 1 
+    ; _dup 
 
-    call tesExit
+    ; call tesExit
 
-    _push 1 
-    _push 1 
+    ; _push 1 
+    ; _push 1 
 
-    call tesEq
+    ; call tesEq
     
-    call tesEnd
+    ; call tesEnd
 
-    _printString "\r\nDone! \r\n"
+    ; _printString "\r\nDone! \r\n"
     halt
     
 START_USER:

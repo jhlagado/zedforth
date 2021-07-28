@@ -1,7 +1,7 @@
-                    ds DATA_STACK_SIZE
-dataStack:                                      ; grows down          
-                    ds RET_STACK_SIZE
-retStack:                                      ; grows down          
+                    ds DSTACK_SIZE
+dStack:                                      ; grows down          
+                    ds RSTACK_SIZE
+rStack:                                      ; grows down          
 
 serInPtr:           dw 0
 serRdPtr:           dw 0

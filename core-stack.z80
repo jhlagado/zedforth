@@ -16,18 +16,18 @@ toR:
     pop IX
     ret
 
-rFrom:
-    ENTER
-    call rAt
-    call rDrop
-    EXIT
-
 rAt:
     ENTER
     _dup
     ld D,IXH
     ld E,IXL
     ex DE,HL
+    EXIT
+
+rFrom:
+    ENTER
+    call rAt
+    call rDrop
     EXIT
 
 twoToR:		; d --          
@@ -41,7 +41,7 @@ twoRFrom:	; -- d
     ENTER
     call rFrom		
     call rFrom		
-    call swap		
+    _swap		
     EXIT
 
 twoRAt:     ; a b -- a b x y  	R: x y
@@ -55,17 +55,13 @@ twoRAt:     ; a b -- a b x y  	R: x y
     ld IXL,E
     EXIT
 
-
-
-
-
 ;      -- c-addr u   
 ; is followed by a literal Packed (Pascal) string
 litString:                         
     ENTER
-    _rFrom          ; addr
+    call rFrom          ; addr
     call count          ; addr+1 len
-    _twodup         ; addr+1 len addr+1 len
-    call plus           ; addr+1 len addr+len+1
-    _toR            ; addr+1 len
-    EXIT                 ; TODO: optimise to LD HL,BC jp (HL)
+    _twoDup             ; addr+1 len addr+1 len
+    _plus               ; addr+1 len addr+len+1
+    call toR            ; addr+1 len
+    EXIT                ; TODO: optimise to LD HL,BC jp (HL)
