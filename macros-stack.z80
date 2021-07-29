@@ -146,12 +146,13 @@
 ; x1 x2 -- x1 x2 x1 x2
 .macro _twoDup      ; 43t         		
     _Tdrop			    ; 10t		; x2				TMP: x1
-    _Tdup			    ; 11t			; x1 x2				TMP: x1
+    _Tdup			    ; 11t		; x1 x2				TMP: x1
 	_dup				; 11t		; x1 x2 x2			TMP: x1
-	_Tdup			    ; 11t			; x1 x2 x1 x2
+	_Tdup			    ; 11t		; x1 x2 x1 x2
 .endm
 
-.macro _twoDrop     ; 20t       		; x x --     
+; x x --     
+.macro _twoDrop     ; 20t       	
     _drop				; 10t
 	_drop				; 10t
 .endm
@@ -161,9 +162,9 @@
     _toTMP			    ; 14			x1 x2 x3			TMP x4
     _xNOS			    ; 19			x1 x4 x3			TMP x2
     _nip			    ; 12			x1 x3		N x4   		TMP x2
-    _xTOS			    ; 4			x1 x2               		TMP x3
+    _xTOS			    ; 4			    x1 x2               		TMP x3
     _xNOS			    ; 19			x3 x2				TMP x1
-    _xTOS			    ; 4			x3 x1				TMP x2
+    _xTOS			    ; 4			    x3 x1				TMP x2
     UNnip			    ; 12			x3 x4 x1			TMP x1
     _TMPfrom			; 14			x3 x4 x1 x2
 .endm
@@ -171,19 +172,18 @@
 ; x1 x2 x3 x4 -- x1 x2 x3 x4 x1 x2	       
 .macro _twoOver	    ; 114t			
     _dup				; 11t		x1 x2 x3 x4 x4
-	_twoNip				; 24t		x1 x2 x4	      N: x3 x4
-	_drop				; 10t		x1 x2	                  N: x2 x3 x4
-	_Tdrop			    ; 10t		x2		      N: x1 x2 x3 x4  TMP = x1
-    _twoUnnip			; 24t		x1 x2 x2   	      N: x3 x4            TMP = x1
-	_twoUnnip			; 24t		x1 x2 x3 x4 x2                                TMP = x1
-    _Tdup			    ; 11t			x1 x2 x3 x4 x1 x2	
+	_twoNip				; 24t		x1 x2 x4	    N: x3 x4
+	_drop				; 10t		x1 x2	        N: x2 x3 x4
+	_Tdrop			    ; 10t		x2		        N: x1 x2 x3 x4  TMP = x1
+    _twoUnnip			; 24t		x1 x2 x2   	    N: x3 x4        TMP = x1
+	_twoUnnip			; 24t		x1 x2 x3 x4 x2                  TMP = x1
+    _Tdup			    ; 11t		x1 x2 x3 x4 x1 x2	
 .endm
 
 ; n1 n2 n3 -- n3 		
 .macro _twonip      ; 24t			
     _nip				; 12t
     _nip				; 12t
-
 
 ; a -- x y
 .macro _twoAt	    ; 81t			

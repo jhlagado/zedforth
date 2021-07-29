@@ -1,11 +1,11 @@
 ; xor ( x1 x2 -- x3 )       
 CODE "xorr",XORR	        ; bitwise xor
     ENTER
-    pop DE
-    ld A,H
-    xor D
-    ld H,A
+    _toTMP
     ld A,L
     xor E
-    ld L,A
+    ld E,A
+    ld A,H
+    xor D
+    ld D,A
     EXIT

@@ -1,36 +1,22 @@
 ; c@ ( CODE 'c@',cat )                                 
     ENTER
-    LD HL,BC
-    ld C,(HL)
-    ld B,0
+    _cAt
     EXIT
 
 ; c! ( n ptr -- ) 
-CODE 'c!',cstore                              
+CODE 'c!',cbang                              
     ENTER
-    ld HL,BC
-    _drop
-    ld (HL),C
-    _drop
+    _cBang
     EXIT
 
 ; ! ( a -- n )
 CODE "@",at 
     ENTER
-    ld E,(HL)
-    inc HL
-    ld D,(HL)
-    ex DE,HL
+    _at
     EXIT
 
 ; ! ( n a -- )
-CODE "!",store 
+CODE "!",bang 
     ENTER
-    ex DE,HL        ; DE = a
-    _drop           ; HL = n
-    ex DE,HL        ; HL = a  DE = n
-    ld (HL),E
-    inc HL
-    ld (HL),D       ; rp a+1
-    _drop    
+    _bang    
     EXIT
