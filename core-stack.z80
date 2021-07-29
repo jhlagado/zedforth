@@ -13,7 +13,7 @@ CODE "r>",rFrom
 CODE "r@",rAt
     pop IX
 	_dup			; 11
-    _rpeek D,E		; 34t				R x		TMP x
+    _rpeek D,E		; 34t				R x		T x
     jp (IX)
 
 ; d --          
@@ -36,7 +36,7 @@ CODE "2r>",twoRFrom
 CODE "2r@",twoRAt             
     ENTER
     call rFrom      ; 44t		a b y 		R x
-    call rAt        ; 44t		a b y x		R x		TMP x
+    call rAt        ; 44t		a b y x		R x		T x
     _swap           ; 20t		a b x y  
     _dup            ; 10t		a b x y y	R x
     call toR        ; 45t		a b x y		R x y

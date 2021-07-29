@@ -1,12 +1,12 @@
 
 .macro _plus                         
-    _toTMP
+    _toT
     add HL,DE    
     ex DE,HL
 .endm
 
 .macro _minus                         
-    _Tdrop
+    POP HL
     or A    
     sbc HL,DE
     ex DE,HL

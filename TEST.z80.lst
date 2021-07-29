@@ -75,19 +75,19 @@
 0000                 
 0000                .macro ENTER,
 0000                             ; 
-0000                 _TDROP			; 10t	; x y 				TMP: a
+0000                 _TDROP			; 10t	; x y 				T: a
 0000                 _RPUSH H,L		; 34t	; x y    	R: a	
 0000                .endm
 0000                 
 0000                .macro EXIT,
 0000                             ; 
-0000                	_RPOP H,L			; 34t			R: 		TMP: a
+0000                	_RPOP H,L			; 34t			R: 		T: a
 0000                	JP (HL)			    ; 4t;
 0000                .endm
 0000                 
 0000                             ; BC = RP
 0000                             ; DE = TOS
-0000                             ; HL = TMP (H = TH, L = TL)
+0000                             ; HL = T (H = TH, L = TL)
 0000                             ; (SP) = NOS
 0000                .macro _RPEEK0,hi,lo
 0000                             ; 
@@ -132,13 +132,13 @@
 0000                 _unnip	
 0000                .endm
 0000                 
-0000                .macro _FROMTMP,
+0000                .macro _FROMT,
 0000                             ; 
 0000                	_dup			        ; 11t
-0000                	_xTOS			        ; 4t
+0000                	EX DE,HL			        ; 4t
 0000                .endm
 0000                 
-0000                .macro _TOTMP,
+0000                .macro _TOT,
 0000                             ; 
 0000                 ex DE,HL		
 0000                 POP DE		
@@ -177,15 +177,15 @@
 0000                 
 0000                .macro _SWAP,
 0000                             ; 
-0000                 _toTMP			; 14t			x1			TMP: x2
-0000                 _Tdup			; 11t			x2 x1
+0000                 _toT			; 14t			x1			T: x2
+0000                 PUSH HL			; 11t			x2 x1
 0000                .endm
 0000                 
 0000                .macro _OVER,
 0000                             ; 
-0000                 _Tdrop			; 10t		x2			TMP: x1
-0000                 _Tdup			; 11t			x1 x2			TMP: x1
-0000                 _TMPfrom			; 14t                		x1 x2 x1
+0000                 POP HL			; 10t		x2			T: x1
+0000                 PUSH HL			; 11t			x1 x2			T: x1
+0000                 _Tfrom			; 14t                		x1 x2 x1
 0000                .endm
 0000                 
 0000                .macro _NIP,
@@ -202,22 +202,22 @@
 0000                 
 0000                .macro _ROT,
 0000                             ; 
-0000                 _toTMP			; 14t			x1 x2			TMP: x3
-0000                 _xTOS			; 4t			x1 x3 			TMP: x2
-0000                 _xNOS			; 20t			x2 x3 			TMP: x1
-0000                 _TMPfrom			; 14t			x2 x3 x1
+0000                 _toT			; 14t			x1 x2			T: x3
+0000                 EX DE,HL			; 4t			x1 x3 			T: x2
+0000                 EX(SP),HL			; 20t			x2 x3 			T: x1
+0000                 _Tfrom			; 14t			x2 x3 x1
 0000                .endm
 0000                 
 0000                .macro _CBANG,
 0000                             ; 
-0000                	_toTMP				; 14t
+0000                	_toT				; 14t
 0000                 LD (HL),E			; 7t
 0000                	_drop				; 10t
 0000                .endm
 0000                 
 0000                .macro _AT,
 0000                             ; 
-0000                 _xTOS			; 4t
+0000                 EX DE,HL			; 4t
 0000                 LD E,(HL)			; 7t
 0000                	INC HL			; 6t
 0000                 LD D,(HL)			; 7t
@@ -225,7 +225,7 @@
 0000                 
 0000                .macro _BANG,
 0000                             ; 
-0000                	_toTMP				; 14t
+0000                	_toT				; 14t
 0000                 LD (HL),E			; 7
 0000                	INC HL			; 6
 0000                 LD (HL),D			; 7
@@ -233,10 +233,10 @@
 0000                 
 0000                .macro _TWODUP,
 0000                             ; 
-0000                 _Tdrop			; 10t		; x2				TMP: x1
-0000                 _Tdup			; 11t			; x1 x2				TMP: x1
-0000                	_dup				; 11t		; x1 x2 x2			TMP: x1
-0000                	_Tdup			; 11t			; x1 x2 x1 x2
+0000                 POP HL			; 10t		; x2				T: x1
+0000                 PUSH HL			; 11t			; x1 x2				T: x1
+0000                	_dup				; 11t		; x1 x2 x2			T: x1
+0000                	PUSH HL			; 11t			; x1 x2 x1 x2
 0000                .endm
 0000                 
 0000                .macro _TWODROP,
@@ -247,14 +247,14 @@
 0000                 
 0000                .macro _TWOSWAP,
 0000                             ; 
-0000                 _toTMP			; 14			x1 x2 x3			TMP x4
-0000                 _xNOS			; 19			x1 x4 x3			TMP x2
-0000                 _nip			; 12			x1 x3		N x4   		TMP x2
-0000                 _xTOS			; 4			x1 x2               		TMP x3
-0000                 _xNOS			; 19			x3 x2				TMP x1
-0000                 _xTOS			; 4			x3 x1				TMP x2
-0000                 UNnip			; 12			x3 x4 x1			TMP x1
-0000                 _TMPfrom			; 14			x3 x4 x1 x2
+0000                 _toT			; 14			x1 x2 x3			T x4
+0000                 EX(SP),HL			; 19			x1 x4 x3			T x2
+0000                 _nip			; 12			x1 x3		N x4   		T x2
+0000                 EX DE,HL			; 4			x1 x2               		T x3
+0000                 EX(SP),HL			; 19			x3 x2				T x1
+0000                 EX DE,HL			; 4			x3 x1				T x2
+0000                 UNnip			; 12			x3 x4 x1			T x1
+0000                 _Tfrom			; 14			x3 x4 x1 x2
 0000                .endm
 0000                 
 0000                .macro _TWOOVER,
@@ -262,10 +262,10 @@
 0000                 _dup				; 11t		x1 x2 x3 x4 x4
 0000                	_twoNip				; 24t		x1 x2 x4	      N: x3 x4
 0000                	_drop				; 10t		x1 x2	                  N: x2 x3 x4
-0000                	_Tdrop			; 10t		x2		      N: x1 x2 x3 x4  TMP = x1
-0000                 _twoUnnip			; 24t		x1 x2 x2   	      N: x3 x4            TMP = x1
-0000                	_twoUnnip			; 24t		x1 x2 x3 x4 x2                                TMP = x1
-0000                 _Tdup			; 11t			x1 x2 x3 x4 x1 x2	
+0000                	POP HL			; 10t		x2		      N: x1 x2 x3 x4  T = x1
+0000                 _twoUnnip			; 24t		x1 x2 x2   	      N: x3 x4            T = x1
+0000                	_twoUnnip			; 24t		x1 x2 x3 x4 x2                                T = x1
+0000                 PUSH HL			; 11t			x1 x2 x3 x4 x1 x2	
 0000                .endm
 0000                 
 0000                .macro _TWOAT,
@@ -288,7 +288,7 @@
 0000                 
 0000                .macro _PLUS,
 0000                             ; 
-0000                 _toTMP
+0000                 _toT
 0000                 add HL,DE
 0000                 ex DE,HL
 0000                .endm
@@ -405,7 +405,7 @@
 0049   D5                     PUSH   DE   
 004A   11 53 22               LD   DE,var_state   
 004D                          ;*Macro unroll:  _bang
-004D                          ;*Macro unroll: 	_toTMP				; 14t
+004D                          ;*Macro unroll: 	_toT				; 14t
 004D   EB                     EX   DE,HL   ; 14t
 004E   D1                     POP   DE   
 004F   73                     LD   (HL),E   
@@ -421,7 +421,7 @@
 0056   D5                     PUSH   DE   
 0057   11 4D 22               LD   DE,var_base   
 005A                          ;*Macro unroll:  _bang
-005A                          ;*Macro unroll: 	_toTMP				; 14t
+005A                          ;*Macro unroll: 	_toT				; 14t
 005A   EB                     EX   DE,HL   ; 14t
 005B   D1                     POP   DE   
 005C   73                     LD   (HL),E   
@@ -433,7 +433,7 @@
 005F   D5                     PUSH   DE   
 0060   11 34 02               LD   DE,initialLatest   
 0063                          ;*Macro unroll:  _at
-0063                          ;*Macro unroll:  _xTOS			; 4t
+0063                          ;*Macro unroll:  EX DE,HL			; 4t
 0063   EB                     EX   DE,HL   ; 4t
 0064   5E                     LD   E,(HL)   
 0065   23                     INC   HL   
@@ -444,7 +444,7 @@
 0067   D5                     PUSH   DE   
 0068   11 51 22               LD   DE,var_latest   
 006B                          ;*Macro unroll:  _bang
-006B                          ;*Macro unroll: 	_toTMP				; 14t
+006B                          ;*Macro unroll: 	_toT				; 14t
 006B   EB                     EX   DE,HL   ; 14t
 006C   D1                     POP   DE   
 006D   73                     LD   (HL),E   
@@ -460,7 +460,7 @@
 0074   D5                     PUSH   DE   
 0075   11 4F 22               LD   DE,var_here   
 0078                          ;*Macro unroll:  _bang
-0078                          ;*Macro unroll: 	_toTMP				; 14t
+0078                          ;*Macro unroll: 	_toT				; 14t
 0078   EB                     EX   DE,HL   ; 14t
 0079   D1                     POP   DE   
 007A   73                     LD   (HL),E   
@@ -477,8 +477,8 @@
 0084   02 63 40               .PSTR   "c@"   
 0087                CAT:         
 0087                          ;*Macro unroll:  ENTER
-0087                          ;*Macro unroll:  _TDROP			; 10t	; x y 				TMP: a
-0087   E1                     POP   HL   ; 10t	; x y 				TMP: a
+0087                          ;*Macro unroll:  _TDROP			; 10t	; x y 				T: a
+0087   E1                     POP   HL   ; 10t	; x y 				T: a
 0088                          ;*Macro unroll:  _RPUSH H,L		; 34t	; x y    	R: a	
 0088   0B                     DEC   BC   ; 34t	; x y    	R: a	
 0089   7D                     LD   A,L   
@@ -490,14 +490,14 @@
 0090   4E                     LD   C,(HL)   
 0091   06 00                  LD   B,0   
 0093                          ;*Macro unroll:  EXIT
-0093                          ;*Macro unroll: 	_RPOP H,L			; 34t			R: 		TMP: a
+0093                          ;*Macro unroll: 	_RPOP H,L			; 34t			R: 		T: a
 0093                          ;*Macro unroll: 	_RPEEK0 H,L			    ; 28t
 0093   0A                     LD   A,(BC)   ; 28t
 0094   6F                     LD   L,A   
 0095   03                     INC   BC   
 0096   0A                     LD   A,(BC)   
 0097   67                     LD   H,A   
-0098   03                     INC   BC   ; 34t			R: 		TMP: a
+0098   03                     INC   BC   ; 34t			R: 		T: a
 0099   E9                     JP   (HL)   
 009A                          ;*Macro unroll: CODE 'c!',cstore                              ; n ptr --
 009A                          ;*Macro unroll:  _CODE "c!", 0, cstore
@@ -508,8 +508,8 @@
 009D   02 63 21               .PSTR   "c!"   
 00A0                CSTORE:      
 00A0                          ;*Macro unroll:  ENTER
-00A0                          ;*Macro unroll:  _TDROP			; 10t	; x y 				TMP: a
-00A0   E1                     POP   HL   ; 10t	; x y 				TMP: a
+00A0                          ;*Macro unroll:  _TDROP			; 10t	; x y 				T: a
+00A0   E1                     POP   HL   ; 10t	; x y 				T: a
 00A1                          ;*Macro unroll:  _RPUSH H,L		; 34t	; x y    	R: a	
 00A1   0B                     DEC   BC   ; 34t	; x y    	R: a	
 00A2   7D                     LD   A,L   
@@ -524,14 +524,14 @@
 00AB                          ;*Macro unroll:  _drop
 00AB   D1                     POP   DE   
 00AC                          ;*Macro unroll:  EXIT
-00AC                          ;*Macro unroll: 	_RPOP H,L			; 34t			R: 		TMP: a
+00AC                          ;*Macro unroll: 	_RPOP H,L			; 34t			R: 		T: a
 00AC                          ;*Macro unroll: 	_RPEEK0 H,L			    ; 28t
 00AC   0A                     LD   A,(BC)   ; 28t
 00AD   6F                     LD   L,A   
 00AE   03                     INC   BC   
 00AF   0A                     LD   A,(BC)   
 00B0   67                     LD   H,A   
-00B1   03                     INC   BC   ; 34t			R: 		TMP: a
+00B1   03                     INC   BC   ; 34t			R: 		T: a
 00B2   E9                     JP   (HL)   
 00B3                             ; ! ( a -- n )
 00B3                          ;*Macro unroll: CODE "@",at
@@ -543,8 +543,8 @@
 00B6   01 40                  .PSTR   "@"   
 00B8                AT:          
 00B8                          ;*Macro unroll:  ENTER
-00B8                          ;*Macro unroll:  _TDROP			; 10t	; x y 				TMP: a
-00B8   E1                     POP   HL   ; 10t	; x y 				TMP: a
+00B8                          ;*Macro unroll:  _TDROP			; 10t	; x y 				T: a
+00B8   E1                     POP   HL   ; 10t	; x y 				T: a
 00B9                          ;*Macro unroll:  _RPUSH H,L		; 34t	; x y    	R: a	
 00B9   0B                     DEC   BC   ; 34t	; x y    	R: a	
 00BA   7D                     LD   A,L   
@@ -557,14 +557,14 @@
 00C1   56                     LD   D,(HL)   
 00C2   EB                     EX   DE,HL   
 00C3                          ;*Macro unroll:  EXIT
-00C3                          ;*Macro unroll: 	_RPOP H,L			; 34t			R: 		TMP: a
+00C3                          ;*Macro unroll: 	_RPOP H,L			; 34t			R: 		T: a
 00C3                          ;*Macro unroll: 	_RPEEK0 H,L			    ; 28t
 00C3   0A                     LD   A,(BC)   ; 28t
 00C4   6F                     LD   L,A   
 00C5   03                     INC   BC   
 00C6   0A                     LD   A,(BC)   
 00C7   67                     LD   H,A   
-00C8   03                     INC   BC   ; 34t			R: 		TMP: a
+00C8   03                     INC   BC   ; 34t			R: 		T: a
 00C9   E9                     JP   (HL)   
 00CA                             ; ! ( n a -- )
 00CA                          ;*Macro unroll: CODE "!",store
@@ -576,8 +576,8 @@
 00CD   01 21                  .PSTR   "!"   
 00CF                STORE:       
 00CF                          ;*Macro unroll:  ENTER
-00CF                          ;*Macro unroll:  _TDROP			; 10t	; x y 				TMP: a
-00CF   E1                     POP   HL   ; 10t	; x y 				TMP: a
+00CF                          ;*Macro unroll:  _TDROP			; 10t	; x y 				T: a
+00CF   E1                     POP   HL   ; 10t	; x y 				T: a
 00D0                          ;*Macro unroll:  _RPUSH H,L		; 34t	; x y    	R: a	
 00D0   0B                     DEC   BC   ; 34t	; x y    	R: a	
 00D1   7D                     LD   A,L   
@@ -595,14 +595,14 @@
 00DC                          ;*Macro unroll:  _drop
 00DC   D1                     POP   DE   
 00DD                          ;*Macro unroll:  EXIT
-00DD                          ;*Macro unroll: 	_RPOP H,L			; 34t			R: 		TMP: a
+00DD                          ;*Macro unroll: 	_RPOP H,L			; 34t			R: 		T: a
 00DD                          ;*Macro unroll: 	_RPEEK0 H,L			    ; 28t
 00DD   0A                     LD   A,(BC)   ; 28t
 00DE   6F                     LD   L,A   
 00DF   03                     INC   BC   
 00E0   0A                     LD   A,(BC)   
 00E1   67                     LD   H,A   
-00E2   03                     INC   BC   ; 34t			R: 		TMP: a
+00E2   03                     INC   BC   ; 34t			R: 		T: a
 00E3   E9                     JP   (HL)   
 00E4                          ;*Macro unroll: CODE "emit", emit                            ; --
 00E4                          ;*Macro unroll:  _CODE "emit", 0, emit
@@ -627,8 +627,8 @@
 00F8   01 2E                  .PSTR   "."   
 00FA                DOT:         
 00FA                          ;*Macro unroll:  ENTER
-00FA                          ;*Macro unroll:  _TDROP			; 10t	; x y 				TMP: a
-00FA   E1                     POP   HL   ; 10t	; x y 				TMP: a
+00FA                          ;*Macro unroll:  _TDROP			; 10t	; x y 				T: a
+00FA   E1                     POP   HL   ; 10t	; x y 				T: a
 00FB                          ;*Macro unroll:  _RPUSH H,L		; 34t	; x y    	R: a	
 00FB   0B                     DEC   BC   ; 34t	; x y    	R: a	
 00FC   7D                     LD   A,L   
@@ -657,14 +657,14 @@
 0112                DOT2:        
 0112   CD EC 00               CALL   emit   
 0115                          ;*Macro unroll:  EXIT
-0115                          ;*Macro unroll: 	_RPOP H,L			; 34t			R: 		TMP: a
+0115                          ;*Macro unroll: 	_RPOP H,L			; 34t			R: 		T: a
 0115                          ;*Macro unroll: 	_RPEEK0 H,L			    ; 28t
 0115   0A                     LD   A,(BC)   ; 28t
 0116   6F                     LD   L,A   
 0117   03                     INC   BC   
 0118   0A                     LD   A,(BC)   
 0119   67                     LD   H,A   
-011A   03                     INC   BC   ; 34t			R: 		TMP: a
+011A   03                     INC   BC   ; 34t			R: 		T: a
 011B   E9                     JP   (HL)   
 011C                             ; ; DE = TOS
 011C                             ; ; T. (x -- )
@@ -910,19 +910,19 @@
 01A1   DD E1                  POP   IX   
 01A3                          ;*Macro unroll: 	_dup				; 11
 01A3   D5                     PUSH   DE   ; 11
-01A4                          ;*Macro unroll:  _RPEEK D,E		; 34t				R: x		TMP x
+01A4                          ;*Macro unroll:  _RPEEK D,E		; 34t				R: x		T x
 01A4                          ;*Macro unroll: 	_rpeek0 D,E			    ; 28t
 01A4   0A                     LD   A,(BC)   ; 28t
 01A5   5F                     LD   E,A   
 01A6   03                     INC   BC   
 01A7   0A                     LD   A,(BC)   
 01A8   57                     LD   D,A   
-01A9   0B                     DEC   BC   ; 34t				R: x		TMP x
+01A9   0B                     DEC   BC   ; 34t				R: x		T x
 01AA   DD E9                  JP   (IX)   
 01AC                TWOTOR:      ; d --
 01AC                          ;*Macro unroll:  ENTER
-01AC                          ;*Macro unroll:  _TDROP			; 10t	; x y 				TMP: a
-01AC   E1                     POP   HL   ; 10t	; x y 				TMP: a
+01AC                          ;*Macro unroll:  _TDROP			; 10t	; x y 				T: a
+01AC   E1                     POP   HL   ; 10t	; x y 				T: a
 01AD                          ;*Macro unroll:  _RPUSH H,L		; 34t	; x y    	R: a	
 01AD   0B                     DEC   BC   ; 34t	; x y    	R: a	
 01AE   7D                     LD   A,L   
@@ -931,27 +931,27 @@
 01B1   7C                     LD   A,H   
 01B2   02                     LD   (BC),A   
 01B3                          ;*Macro unroll:  _swap			
-01B3                          ;*Macro unroll:  _toTMP			; 14t			x1			TMP: x2
-01B3   EB                     EX   DE,HL   ; 14t			x1			TMP: x2
+01B3                          ;*Macro unroll:  _toT			; 14t			x1			T: x2
+01B3   EB                     EX   DE,HL   ; 14t			x1			T: x2
 01B4   D1                     POP   DE   
-01B5                          ;*Macro unroll:  _Tdup			; 11t			x2 x1
+01B5                          ;*Macro unroll:  PUSH HL			; 11t			x2 x1
 01B5   E5                     PUSH   HL   ; 11t			x2 x1
 01B6   CD 8B 01               CALL   toR   
 01B9   CD 8B 01               CALL   toR   
 01BC                          ;*Macro unroll:  EXIT
-01BC                          ;*Macro unroll: 	_RPOP H,L			; 34t			R: 		TMP: a
+01BC                          ;*Macro unroll: 	_RPOP H,L			; 34t			R: 		T: a
 01BC                          ;*Macro unroll: 	_RPEEK0 H,L			    ; 28t
 01BC   0A                     LD   A,(BC)   ; 28t
 01BD   6F                     LD   L,A   
 01BE   03                     INC   BC   
 01BF   0A                     LD   A,(BC)   
 01C0   67                     LD   H,A   
-01C1   03                     INC   BC   ; 34t			R: 		TMP: a
+01C1   03                     INC   BC   ; 34t			R: 		T: a
 01C2   E9                     JP   (HL)   
 01C3                TWORFROM:      ; -- d
 01C3                          ;*Macro unroll:  ENTER
-01C3                          ;*Macro unroll:  _TDROP			; 10t	; x y 				TMP: a
-01C3   E1                     POP   HL   ; 10t	; x y 				TMP: a
+01C3                          ;*Macro unroll:  _TDROP			; 10t	; x y 				T: a
+01C3   E1                     POP   HL   ; 10t	; x y 				T: a
 01C4                          ;*Macro unroll:  _RPUSH H,L		; 34t	; x y    	R: a	
 01C4   0B                     DEC   BC   ; 34t	; x y    	R: a	
 01C5   7D                     LD   A,L   
@@ -962,25 +962,25 @@
 01CA   CD 96 01               CALL   rFrom   
 01CD   CD 96 01               CALL   rFrom   
 01D0                          ;*Macro unroll:  _swap		
-01D0                          ;*Macro unroll:  _toTMP			; 14t			x1			TMP: x2
-01D0   EB                     EX   DE,HL   ; 14t			x1			TMP: x2
+01D0                          ;*Macro unroll:  _toT			; 14t			x1			T: x2
+01D0   EB                     EX   DE,HL   ; 14t			x1			T: x2
 01D1   D1                     POP   DE   
-01D2                          ;*Macro unroll:  _Tdup			; 11t			x2 x1
+01D2                          ;*Macro unroll:  PUSH HL			; 11t			x2 x1
 01D2   E5                     PUSH   HL   ; 11t			x2 x1
 01D3                          ;*Macro unroll:  EXIT
-01D3                          ;*Macro unroll: 	_RPOP H,L			; 34t			R: 		TMP: a
+01D3                          ;*Macro unroll: 	_RPOP H,L			; 34t			R: 		T: a
 01D3                          ;*Macro unroll: 	_RPEEK0 H,L			    ; 28t
 01D3   0A                     LD   A,(BC)   ; 28t
 01D4   6F                     LD   L,A   
 01D5   03                     INC   BC   
 01D6   0A                     LD   A,(BC)   
 01D7   67                     LD   H,A   
-01D8   03                     INC   BC   ; 34t			R: 		TMP: a
+01D8   03                     INC   BC   ; 34t			R: 		T: a
 01D9   E9                     JP   (HL)   
 01DA                TWORAT:      ; a b -- a b x y  	R: x y
 01DA                          ;*Macro unroll:  ENTER
-01DA                          ;*Macro unroll:  _TDROP			; 10t	; x y 				TMP: a
-01DA   E1                     POP   HL   ; 10t	; x y 				TMP: a
+01DA                          ;*Macro unroll:  _TDROP			; 10t	; x y 				T: a
+01DA   E1                     POP   HL   ; 10t	; x y 				T: a
 01DB                          ;*Macro unroll:  _RPUSH H,L		; 34t	; x y    	R: a	
 01DB   0B                     DEC   BC   ; 34t	; x y    	R: a	
 01DC   7D                     LD   A,L   
@@ -989,32 +989,32 @@
 01DF   7C                     LD   A,H   
 01E0   02                     LD   (BC),A   
 01E1   CD 96 01               CALL   rFrom   ; 44t		a b y 		R: x
-01E4   CD A1 01               CALL   rAt   ; 44t		a b y x		R: x		TMP: x
+01E4   CD A1 01               CALL   rAt   ; 44t		a b y x		R: x		T: x
 01E7                          ;*Macro unroll:  _swap           ; 20t		a b x y
-01E7                          ;*Macro unroll:  _toTMP			; 14t			x1			TMP: x2
-01E7   EB                     EX   DE,HL   ; 14t			x1			TMP: x2
+01E7                          ;*Macro unroll:  _toT			; 14t			x1			T: x2
+01E7   EB                     EX   DE,HL   ; 14t			x1			T: x2
 01E8   D1                     POP   DE   
-01E9                          ;*Macro unroll:  _Tdup			; 11t			x2 x1
+01E9                          ;*Macro unroll:  PUSH HL			; 11t			x2 x1
 01E9   E5                     PUSH   HL   ; 11t			x2 x1
 01EA                          ;*Macro unroll:  _dup            ; 10t		a b x y y	R: x
 01EA   D5                     PUSH   DE   ; 10t		a b x y y	R: x
 01EB   CD 8B 01               CALL   toR   ; 45t		a b x y		R: x y
 01EE                          ;*Macro unroll:  EXIT
-01EE                          ;*Macro unroll: 	_RPOP H,L			; 34t			R: 		TMP: a
+01EE                          ;*Macro unroll: 	_RPOP H,L			; 34t			R: 		T: a
 01EE                          ;*Macro unroll: 	_RPEEK0 H,L			    ; 28t
 01EE   0A                     LD   A,(BC)   ; 28t
 01EF   6F                     LD   L,A   
 01F0   03                     INC   BC   
 01F1   0A                     LD   A,(BC)   
 01F2   67                     LD   H,A   
-01F3   03                     INC   BC   ; 34t			R: 		TMP: a
+01F3   03                     INC   BC   ; 34t			R: 		T: a
 01F4   E9                     JP   (HL)   
 01F5                             ;      -- c-addr u
 01F5                             ; is followed by a literal Packed (Pascal) string
 01F5                LITSTRING:      
 01F5                          ;*Macro unroll:  ENTER
-01F5                          ;*Macro unroll:  _TDROP			; 10t	; x y 				TMP: a
-01F5   E1                     POP   HL   ; 10t	; x y 				TMP: a
+01F5                          ;*Macro unroll:  _TDROP			; 10t	; x y 				T: a
+01F5   E1                     POP   HL   ; 10t	; x y 				T: a
 01F6                          ;*Macro unroll:  _RPUSH H,L		; 34t	; x y    	R: a	
 01F6   0B                     DEC   BC   ; 34t	; x y    	R: a	
 01F7   7D                     LD   A,L   
@@ -1025,30 +1025,30 @@
 01FC   CD 96 01               CALL   rFrom   ; addr
 01FF   CD 1D 02               CALL   count   ; addr+1 len
 0202                          ;*Macro unroll:  _twoDup             ; addr+1 len addr+1 len
-0202                          ;*Macro unroll:  _Tdrop			; 10t		; x2				TMP: x1
-0202   E1                     POP   HL   ; 10t		; x2				TMP: x1
-0203                          ;*Macro unroll:  _Tdup			; 11t			; x1 x2				TMP: x1
-0203   E5                     PUSH   HL   ; 11t			; x1 x2				TMP: x1
-0204                          ;*Macro unroll: 	_dup				; 11t		; x1 x2 x2			TMP: x1
-0204   D5                     PUSH   DE   ; 11t		; x1 x2 x2			TMP: x1
-0205                          ;*Macro unroll: 	_Tdup			; 11t			; x1 x2 x1 x2
+0202                          ;*Macro unroll:  POP HL			; 10t		; x2				T: x1
+0202   E1                     POP   HL   ; 10t		; x2				T: x1
+0203                          ;*Macro unroll:  PUSH HL			; 11t			; x1 x2				T: x1
+0203   E5                     PUSH   HL   ; 11t			; x1 x2				T: x1
+0204                          ;*Macro unroll: 	_dup				; 11t		; x1 x2 x2			T: x1
+0204   D5                     PUSH   DE   ; 11t		; x1 x2 x2			T: x1
+0205                          ;*Macro unroll: 	PUSH HL			; 11t			; x1 x2 x1 x2
 0205   E5                     PUSH   HL   ; 11t			; x1 x2 x1 x2
 0206                          ;*Macro unroll:  _plus               ; addr+1 len addr+len+1
-0206                          ;*Macro unroll:  _toTMP
+0206                          ;*Macro unroll:  _toT
 0206   EB                     EX   DE,HL   
 0207   D1                     POP   DE   
 0208   19                     ADD   HL,DE   ; addr+1 len addr+len+1
 0209   EB                     EX   DE,HL   
 020A   CD 8B 01               CALL   toR   ; addr+1 len
 020D                          ;*Macro unroll:  EXIT                ; TODO: optimise to LD HL,BC jp (HL)
-020D                          ;*Macro unroll: 	_RPOP H,L			; 34t			R: 		TMP: a
+020D                          ;*Macro unroll: 	_RPOP H,L			; 34t			R: 		T: a
 020D                          ;*Macro unroll: 	_RPEEK0 H,L			    ; 28t
 020D   0A                     LD   A,(BC)   ; 28t
 020E   6F                     LD   L,A   
 020F   03                     INC   BC   
 0210   0A                     LD   A,(BC)   
 0211   67                     LD   H,A   
-0212   03                     INC   BC   ; 34t			R: 		TMP: a
+0212   03                     INC   BC   ; 34t			R: 		T: a
 0213   E9                     JP   (HL)   ; TODO: optimise to LD HL,BC jp (HL)
 0214                             ;   COUNT       ( b -- b +n )
 0214                             ;               Return count byte of a string and add 1 to byte address.
@@ -1061,8 +1061,8 @@
 0217   05 43 4F 55 4E 54      .PSTR   "COUNT"   
 021D                COUNT:       
 021D                          ;*Macro unroll:  ENTER
-021D                          ;*Macro unroll:  _TDROP			; 10t	; x y 				TMP: a
-021D   E1                     POP   HL   ; 10t	; x y 				TMP: a
+021D                          ;*Macro unroll:  _TDROP			; 10t	; x y 				T: a
+021D   E1                     POP   HL   ; 10t	; x y 				T: a
 021E                          ;*Macro unroll:  _RPUSH H,L		; 34t	; x y    	R: a	
 021E   0B                     DEC   BC   ; 34t	; x y    	R: a	
 021F   7D                     LD   A,L   
@@ -1075,25 +1075,25 @@
 0225                          ;*Macro unroll:  _onePlus
 0225   13                     INC   DE   
 0226                          ;*Macro unroll:  _swap
-0226                          ;*Macro unroll:  _toTMP			; 14t			x1			TMP: x2
-0226   EB                     EX   DE,HL   ; 14t			x1			TMP: x2
+0226                          ;*Macro unroll:  _toT			; 14t			x1			T: x2
+0226   EB                     EX   DE,HL   ; 14t			x1			T: x2
 0227   D1                     POP   DE   
-0228                          ;*Macro unroll:  _Tdup			; 11t			x2 x1
+0228                          ;*Macro unroll:  PUSH HL			; 11t			x2 x1
 0228   E5                     PUSH   HL   ; 11t			x2 x1
 0229                          ;*Macro unroll:  _cat
-0229                          ;*Macro unroll: 	_xTOS			; 4t
+0229                          ;*Macro unroll: 	EX DE,HL			; 4t
 0229   EB                     EX   DE,HL   ; 4t
 022A   5E                     LD   E,(HL)   
 022B   16 00                  LD   D,0   
 022D                          ;*Macro unroll:  EXIT
-022D                          ;*Macro unroll: 	_RPOP H,L			; 34t			R: 		TMP: a
+022D                          ;*Macro unroll: 	_RPOP H,L			; 34t			R: 		T: a
 022D                          ;*Macro unroll: 	_RPEEK0 H,L			    ; 28t
 022D   0A                     LD   A,(BC)   ; 28t
 022E   6F                     LD   L,A   
 022F   03                     INC   BC   
 0230   0A                     LD   A,(BC)   
 0231   67                     LD   H,A   
-0232   03                     INC   BC   ; 34t			R: 		TMP: a
+0232   03                     INC   BC   ; 34t			R: 		T: a
 0233   E9                     JP   (HL)   
 0234                INITIALLATEST:      
 0234   14 02                  DW   backLink   
@@ -1112,7 +1112,7 @@
 0242   D5                     PUSH   DE   
 0243   11 53 22               LD   DE,var_state   
 0246                          ;*Macro unroll:  _bang
-0246                          ;*Macro unroll: 	_toTMP				; 14t
+0246                          ;*Macro unroll: 	_toT				; 14t
 0246   EB                     EX   DE,HL   ; 14t
 0247   D1                     POP   DE   
 0248   73                     LD   (HL),E   
@@ -1128,7 +1128,7 @@
 024F   D5                     PUSH   DE   
 0250   11 4D 22               LD   DE,var_base   
 0253                          ;*Macro unroll:  _bang
-0253                          ;*Macro unroll: 	_toTMP				; 14t
+0253                          ;*Macro unroll: 	_toT				; 14t
 0253   EB                     EX   DE,HL   ; 14t
 0254   D1                     POP   DE   
 0255   73                     LD   (HL),E   
@@ -1140,7 +1140,7 @@
 0258   D5                     PUSH   DE   
 0259   11 34 02               LD   DE,initialLatest   
 025C                          ;*Macro unroll:  _at
-025C                          ;*Macro unroll:  _xTOS			; 4t
+025C                          ;*Macro unroll:  EX DE,HL			; 4t
 025C   EB                     EX   DE,HL   ; 4t
 025D   5E                     LD   E,(HL)   
 025E   23                     INC   HL   
@@ -1151,7 +1151,7 @@
 0260   D5                     PUSH   DE   
 0261   11 51 22               LD   DE,var_latest   
 0264                          ;*Macro unroll:  _bang
-0264                          ;*Macro unroll: 	_toTMP				; 14t
+0264                          ;*Macro unroll: 	_toT				; 14t
 0264   EB                     EX   DE,HL   ; 14t
 0265   D1                     POP   DE   
 0266   73                     LD   (HL),E   
@@ -1167,7 +1167,7 @@
 026D   D5                     PUSH   DE   
 026E   11 4F 22               LD   DE,var_here   
 0271                          ;*Macro unroll:  _bang
-0271                          ;*Macro unroll: 	_toTMP				; 14t
+0271                          ;*Macro unroll: 	_toT				; 14t
 0271   EB                     EX   DE,HL   ; 14t
 0272   D1                     POP   DE   
 0273   73                     LD   (HL),E   
@@ -1212,7 +1212,7 @@
 225F   D5                     PUSH   DE   
 2260   11 4D 22               LD   DE,var_base   
 2263                          ;*Macro unroll:  _bang
-2263                          ;*Macro unroll: 	_toTMP				; 14t
+2263                          ;*Macro unroll: 	_toT				; 14t
 2263   EB                     EX   DE,HL   ; 14t
 2264   D1                     POP   DE   
 2265   73                     LD   (HL),E   
@@ -1227,7 +1227,7 @@
 226C   D5                     PUSH   DE   
 226D   11 02 00               LD   DE,2   
 2270                          ;*Macro unroll:  _plus
-2270                          ;*Macro unroll:  _toTMP
+2270                          ;*Macro unroll:  _toT
 2270   EB                     EX   DE,HL   
 2271   D1                     POP   DE   
 2272   19                     ADD   HL,DE   
