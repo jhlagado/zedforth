@@ -1,7 +1,7 @@
 ROM_SIZE        equ     $2000
 RAM_SIZE        equ     $10000 - ROM_SIZE
-RSTACK_SIZE  equ     $80                 ; return stack
-DSTACK_SIZE equ     $80                ; parameter stack
+RSTACK_SIZE     equ     $80                 ; return stack
+DSTACK_SIZE     equ     $80                ; parameter stack
 PAD_SIZE        equ     $80                 ; user scratch pad
 
 SER_BUFSIZE     equ     $3F

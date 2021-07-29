@@ -1,11 +1,12 @@
-CODE 'c@',cat                                 ; ptr -- n
+; c@ ( CODE 'c@',cat )                                 
     ENTER
     LD HL,BC
     ld C,(HL)
     ld B,0
     EXIT
 
-CODE 'c!',cstore                              ; n ptr --
+; c! ( n ptr -- ) 
+CODE 'c!',cstore                              
     ENTER
     ld HL,BC
     _drop

@@ -31,17 +31,20 @@
     _drop
 .endm
 
-.macro _push, src                           ; put src (value or memory) location on top of param stack
+; put src (value or memory) location on top of param stack
+.macro _push, src                           
     _dup
     ld DE, src
 .endm
 
-.macro _pop, dest                           ; put top of param stack into dest
+; put top of param stack into dest
+.macro _pop, dest                           
     ld dest, DE
     _drop
 .endm
 
-.macro _pushc, src                           ; put src (value or memory) location on top of param stack
+; put src (value or memory) location on top of param stack
+.macro _pushc, src                           
     _dup
     ld E, src
     ld D,0
