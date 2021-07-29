@@ -1,10 +1,4 @@
 initKernel:
-    ENTER
+    POP IX
     _initKernel
-    EXIT
-
-exit:
-    _rdrop          ; 26t  
-    JP (IX)		    ; 4t		HL = TOS (SP) = TOS
-
-
+    jp (IX)

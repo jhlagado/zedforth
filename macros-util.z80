@@ -1,56 +1,70 @@
+
 .macro _plus                         
-    ex DE,HL
-    _drop
+    _toTMP
     add HL,DE    
+    ex DE,HL
 .endm
 
 .macro _minus                         
-    ex DE,HL
-    _drop
-    ex DE,HL
+    _Tdrop
+    or A    
     sbc HL,DE
+    ex DE,HL
 .endm
 
 .macro _cellPlus
-    add HL,2	; 11t		; n1 -- n2
+    inc DE
+    inc DE
 .endm
 
 .macro _onePlus
-    inc HL 
+    inc DE 
 .endm
 
 .macro _oneMinus
-    dec HL
+    dec DE
 .endm
 
 .macro _isZero
-    ld A, L
-    or H
+    ld A, E
+    or D
     _drop
 .endm
 
-.macro _fetch0, name
+.macro _push, src                           ; put src (value or memory) location on top of param stack
     _dup
-    ld HL,name
-    call at
+    ld DE, src
+.endm
+
+.macro _pop, dest                           ; put top of param stack into dest
+    ld dest, DE
+    _drop
+.endm
+
+.macro _pushc, src                           ; put src (value or memory) location on top of param stack
+    _dup
+    ld E, src
+    ld D,0
+.endm
+
+.macro _fetch0, name
+    _push name
+    _at
 .endm
 
 .macro _store0, name
-    _dup
-    ld HL,name
-    call store
+    _push name
+    _bang
 .endm
 
 .macro _fetch, name
-    _dup
-    ld HL,var_name
-    call at
+    _push var_name
+    _at
 .endm
 
 .macro _store, name
-    _dup
-    ld HL,var_name
-    call store
+    _push var_name
+    _bang
 .endm
 
 .macro _printString, s1
@@ -63,18 +77,3 @@
     .pstr s1
 .endm    
 
-.macro _push, src                           ; put src (value or memory) location on top of param stack
-    _dup
-    ld HL, src
-.endm
-
-.macro _pop, dest                           ; put top of param stack into dest
-    ld dest, HL
-    _drop
-.endm
-
-.macro _pushc, src                           ; put src (value or memory) location on top of param stack
-    _dup
-    ld L, src
-    ld H,0
-.endm
