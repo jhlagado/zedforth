@@ -1,18 +1,18 @@
 CODE "emit", emit                            ; --
-    pop IX
-    ld A,C
+    FENTER
+    ld A,E
     call putc
     _drop
-    JP (IX)
+    FEXIT
     
 CODE ".", dot
     ENTER
     _isZero
     jr z,dot1
-    _pushc "0"
+    _pushc "?"
     jr dot2
 dot1:    
-    _pushc "?"
+    _pushc "0"
 dot2:
     call emit
     EXIT

@@ -2,22 +2,22 @@
 ; HL = TOS
 
 toR:
-    pop IX
+    FENTER
     _rpush D,E		; 34t		x		R: x 
 	_drop			; 10t				R: x
-    jp (IX)
+    FEXIT
 
 rFrom:
-    pop IX
+    FENTER
 	_dup			; 11t			
     _rpop	D,E		; 34t		x 		
-    jp (IX)
+    FEXIT
 
 rAt:
-    pop IX
+    FENTER
 	_dup			; 11
     _rpeek D,E		; 34t				R: x		TMP x
-    jp (IX)
+    FEXIT
 
 twoToR:		        ; d --          
     ENTER

@@ -1,15 +1,6 @@
 ; xor    x1 x2 -- x3            logical xor
 CODE "xorr",XORR	        ; bitwise xor
     _binaryOp xor
-    ; FENTER
-    ; pop DE
-    ; ld A,H
-    ; xor D
-    ; ld H,A
-    ; ld A,L
-    ; xor E
-    ; ld L,A
-    ; FEXIT
 
 .macro _binaryOp op
     FENTER

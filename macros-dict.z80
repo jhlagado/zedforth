@@ -18,9 +18,9 @@ label:                                      ; body
 ; Enter and Exit do not use RSTACK.
 .macro PRIM, name, label, bodyMacro
     CODE name,label
-    pop IX
+    FENTER
     bodyMacro
-	jp (IX)			    ; 4t;
+	FEXIT			    ; 4t;
 .endm
 
 .macro CONST, name, label, value

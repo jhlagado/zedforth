@@ -18,10 +18,10 @@
 
 .macro _rpush,hi,lo		        ; 34t	6 bytes inline?
     dec BC			            ; 6t
-    ld A,lo			            ; 4t 
+    ld A,hi			            ; 4t 
     ld (BC),A			        ; 7t
     dec BC			            ; 6t
-    ld A,hi			            ; 4t 
+    ld A,lo			            ; 4t 
     ld (BC),A			        ; 7t
 .endm
 

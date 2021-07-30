@@ -1,5 +1,4 @@
 .macro _initKernel
-    push IX
     ld SP,dStack
     ld BC,rStack 
     _push FALSE
@@ -10,7 +9,6 @@
     _store latest
     _push START_USER
     _store here
-    jp (IX)
 .endm
 
 ; enter and exit for normal colon words 
@@ -22,4 +20,12 @@
 .macro EXIT         ; 38t       x -- x a    R: a --          5 bytes
 	_rpop H,L			; 34t			R: 		TMP: a
 	jp (HL)			    ; 4t;
+.endm
+
+.macro FENTER        ; 14t		x a ? --      5 bytes 
+    pop IX			    
+.endm
+
+.macro FEXIT         ; 7t       x -- x a    R: a --          5 bytes
+	jp (IX)			    
 .endm

@@ -1,4 +1,4 @@
-; .engine mycomputer
+.engine mycomputer
 
 TESTMODE equ 1
 
