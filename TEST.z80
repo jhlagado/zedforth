@@ -9,6 +9,7 @@ TESTMODE equ 1
 .include "constants.z80"
 .include "macros-dict.z80"
 .include "macros-kernel.z80"
+.include "macros-memory.z80"
 .include "macros-stack.z80"
 .include "macros-util.z80"
 
@@ -25,7 +26,9 @@ RST08:                                      ; rst 38
 RST38:                                      ; rst 38
     jp serialIn
 
+.include "core-control.z80"
 .include "core-kernel.z80"
+.include "core-logic.z80"
 .include "core-memory.z80"
 .include "core-print.z80"
 .include "core-tester.z80"
@@ -58,12 +61,8 @@ TESTS_START:
     _push 16
     _store base
 
-    _push 1
-    _push 2
-    _plus 
-    _push 3
-    _minus
-    call dot
+    _print "Hello!\r\n"
+    ; call ok
 
     ; call tesStart
     ; call tesEnter

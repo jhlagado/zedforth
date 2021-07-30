@@ -1,6 +1,6 @@
 
 .macro _plus                         
-    _toTMP
+    _toT
     add HL,DE    
     ex DE,HL
 .endm
@@ -25,10 +25,15 @@
     dec DE
 .endm
 
-.macro _isZero
-    ld A, E
-    or D
-    _drop
+.macro _twoPlus
+    _onePlus
+    _onePlus
+.endm
+
+.macro _isZero      ; 18t
+    ld A, E         ; 4t
+    or D            ; 4t
+    _drop           ; 10t
 .endm
 
 .macro _push, src                           ; put src (value or memory) location on top of param stack
@@ -47,39 +52,24 @@
     ld D,0
 .endm
 
-.macro _fetch0, name
-    _push name
-    _at
-.endm
-
-.macro _store0, name
-    _push name
-    _bang
-.endm
-
-.macro _fetch, name
-    _push var_name
-    _at
-.endm
-
-.macro _store, name
-    _push var_name
-    _bang
-.endm
-
-.macro _printString, s1
-    _pushString s1
-    call printStr
-.endm    
-
-.macro _pushString, s1
-    call litString
+.macro _pushStr, s1
+    call litStr
     .pstr s1
 .endm    
 
-.macro _count
-    _dup
-    _onePlus
-    _swap
-    _cat
-.endm
+.macro _print, s1
+    _pushStr s1
+    call typex
+.endm    
+
+.macro _println, s1
+    _pushStr s1
+    call type
+    _cr
+.endm    
+
+.macro _cr
+    _pushStr "\r\n"
+    call type
+.endm    
+

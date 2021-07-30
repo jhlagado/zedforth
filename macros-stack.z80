@@ -1,6 +1,6 @@
 ; BC = RP
 ; DE = TOS
-; HL = TMP (H = TH, L = TL)
+; HL = T (H = TH, L = TL)
 ; (SP) = NOS
 
 .macro _rpeek0,hi,lo		    ; 28t	6 bytes inline?
@@ -40,12 +40,12 @@
     _unnip	
 .endm
 
-.macro _fromTMP				; 15t		-- n		; from TMP
+.macro _fromT				; 15t		-- n		; from T
 	_dup			            ; 11t
-	_xTOS			            ; 4t
+	EX DE,HL			            ; 4t
 .endm
 
-.macro _toTMP				; 14t				    ; to TMP
+.macro _toT				; 14t				    ; to T
     ex DE,HL		
     POP DE		
 .endm
@@ -58,14 +58,6 @@
     POP HL
 .endm
 
-.macro _xTOS				; 4t				    ; _swap TMP and TOS
-    EX DE,HL
-.endm
-
-.macro _xNOS				; 19t				    ; _swap TMP and NOS
-    EX(SP),HL
-.endm
-
 .macro _dup
     PUSH DE			        ; 11t
 .endm
@@ -75,14 +67,14 @@
 .endm
 
 .macro _swap                ; 25t			x1 x2 -- x2 x1
-    _toTMP			            ; 14t			x1			TMP: x2
+    _toT			            ; 14t			x1			T: x2
     _Tdup			            ; 11t			x2 x1
 .endm
 
 .macro _over 	            ; 35t			x1 x2 -- x1 x2 x1
-    _Tdrop			            ; 10t		x2			TMP: x1
-    _Tdup			            ; 11t			x1 x2			TMP: x1
-    _TMPfrom			        ; 14t                		x1 x2 x1
+    _Tdrop			            ; 10t		x2			T: x1
+    _Tdup			            ; 11t			x1 x2			T: x1
+    _Tfrom			            ; 14t                		x1 x2 x1
 .endm
 
 .macro _nip 	; 12t			x1 x2 -- x2  		
@@ -96,41 +88,16 @@
 .endm
 
 .macro _rot	    ; 53t			( x1 x2 x3 -- x2 x3 x1 )
-    _toTMP			; 14t			x1 x2			TMP: x3
-    _xTOS			; 4t			x1 x3 			TMP: x2
-    _xNOS			; 20t			x2 x3 			TMP: x1
-    _TMPfrom		; 14t			x2 x3 x1
-.endm
-
-.macro _cAt     ; 18t			a -- c
-	_xTOS			; 4t
-    ld E,(HL)		; 7t
-    ld D,0			; 7t
-
-.macro _cBang   ; 31t			c a --
-	_toTMP			; 14t
-    ld (HL),E		; 7t
-	_drop			; 10t
-.endm
-
-.macro _at          ; 24t 			a -- n 
-    _xTOS			; 4t
-    ld E,(HL)		; 7t
-	INC HL			; 6t
-    ld D,(HL)		; 7t
-.endm
-
-.macro _bang        ; 34t			n a --
-	_toTMP				; 14t
-    ld (HL),E			; 7
-	INC HL			    ; 6
-    ld (HL),D			; 7
+    _toT			; 14t			x1 x2			T: x3
+    EX DE,HL			; 4t			x1 x3 			T: x2
+    EX(SP),HL			; 20t			x2 x3 			T: x1
+    _Tfrom		; 14t			x2 x3 x1
 .endm
 
 .macro _twoDup      ; 43t         		; x1 x2 -- x1 x2 x1 x2
-    _Tdrop			    ; 10t		; x2				TMP: x1
-    _Tdup			    ; 11t			; x1 x2				TMP: x1
-	_dup				; 11t		; x1 x2 x2			TMP: x1
+    _Tdrop			    ; 10t		; x2				T: x1
+    _Tdup			    ; 11t			; x1 x2				T: x1
+	_dup				; 11t		; x1 x2 x2			T: x1
 	_Tdup			    ; 11t			; x1 x2 x1 x2
 .endm
 
@@ -140,43 +107,28 @@
 .endm
 
 .macro _twoswap	    ; 99t 			x1 x2 x3 x4 -- x3 x4 x1 x2 	
-    _toTMP			    ; 14			x1 x2 x3			TMP x4
-    _xNOS			    ; 19			x1 x4 x3			TMP x2
-    _nip			    ; 12			x1 x3		N x4   		TMP x2
-    _xTOS			    ; 4			x1 x2               		TMP x3
-    _xNOS			    ; 19			x3 x2				TMP x1
-    _xTOS			    ; 4			x3 x1				TMP x2
-    UNnip			    ; 12			x3 x4 x1			TMP x1
-    _TMPfrom			; 14			x3 x4 x1 x2
+    _toT			    ; 14			x1 x2 x3			T x4
+    EX(SP),HL			    ; 19			x1 x4 x3			T x2
+    _nip			    ; 12			x1 x3		N x4   		T x2
+    EX DE,HL			    ; 4			x1 x2               		T x3
+    EX(SP),HL			    ; 19			x3 x2				T x1
+    EX DE,HL			    ; 4			x3 x1				T x2
+    UNnip			    ; 12			x3 x4 x1			T x1
+    _Tfrom			; 14			x3 x4 x1 x2
 .endm
 
 .macro _twoOver	    ; 114t			x1 x2 x3 x4 -- x1 x2 x3 x4 x1 x2	       
     _dup				; 11t		x1 x2 x3 x4 x4
 	_twoNip				; 24t		x1 x2 x4	      N: x3 x4
 	_drop				; 10t		x1 x2	                  N: x2 x3 x4
-	_Tdrop			    ; 10t		x2		      N: x1 x2 x3 x4  TMP = x1
-    _twoUnnip			; 24t		x1 x2 x2   	      N: x3 x4            TMP = x1
-	_twoUnnip			; 24t		x1 x2 x3 x4 x2                                TMP = x1
+	_Tdrop			    ; 10t		x2		      N: x1 x2 x3 x4  T = x1
+    _twoUnnip			; 24t		x1 x2 x2   	      N: x3 x4            T = x1
+	_twoUnnip			; 24t		x1 x2 x3 x4 x2                                T = x1
     _Tdup			    ; 11t			x1 x2 x3 x4 x1 x2	
 .endm
 
 .macro _twonip      ; 24t			n1 n2 n3 -- n3 		
     _nip				; 12t
     _nip				; 12t
-
-
-.macro _twoAt	    ; 81t			a -- x y
-	_dup				; 11t
-	_cellPlus			; 11t
-	_at				    ; 20t
-	_swap				; 19t
-	_at				    ; 20t
 .endm
 
-.macro _twoBang	    ; 124t			x y a --
-	_swap				; 19t		x a y
-	_over				; 16t		x a y a
-	_bang			    ; 46t		x a
-	_cellPlus			; 12t		x a+1
-	_bang			    ; 46t
-.endm

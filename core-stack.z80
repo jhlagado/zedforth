@@ -7,7 +7,7 @@ toR:
 	_drop			; 10t				R: x
     FEXIT
 
-rFrom:
+rFrom:              ; 45t + 15t
     FENTER
 	_dup			; 11t			
     _rpop	D,E		; 34t		x 		
@@ -42,13 +42,21 @@ twoRAt:             ; a b -- a b x y  	R: x y
     call toR        ; 45t		a b x y		R: x y
     EXIT
 
-;      -- c-addr u   
+CODE "lit", lit
+    pop HL          ; HL = return adr
+    _dup            ; push current TOS
+    ld E,(HL)       
+    inc HL
+    ld D,(HL)       ; TOS = word data at return adr
+    inc HL          ; HL = return adr + 2
+    jp (HL)         ; return to adr2 + 2
+
+; -- p n   
 ; is followed by a literal Packed (Pascal) string
-litString:                         
-    ENTER
-    call rFrom      ; addr
-    call count      ; addr+1 len
-    _twoDup         ; addr+1 len addr+1 len
-    _plus           ; addr+1 len addr+len+1
-    call toR        ; addr+1 len
-    EXIT            ; TODO: optimise to LD HL,BC jp (HL)
+CODE "litStr", litStr                         
+    _swap           ; adr - return address
+    call count      ; adr+1 len
+    _twoDup         ; adr+1 len adr+1 len
+    _plus           ; adr+1 len adr'
+    _toT            ; adr+1 len             HL: adr'
+    jp (HL)

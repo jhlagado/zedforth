@@ -1,3 +1,14 @@
-;   COUNT       ( b -- b +n )
-;               Return count byte of a string and add 1 to byte address.
-PRIM 'COUNT',count,_count
+; count ( b -- b +n )
+; Return count byte of a string and add 1 to byte address.
+CODE 'count',count
+    FENTER
+    _dup
+    _onePlus
+    _swap
+    _cat
+    FEXIT
+    
+CODE 'ok',ok
+    ENTER
+    _println "ok"
+    EXIT

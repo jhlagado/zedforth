@@ -1,0 +1,20 @@
+; doNext ( -- ) ( r: idx ) followed by address of loop start
+; Run time code for the single index loop.
+doNext:                 ; ~274t
+    _swap               ; 25t   ; ret 
+    call rfrom          ; 60t   ; ret idx 
+    _dup                ; 11t   ; ret idx idx
+    _isZero             ; 18t   ; ret idx
+    jr z,doNext1        ; 12t
+    _oneMinus           ; 4t    ; ret idx'
+    call tor            ; 60t   ; ret   R: idx'
+    _at                 ; 32t   ; ret'  R: idx'
+    jr doNext2          ; 12t
+doNext1:
+    _drop           ; 10t   ; ret
+    _twoPlus            ; 12t   ; ret'
+doNext2:
+    ex DE,HL            ; 4t    ;       R: idx'     HL: ret'    
+    _drop               ; 10t   ; 
+    jp (HL)             ; 4t
+

@@ -1,0 +1,16 @@
+    _initKernel
+    _push 16
+    _store base
+
+    call lit
+    dw $123
+    _push $123 
+    _minus
+    call dot
+
+    _push 1
+    _push 2
+    _plus 
+    _push 3
+    _minus
+    call dot

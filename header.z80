@@ -18,6 +18,7 @@ RST38:                                      ; rst 38
     jp serialIn
 
 .include "core-kernel.z80"
+.include "core-logic.z80"
 .include "core-memory.z80"
 .include "core-print.z80"
 .include "core-tester.z80"
@@ -25,15 +26,12 @@ RST38:                                      ; rst 38
 .include "core-stack.z80"
 .include "core-util.z80"
 
-CODE "ok", OK
-    ; _printString "OK"
-    ret
-
 initialLatest:
     dw backLink
 
 start:
-    ld SP, RET_STACK                        ; Initialise the return stack.
-    call initInput
+    _initKernel
     call initSerial
-    call initKernel
+    ; call initInput
+    
+    

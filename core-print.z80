@@ -1,10 +1,3 @@
-CODE "emit", emit                            ; --
-    FENTER
-    ld A,E
-    call putc
-    _drop
-    FEXIT
-    
 CODE ".", dot
     ENTER
     _isZero
@@ -17,3 +10,44 @@ dot2:
     call emit
     EXIT
     
+; type  ( adr n -- )
+; Output n characters from adr.
+CODE 'type',type
+    ENTER
+    pop HL              ; len   HL = ptr
+type1:
+    _dup
+    _isZero             ; len   HL = ptr
+    jr z,type2
+    ex DE,HL            ; ptr   HL = len
+    _dup                ; ptr ptr
+    _cat                ; ptr c
+    call emit           ; ptr
+    _onePlus            ; ptr+1
+    ex DE,HL
+    _oneMinus           ; len-1
+    jr type1
+type2:    
+    _drop
+    EXIT
+
+PRIM "cr",cr,_cr
+
+
+; type  ( adr n -- )
+; Output n characters from adr.
+CODE 'typex',typex
+    ENTER
+    call toR
+    jr typex2
+TYPEx1:          
+    _dup
+    _cAt
+    call emit
+    _push 1
+    _plus
+TYPEx2:          
+    call doNext
+    dw TYPEx1
+    _drop
+    EXIT

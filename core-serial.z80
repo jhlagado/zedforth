@@ -68,20 +68,17 @@ serialIn22:
 serialIn23:
     ret
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; putc - output a character
-; params: A = char to output
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-putc:
-    push AF                     ; Store character
-putc0:
+; emit  ( c -- )
+CODE "emit",emit
+    FENTER
+emit1:
     in A,(IO_CTRL)      ; Status byte
     bit 1,A             ; Set Zero flag if still transmitting character
-    jr z,putc0
-    pop AF                  ; Retrieve character
+    jr z,emit1
+    ld A,E
+    _drop
     out (IO_DATA),A         ; Output the character
-    ret
+    FEXIT
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; serReady - check if there is input waiting to be read
@@ -93,48 +90,98 @@ serReady:
     cp $0
     ret
 
+; key   ( -- c )
+; Wait for and return an input character.
+CODE "key",key
+    ENTER
+key1:  
+    call qkey
+    _isZero
+    jr z,key1 
+    EXIT
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; getc - input
-; returns: A = input char
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-getc:
-    push HL
-
+; ?key  ( -- c T | F )
+; Return input character and true, or a false if no input.
+CODE "?key",qkey
+    FENTER
     .if TESTMODE
-
-    ld HL, (charPtr)
-    ld A, (HL)
-    inc HL
-    ld (charPtr), HL
-
+        _fetch0 charPtr
+        _dup
+        _cat
+        _swap
+        _store0 charPtr
+        _push TRUE
     .else
-getc0:
-    call serReady
-    jr z, getc0
-    ld HL,(serRdPtr)
-    inc HL
-    ld A,L             ; Only need to check low byte because lineBuf<256 bytes
-    cp (serBuf + SER_BUFSIZE) & $FF
-    jr nz,getc21
-    ld HL,serBuf
-getc21:
-    di
-    ld (serRdPtr),HL
-    ld A,(serBufUsed)
-    dec A
-    ld (serBufUsed),A
-    
-    cp SER_EMPTYSIZE
-    jr nc,getc22
-    ld A,RTS_LOW
-    out (IO_CTRL),A
-getc22:
-    ld A,(HL)
-    ei
-
+        ld A,(serBufUsed)
+        cp $0
+        jr nz, qkey1
+        _push FALSE
+        FEXIT
+qkey1:
+        ld HL,(serRdPtr)
+        inc HL
+        ld A,L             ; Only need to check low byte because lineBuf<256 bytes
+        cp (serBuf + SER_BUFSIZE) & $FF
+        jr nz,qkey2
+        ld HL,serBuf
+qkey2:
+        di
+        ld (serRdPtr),HL
+        ld A,(serBufUsed)
+        dec A
+        ld (serBufUsed),A
+        cp SER_EMPTYSIZE
+        jr nc,qkey3
+        ld A,RTS_LOW
+        out (IO_CTRL),A
+qkey3:
+        ld A,(HL)
+        _push TRUE
+        ei
     .endif
+    FEXIT
 
-    pop HL
-    ret
+; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; ; getc - input
+; ; returns: A = input char
+; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+; getc:
+;     push HL
+
+;     .if TESTMODE
+
+;     ld HL, (charPtr)
+;     ld A, (HL)
+;     inc HL
+;     ld (charPtr), HL
+
+;     .else
+; getc0:
+;     call serReady
+;     jr z, getc0
+;     ld HL,(serRdPtr)
+;     inc HL
+;     ld A,L             ; Only need to check low byte because lineBuf<256 bytes
+;     cp (serBuf + SER_BUFSIZE) & $FF
+;     jr nz,getc21
+;     ld HL,serBuf
+; getc21:
+;     di
+;     ld (serRdPtr),HL
+;     ld A,(serBufUsed)
+;     dec A
+;     ld (serBufUsed),A
+    
+;     cp SER_EMPTYSIZE
+;     jr nc,getc22
+;     ld A,RTS_LOW
+;     out (IO_CTRL),A
+; getc22:
+;     ld A,(HL)
+;     ei
+
+;     .endif
+
+;     pop HL
+;     ret

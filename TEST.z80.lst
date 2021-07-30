@@ -42,9 +42,9 @@
 0000                .macro PRIM,name,label,bodyMacro
 0000                             ; 
 0000                 CODE name,label
-0000                 pop IX
+0000                 FENTER
 0000                 bodyMacro
-0000                	jp (IX)			    ; 4t;
+0000                	FEXIT			    ; 4t;
 0000                .endm
 0000                 
 0000                .macro CONST,name,label,value
@@ -95,9 +95,94 @@
 0000                	jp (HL)			    ; 4t;
 0000                .endm
 0000                 
+0000                .macro FENTER,
+0000                             ; 
+0000                 pop IX			
+0000                .endm
+0000                 
+0000                .macro FEXIT,
+0000                             ; 
+0000                	jp (IX)			
+0000                .endm
+0000                 
+0000                .macro _FETCH0,name
+0000                             ; 
+0000                 _push name
+0000                 _at
+0000                .endm
+0000                 
+0000                .macro _STORE0,name
+0000                             ; 
+0000                 _push name
+0000                 _bang
+0000                .endm
+0000                 
+0000                .macro _FETCH,name
+0000                             ; 
+0000                 _push var_name
+0000                 _at
+0000                .endm
+0000                 
+0000                .macro _STORE,name
+0000                             ; 
+0000                 _push var_name
+0000                 _bang
+0000                .endm
+0000                 
+0000                .macro _CAT,
+0000                             ; 
+0000                	EX DE,HL		; 4t
+0000                 ld L,(HL)		; 7t
+0000                 ld H,0			; 7t
+0000                	EX DE,HL		; 4t
+0000                .endm
+0000                 
+0000                .macro _CBANG,
+0000                             ; 
+0000                	_toT			; 14t
+0000                 ld (HL),E		; 7t
+0000                	_drop			; 10t
+0000                .endm
+0000                 
+0000                .macro _AT,
+0000                             ; 
+0000                 EX DE,HL		; 4t
+0000                 ld A,(HL)		; 7t
+0000                	INC HL			; 6t
+0000                 ld H,(HL)		; 7t
+0000                 ld E,A          ; 4t
+0000                 EX DE,HL		; 4t
+0000                .endm
+0000                 
+0000                .macro _BANG,
+0000                             ; 
+0000                	_toT				; 14t
+0000                 ld (HL),E			; 7
+0000                	INC HL			    ; 6
+0000                 ld (HL),D			; 7
+0000                .endm
+0000                 
+0000                .macro _TWOAT,
+0000                             ; 
+0000                	_dup				; 11t
+0000                	_cellPlus			; 11t
+0000                	_at				    ; 20t
+0000                	_swap				; 19t
+0000                	_at				    ; 20t
+0000                .endm
+0000                 
+0000                .macro _TWOBANG,
+0000                             ; 
+0000                	_swap				; 19t		x a y
+0000                	_over				; 16t		x a y a
+0000                	_bang			    ; 46t		x a
+0000                	_cellPlus			; 12t		x a+1
+0000                	_bang			    ; 46t
+0000                .endm
+0000                 
 0000                             ; BC = RP
 0000                             ; DE = TOS
-0000                             ; HL = TMP (H = TH, L = TL)
+0000                             ; HL = T (H = TH, L = TL)
 0000                             ; (SP) = NOS
 0000                .macro _RPEEK0,hi,lo
 0000                             ; 
@@ -142,13 +227,13 @@
 0000                 _unnip	
 0000                .endm
 0000                 
-0000                .macro _FROMTMP,
+0000                .macro _FROMT,
 0000                             ; 
 0000                	_dup			            ; 11t
-0000                	_xTOS			            ; 4t
+0000                	EX DE,HL			            ; 4t
 0000                .endm
 0000                 
-0000                .macro _TOTMP,
+0000                .macro _TOT,
 0000                             ; 
 0000                 ex DE,HL		
 0000                 POP DE		
@@ -165,16 +250,6 @@
 0000                 POP HL
 0000                .endm
 0000                 
-0000                .macro _XTOS,
-0000                             ; 
-0000                 EX DE,HL
-0000                .endm
-0000                 
-0000                .macro _XNOS,
-0000                             ; 
-0000                 EX(SP),HL
-0000                .endm
-0000                 
 0000                .macro _DUP,
 0000                             ; 
 0000                 PUSH DE			        ; 11t
@@ -187,15 +262,15 @@
 0000                 
 0000                .macro _SWAP,
 0000                             ; 
-0000                 _toTMP			            ; 14t			x1			TMP: x2
+0000                 _toT			            ; 14t			x1			T: x2
 0000                 _Tdup			            ; 11t			x2 x1
 0000                .endm
 0000                 
 0000                .macro _OVER,
 0000                             ; 
-0000                 _Tdrop			            ; 10t		x2			TMP: x1
-0000                 _Tdup			            ; 11t			x1 x2			TMP: x1
-0000                 _TMPfrom			        ; 14t                		x1 x2 x1
+0000                 _Tdrop			            ; 10t		x2			T: x1
+0000                 _Tdup			            ; 11t			x1 x2			T: x1
+0000                 _Tfrom			            ; 14t                		x1 x2 x1
 0000                .endm
 0000                 
 0000                .macro _NIP,
@@ -212,40 +287,17 @@
 0000                 
 0000                .macro _ROT,
 0000                             ; 
-0000                 _toTMP			; 14t			x1 x2			TMP: x3
-0000                 _xTOS			; 4t			x1 x3 			TMP: x2
-0000                 _xNOS			; 20t			x2 x3 			TMP: x1
-0000                 _TMPfrom		; 14t			x2 x3 x1
-0000                .endm
-0000                 
-0000                .macro _CBANG,
-0000                             ; 
-0000                	_toTMP			; 14t
-0000                 ld (HL),E		; 7t
-0000                	_drop			; 10t
-0000                .endm
-0000                 
-0000                .macro _AT,
-0000                             ; 
-0000                 _xTOS			; 4t
-0000                 ld E,(HL)		; 7t
-0000                	INC HL			; 6t
-0000                 ld D,(HL)		; 7t
-0000                .endm
-0000                 
-0000                .macro _BANG,
-0000                             ; 
-0000                	_toTMP				; 14t
-0000                 ld (HL),E			; 7
-0000                	INC HL			    ; 6
-0000                 ld (HL),D			; 7
+0000                 _toT			; 14t			x1 x2			T: x3
+0000                 EX DE,HL			; 4t			x1 x3 			T: x2
+0000                 EX(SP),HL			; 20t			x2 x3 			T: x1
+0000                 _Tfrom		; 14t			x2 x3 x1
 0000                .endm
 0000                 
 0000                .macro _TWODUP,
 0000                             ; 
-0000                 _Tdrop			    ; 10t		; x2				TMP: x1
-0000                 _Tdup			    ; 11t			; x1 x2				TMP: x1
-0000                	_dup				; 11t		; x1 x2 x2			TMP: x1
+0000                 _Tdrop			    ; 10t		; x2				T: x1
+0000                 _Tdup			    ; 11t			; x1 x2				T: x1
+0000                	_dup				; 11t		; x1 x2 x2			T: x1
 0000                	_Tdup			    ; 11t			; x1 x2 x1 x2
 0000                .endm
 0000                 
@@ -257,14 +309,14 @@
 0000                 
 0000                .macro _TWOSWAP,
 0000                             ; 
-0000                 _toTMP			    ; 14			x1 x2 x3			TMP x4
-0000                 _xNOS			    ; 19			x1 x4 x3			TMP x2
-0000                 _nip			    ; 12			x1 x3		N x4   		TMP x2
-0000                 _xTOS			    ; 4			x1 x2               		TMP x3
-0000                 _xNOS			    ; 19			x3 x2				TMP x1
-0000                 _xTOS			    ; 4			x3 x1				TMP x2
-0000                 UNnip			    ; 12			x3 x4 x1			TMP x1
-0000                 _TMPfrom			; 14			x3 x4 x1 x2
+0000                 _toT			    ; 14			x1 x2 x3			T x4
+0000                 EX(SP),HL			    ; 19			x1 x4 x3			T x2
+0000                 _nip			    ; 12			x1 x3		N x4   		T x2
+0000                 EX DE,HL			    ; 4			x1 x2               		T x3
+0000                 EX(SP),HL			    ; 19			x3 x2				T x1
+0000                 EX DE,HL			    ; 4			x3 x1				T x2
+0000                 UNnip			    ; 12			x3 x4 x1			T x1
+0000                 _Tfrom			; 14			x3 x4 x1 x2
 0000                .endm
 0000                 
 0000                .macro _TWOOVER,
@@ -272,33 +324,21 @@
 0000                 _dup				; 11t		x1 x2 x3 x4 x4
 0000                	_twoNip				; 24t		x1 x2 x4	      N: x3 x4
 0000                	_drop				; 10t		x1 x2	                  N: x2 x3 x4
-0000                	_Tdrop			    ; 10t		x2		      N: x1 x2 x3 x4  TMP = x1
-0000                 _twoUnnip			; 24t		x1 x2 x2   	      N: x3 x4            TMP = x1
-0000                	_twoUnnip			; 24t		x1 x2 x3 x4 x2                                TMP = x1
+0000                	_Tdrop			    ; 10t		x2		      N: x1 x2 x3 x4  T = x1
+0000                 _twoUnnip			; 24t		x1 x2 x2   	      N: x3 x4            T = x1
+0000                	_twoUnnip			; 24t		x1 x2 x3 x4 x2                                T = x1
 0000                 _Tdup			    ; 11t			x1 x2 x3 x4 x1 x2	
 0000                .endm
 0000                 
-0000                .macro _TWOAT,
+0000                .macro _TWONIP,
 0000                             ; 
-0000                	_dup				; 11t
-0000                	_cellPlus			; 11t
-0000                	_at				    ; 20t
-0000                	_swap				; 19t
-0000                	_at				    ; 20t
-0000                .endm
-0000                 
-0000                .macro _TWOBANG,
-0000                             ; 
-0000                	_swap				; 19t		x a y
-0000                	_over				; 16t		x a y a
-0000                	_bang			    ; 46t		x a
-0000                	_cellPlus			; 12t		x a+1
-0000                	_bang			    ; 46t
+0000                 _nip				; 12t
+0000                 _nip				; 12t
 0000                .endm
 0000                 
 0000                .macro _PLUS,
 0000                             ; 
-0000                 _toTMP
+0000                 _toT
 0000                 add HL,DE
 0000                 ex DE,HL
 0000                .endm
@@ -327,11 +367,17 @@
 0000                 dec DE
 0000                .endm
 0000                 
+0000                .macro _TWOPLUS,
+0000                             ; 
+0000                 _onePlus
+0000                 _onePlus
+0000                .endm
+0000                 
 0000                .macro _ISZERO,
 0000                             ; 
-0000                 ld A, E
-0000                 or D
-0000                 _drop
+0000                 ld A, E         ; 4t
+0000                 or D            ; 4t
+0000                 _drop           ; 10t
 0000                .endm
 0000                 
 0000                .macro _PUSH,src
@@ -353,532 +399,445 @@
 0000                 ld D,0
 0000                .endm
 0000                 
-0000                .macro _FETCH0,name
+0000                .macro _PUSHSTR,s1
 0000                             ; 
-0000                 _push name
-0000                 _at
-0000                .endm
-0000                 
-0000                .macro _STORE0,name
-0000                             ; 
-0000                 _push name
-0000                 _bang
-0000                .endm
-0000                 
-0000                .macro _FETCH,name
-0000                             ; 
-0000                 _push var_name
-0000                 _at
-0000                .endm
-0000                 
-0000                .macro _STORE,name
-0000                             ; 
-0000                 _push var_name
-0000                 _bang
-0000                .endm
-0000                 
-0000                .macro _PRINTSTRING,s1
-0000                             ; 
-0000                 _pushString s1
-0000                 call printStr
-0000                .endm
-0000                 
-0000                .macro _PUSHSTRING,s1
-0000                             ; 
-0000                 call litString
+0000                 call litStr
 0000                 .pstr s1
 0000                .endm
 0000                 
-0000                .macro _COUNT,
+0000                .macro _PRINT,s1
 0000                             ; 
-0000                 _dup
-0000                 _onePlus
-0000                 _swap
-0000                 _cat
+0000                 _pushStr s1
+0000                 call typex
+0000                .endm
+0000                 
+0000                .macro _PRINTLN,s1
+0000                             ; 
+0000                 _pushStr s1
+0000                 call type
+0000                 _cr
+0000                .endm
+0000                 
+0000                .macro _CR,
+0000                             ; 
+0000                 _pushStr "\r\n"
+0000                 call type
 0000                .endm
 0000                 
 0000                          .ORG   START_ROM   
 0000                RST00:       ; Reset
 0000   F3                     DI      ; Disable interrupts
-0001   C3 FC 01               JP   start   
+0001   C3 30 03               JP   start   
 0008                          .ORG   $0008   
 0008                RST08:       ; rst 38
 0008   C9                     RET      
 0038                          .ORG   $0038   
 0038                RST38:       ; rst 38
-0038   C3 03 01               JP   serialIn   
-003B                             ; resets the stacks so it must only be called from the top-level routine
-003B                INITKERNEL:      
-003B   DD E1                  POP   IX   
-003D                          ;*Macro unroll:  _initKernel
-003D   31 80 20               LD   SP,dStack   
-0040   01 00 21               LD   BC,rStack   
-0043                          ;*Macro unroll:  _push FALSE
-0043                          ;*Macro unroll:  _dup
-0043   D5                     PUSH   DE   
-0044   11 00 00               LD   DE,FALSE   
-0047                          ;*Macro unroll:  _store state
-0047                          ;*Macro unroll:  _push var_state
-0047                          ;*Macro unroll:  _dup
-0047   D5                     PUSH   DE   
-0048   11 53 22               LD   DE,var_state   
-004B                          ;*Macro unroll:  _bang
-004B                          ;*Macro unroll: 	_toTMP				; 14t
-004B   EB                     EX   DE,HL   ; 14t
-004C   D1                     POP   DE   
-004D   73                     LD   (HL),E   
-004E   23                     INC   HL   
-004F   72                     LD   (HL),D   
-0050                          ;*Macro unroll:  _push 10
-0050                          ;*Macro unroll:  _dup
-0050   D5                     PUSH   DE   
-0051   11 0A 00               LD   DE,10   
-0054                          ;*Macro unroll:  _store base
-0054                          ;*Macro unroll:  _push var_base
-0054                          ;*Macro unroll:  _dup
-0054   D5                     PUSH   DE   
-0055   11 4D 22               LD   DE,var_base   
-0058                          ;*Macro unroll:  _bang
-0058                          ;*Macro unroll: 	_toTMP				; 14t
-0058   EB                     EX   DE,HL   ; 14t
-0059   D1                     POP   DE   
-005A   73                     LD   (HL),E   
-005B   23                     INC   HL   
-005C   72                     LD   (HL),D   
-005D                          ;*Macro unroll:  _fetch0 initialLatest
-005D                          ;*Macro unroll:  _push initialLatest
-005D                          ;*Macro unroll:  _dup
-005D   D5                     PUSH   DE   
-005E   11 FA 01               LD   DE,initialLatest   
-0061                          ;*Macro unroll:  _at
-0061                          ;*Macro unroll:  _xTOS			; 4t
-0061   EB                     EX   DE,HL   ; 4t
-0062   5E                     LD   E,(HL)   
-0063   23                     INC   HL   
-0064   56                     LD   D,(HL)   
-0065                          ;*Macro unroll:  _store latest
-0065                          ;*Macro unroll:  _push var_latest
+0038   C3 BD 01               JP   serialIn   
+003B                             ; doNext ( -- ) ( r: idx ) followed by address of loop start
+003B                             ; Run time code for the single index loop.
+003B                DONEXT:      ; ~274t
+003B                          ;*Macro unroll:  _swap               ; 25t   ; ret
+003B                          ;*Macro unroll:  _toT			            ; 14t			x1			T: x2
+003B   EB                     EX   DE,HL   ; 14t			x1			T: x2
+003C   D1                     POP   DE   
+003D                          ;*Macro unroll:  _Tdup			            ; 11t			x2 x1
+003D   E5                     PUSH   HL   ; 11t			x2 x1
+003E   CD 69 02               CALL   rfrom   ; 60t   ; ret idx
+0041                          ;*Macro unroll:  _dup                ; 11t   ; ret idx idx
+0041   D5                     PUSH   DE   ; 11t   ; ret idx idx
+0042                          ;*Macro unroll:  _isZero             ; 18t   ; ret idx
+0042   7B                     LD   A,E   ; 18t   ; ret idx
+0043   B2                     OR   D   
+0044                          ;*Macro unroll:  _drop           ; 10t
+0044   D1                     POP   DE   ; 10t
+0045   28 0C                  JR   z,doNext1   ; 12t
+0047                          ;*Macro unroll:  _oneMinus           ; 4t    ; ret idx'
+0047   1B                     DEC   DE   ; 4t    ; ret idx'
+0048   CD 5E 02               CALL   tor   ; 60t   ; ret   R: idx'
+004B                          ;*Macro unroll:  _at                 ; 32t   ; ret'  R: idx'
+004B   EB                     EX   DE,HL   ; 32t   ; ret"  R: idx"
+004C   7E                     LD   A,(HL)   
+004D   23                     INC   HL   
+004E   66                     LD   H,(HL)   
+004F   5F                     LD   E,A   
+0050   EB                     EX   DE,HL   
+0051   18 03                  JR   doNext2   ; 12t
+0053                DONEXT1:      
+0053                          ;*Macro unroll:  _drop           ; 10t   ; ret
+0053   D1                     POP   DE   ; 10t   ; ret
+0054                          ;*Macro unroll:  _twoPlus            ; 12t   ; ret'
+0054                          ;*Macro unroll:  _onePlus
+0054   13                     INC   DE   
+0055                          ;*Macro unroll:  _onePlus
+0055   13                     INC   DE   
+0056                DONEXT2:      
+0056   EB                     EX   DE,HL   ; 4t    ;       R: idx"     HL: ret"
+0057                          ;*Macro unroll:  _drop               ; 10t   ;
+0057   D1                     POP   DE   ; 10t   ;
+0058   E9                     JP   (HL)   ; 4t
+0059                             ; resets the stacks so it must only be called from the top-level routine
+0059                INITKERNEL:      
+0059                          ;*Macro unroll:  FENTER
+0059   DD E1                  POP   IX   
+005B                          ;*Macro unroll:  _initKernel
+005B   31 80 20               LD   SP,dStack   
+005E   01 00 21               LD   BC,rStack   
+0061                          ;*Macro unroll:  _push FALSE
+0061                          ;*Macro unroll:  _dup
+0061   D5                     PUSH   DE   
+0062   11 00 00               LD   DE,FALSE   
+0065                          ;*Macro unroll:  _store state
+0065                          ;*Macro unroll:  _push var_state
 0065                          ;*Macro unroll:  _dup
 0065   D5                     PUSH   DE   
-0066   11 51 22               LD   DE,var_latest   
+0066   11 53 22               LD   DE,var_state   
 0069                          ;*Macro unroll:  _bang
-0069                          ;*Macro unroll: 	_toTMP				; 14t
+0069                          ;*Macro unroll: 	_toT				; 14t
 0069   EB                     EX   DE,HL   ; 14t
 006A   D1                     POP   DE   
 006B   73                     LD   (HL),E   
 006C   23                     INC   HL   
 006D   72                     LD   (HL),D   
-006E                          ;*Macro unroll:  _push START_USER
+006E                          ;*Macro unroll:  _push 10
 006E                          ;*Macro unroll:  _dup
 006E   D5                     PUSH   DE   
-006F   11 81 22               LD   DE,START_USER   
-0072                          ;*Macro unroll:  _store here
-0072                          ;*Macro unroll:  _push var_here
+006F   11 0A 00               LD   DE,10   
+0072                          ;*Macro unroll:  _store base
+0072                          ;*Macro unroll:  _push var_base
 0072                          ;*Macro unroll:  _dup
 0072   D5                     PUSH   DE   
-0073   11 4F 22               LD   DE,var_here   
+0073   11 4D 22               LD   DE,var_base   
 0076                          ;*Macro unroll:  _bang
-0076                          ;*Macro unroll: 	_toTMP				; 14t
+0076                          ;*Macro unroll: 	_toT				; 14t
 0076   EB                     EX   DE,HL   ; 14t
 0077   D1                     POP   DE   
 0078   73                     LD   (HL),E   
 0079   23                     INC   HL   
 007A   72                     LD   (HL),D   
-007B   DD E9                  JP   (IX)   
-007D                             ; c@ ( a -- n )
-007D                          ;*Macro unroll: PRIM 'c@',cAt,_cAt
-007D                          ;*Macro unroll:  CODE "c@",cAt
-007D                          ;*Macro unroll:  _CODE "c@", cAt, 0
-007D                HEADER_CAT:      
-007D   00 00                  DW   backLink   
-007F                BACKLINK:   .SET   HEADER_cAt   
-007F   00                     DB   0   
-0080   02 63 40               .PSTR   "c@"   
-0083                CAT:         
-0083   DD E1                  POP   IX   
-0085                          ;*Macro unroll:  _cAt
-0085                          ;*Macro unroll: 	_xTOS			; 4t
-0085   EB                     EX   DE,HL   ; 4t
-0086   5E                     LD   E,(HL)   
-0087   16 00                  LD   D,0   
-0089   DD E9                  JP   (IX)   
-008B                          ;*Macro unroll: _flags IMMED
-008B                SAVEASMPTR:   .SET   $   
-007F                          .ORG   backLink + 2   
-007F   40                     DB   IMMED   
-008B                          .ORG   saveAsmPtr   
-008B                             ; c! ( n a -- )
-008B                          ;*Macro unroll: PRIM 'c!',cBang,_cBang
-008B                          ;*Macro unroll:  CODE "c!",cBang
-008B                          ;*Macro unroll:  _CODE "c!", cBang, 0
-008B                HEADER_CBANG:      
-008B   7D 00                  DW   backLink   
-008D                BACKLINK:   .SET   HEADER_cBang   
-008D   00                     DB   0   
-008E   02 63 21               .PSTR   "c!"   
-0091                CBANG:       
-0091   DD E1                  POP   IX   
-0093                          ;*Macro unroll:  _cBang
-0093                          ;*Macro unroll: 	_toTMP			; 14t
-0093   EB                     EX   DE,HL   ; 14t
-0094   D1                     POP   DE   
-0095   73                     LD   (HL),E   
-0096                          ;*Macro unroll: 	_drop			; 10t
-0096   D1                     POP   DE   ; 10t
-0097   DD E9                  JP   (IX)   
-0099                             ; @ ( a -- n )
-0099                          ;*Macro unroll: PRIM "@",at,_at
-0099                          ;*Macro unroll:  CODE "@",at
-0099                          ;*Macro unroll:  _CODE "@", at, 0
-0099                HEADER_AT:      
-0099   8B 00                  DW   backLink   
-009B                BACKLINK:   .SET   HEADER_at   
-009B   00                     DB   0   
-009C   01 40                  .PSTR   "@"   
-009E                AT:          
-009E   DD E1                  POP   IX   
-00A0                          ;*Macro unroll:  _at
-00A0                          ;*Macro unroll:  _xTOS			; 4t
-00A0   EB                     EX   DE,HL   ; 4t
-00A1   5E                     LD   E,(HL)   
-00A2   23                     INC   HL   
-00A3   56                     LD   D,(HL)   
-00A4   DD E9                  JP   (IX)   
-00A6                             ; ! ( n a -- )
-00A6                          ;*Macro unroll: PRIM "!",bang,_bang
-00A6                          ;*Macro unroll:  CODE "!",bang
-00A6                          ;*Macro unroll:  _CODE "!", bang, 0
-00A6                HEADER_BANG:      
-00A6   99 00                  DW   backLink   
-00A8                BACKLINK:   .SET   HEADER_bang   
-00A8   00                     DB   0   
-00A9   01 21                  .PSTR   "!"   
-00AB                BANG:        
-00AB   DD E1                  POP   IX   
-00AD                          ;*Macro unroll:  _bang
-00AD                          ;*Macro unroll: 	_toTMP				; 14t
-00AD   EB                     EX   DE,HL   ; 14t
-00AE   D1                     POP   DE   
-00AF   73                     LD   (HL),E   
-00B0   23                     INC   HL   
-00B1   72                     LD   (HL),D   
-00B2   DD E9                  JP   (IX)   
-00B4                          ;*Macro unroll: CODE "emit", emit                            ; --
-00B4                          ;*Macro unroll:  _CODE "emit", emit, 0
-00B4                HEADER_EMIT:      
-00B4   A6 00                  DW   backLink   
-00B6                BACKLINK:   .SET   HEADER_emit   
-00B6   00                     DB   0   
-00B7   04 65 6D 69 74         .PSTR   "emit"   
-00BC                EMIT:        
-00BC   DD E1                  POP   IX   
-00BE   7B                     LD   A,E   
-00BF   CD 3F 01               CALL   putc   
-00C2                          ;*Macro unroll:  _drop
-00C2   D1                     POP   DE   
-00C3   DD E9                  JP   (IX)   
-00C5                          ;*Macro unroll: CODE ".", dot
-00C5                          ;*Macro unroll:  _CODE ".", dot, 0
-00C5                HEADER_DOT:      
-00C5   B4 00                  DW   backLink   
-00C7                BACKLINK:   .SET   HEADER_dot   
-00C7   00                     DB   0   
-00C8   01 2E                  .PSTR   "."   
-00CA                DOT:         
-00CA                          ;*Macro unroll:  ENTER
-00CA                          ;*Macro unroll:  _tdrop			    ; 10t	; x y 				TMP: a
-00CA   E1                     POP   HL   ; 10t	; x y 				TMP: a
-00CB                          ;*Macro unroll:  _rpush H,L		    ; 34t	; x y    	R: a	
-00CB   0B                     DEC   BC   ; 34t	; x y    	R: a	
-00CC   7C                     LD   A,H   
-00CD   02                     LD   (BC),A   
-00CE   0B                     DEC   BC   
-00CF   7D                     LD   A,L   
-00D0   02                     LD   (BC),A   
-00D1                          ;*Macro unroll:  _isZero
-00D1   7B                     LD   A,E   
-00D2   B2                     OR   D   
-00D3                          ;*Macro unroll:  _drop
-00D3   D1                     POP   DE   
-00D4   28 07                  JR   z,dot1   
-00D6                          ;*Macro unroll:  _pushc "?"
-00D6                          ;*Macro unroll:  _dup
-00D6   D5                     PUSH   DE   
-00D7   1E 3F                  LD   E,"?"   
-00D9   16 00                  LD   D,0   
-00DB   18 05                  JR   dot2   
-00DD                DOT1:        
-00DD                          ;*Macro unroll:  _pushc "0"
-00DD                          ;*Macro unroll:  _dup
-00DD   D5                     PUSH   DE   
-00DE   1E 30                  LD   E,"0"   
-00E0   16 00                  LD   D,0   
-00E2                DOT2:        
-00E2   CD BC 00               CALL   emit   
-00E5                          ;*Macro unroll:  EXIT
-00E5                          ;*Macro unroll: 	_rpop H,L			; 34t			R: 		TMP: a
-00E5                          ;*Macro unroll: 	_rpeek0 H,L			    ; 28t
-00E5   0A                     LD   A,(BC)   ; 28t
-00E6   6F                     LD   L,A   
-00E7   03                     INC   BC   
-00E8   0A                     LD   A,(BC)   
-00E9   67                     LD   H,A   
-00EA   03                     INC   BC   ; 34t			R: 		TMP: a
-00EB   E9                     JP   (HL)   
-00EC                             ; ; DE = TOS
-00EC                             ; ; T. (x -- )
-00EC                             ; ; report the test number to a numeric output device
-00EC                             ; CODE "T.",tesDot
-00EC                             ;     ENTER
-00EC                             ;     jr z, tesDot1
-00EC                             ;     _push $58
-00EC                             ;     call emit
-00EC                             ;     EXIT
-00EC                             ; tesDot1:
-00EC                             ;     _push $4F
-00EC                             ;     call emit
-00EC                             ;     EXIT
-00EC                             ; ; hasn ( x1 h0 -- h1 )
-00EC                             ; ; compute h1 by hashing x1 and h0
-00EC                             ; CODE "hash",testHash
-00EC                             ;     ENTER
-00EC                             ;     _swap
-00EC                             ;     _onePlus
-00EC                             ;     call xorr
-00EC                             ;     EXIT
-00EC                             ; ; hash-n ( x1 x2 ... xn n -- h )
-00EC                             ; ; hash n items from the stack and return the hash code
-00EC                             ; CODE "hash-n",tesHashN
-00EC                             ;     ENTER
-00EC                             ;     _push 0
-00EC                             ;     _toR
-00EC                             ; tesHashN1:
-00EC                             ;     _dup
-00EC                             ;     _isZero
-00EC                             ;     jr z,tesHashN2
-00EC                             ;     _swap
-00EC                             ;     _rFrom
-00EC                             ;     call tesHash
-00EC                             ;     _toR
-00EC                             ;     _oneMinus
-00EC                             ;     jr tesHashN1
-00EC                             ; tesHashN2:
-00EC                             ;     _drop
-00EC                             ;     _rFrom
-00EC                             ;     EXIT
-00EC                             ; ; Tstart ( -- )
-00EC                             ; ; start testing
-00EC                             ; CODE "Tstart",tesStart
-00EC                             ;     ENTER
-00EC                             ;     _push 0
-00EC                             ;     _store tesCount
-00EC                             ;     EXIT
-00EC                             ; ; T{ ( -- )
-00EC                             ; ; start a unit test
-00EC                             ; ;  Tcount @ 1+ dup T. Tcount !
-00EC                             ; ;  depth Tdepth !
-00EC                             ; CODE "T{",tesEnter
-00EC                             ;     ENTER
-00EC                             ;     _fetch testCnt
-00EC                             ;     _onePlus
-00EC                             ;     _dup
-00EC                             ;     call tesDot
-00EC                             ;     _store tesCount
-00EC                             ;     call depth
-00EC                             ;     _store tesDepth
-00EC                             ;     EXIT
-00EC                             ; ; }T ( y1 y2 ... yn -- hy )
-00EC                             ; ; finish a unit test,
-00EC                             ; CODE "}T",tesExit
-00EC                             ;     ENTER
-00EC                             ;     call depth
-00EC                             ;     _fetch tesDepth
-00EC                             ;     call minus
-00EC                             ;     call tesHashN
-00EC                             ;     call depth
-00EC                             ;     _store tesDepth
-00EC                             ;     EXIT
-00EC                             ; ; == ( hy x1 x2 ... xn -- )
-00EC                             ; ; compare actual output with expected output
-00EC                             ; CODE "==",tesEQ
-00EC                             ;     ENTER
-00EC                             ;     call depth
-00EC                             ;     _fetch tesDepth
-00EC                             ;     call minus
-00EC                             ;     call tesHashN
-00EC                             ;     call equal
-00EC                             ;     _isZero
-00EC                             ;     jr z,tesQ1
-00EC                             ;     halt
-00EC                             ; tesQ1:
-00EC                             ;     EXIT
-00EC                             ; ; Tend ( -- )
-00EC                             ; ; signal end of testing
-00EC                             ; CODE "Tend",tesEnd
-00EC                             ;     ENTER
-00EC                             ;     _push -1
-00EC                             ;     call tesDot
-00EC                             ;     EXIT
-00EC                SER_EMPTYSIZE:   EQU   5   
-00EC                SER_FULLSIZE:   EQU   30H   
-00EC                IO_CTRL:   EQU   $80   
-00EC                IO_DATA:   EQU   $81   
-00EC                RTS_HIGH:   EQU   $D6   ; 11010110
-00EC                RTS_LOW:   EQU   $96   ; 10010110
-00EC                PORT_STATUS:   EQU   $04   
-00EC                PORT_DATA:   EQU   $03   
-00EC                             ; destroys: HL
-00EC                INITSERIAL:      
-00EC   21 00 00               LD   HL,0   
-00EF   22 04 21               LD   (serbufused),HL   
-00F2   21 06 21               LD   HL,serbuf   
-00F5   22 00 21               LD   (serinptr),HL   
-00F8   22 02 21               LD   (serrdptr),HL   
-00FB   3E 96                  LD   A,RTS_LOW   
-00FD   D3 80                  OUT   (IO_CTRL),A   
-00FF   ED 56                  IM   1   
-0101   FB                     EI      
-0102   C9                     RET      
-0103                SERIALIN:      
-0103   F5                     PUSH   AF   
-0104   E5                     PUSH   HL   
-0105   DB 80                  IN   A,(IO_CTRL)   
-0107   E6 01                  AND   $01   
-0109   28 05                  JR   z,serialIn1   
-010B   DB 81                  IN   A,(IO_DATA)   
-010D   CD 14 01               CALL   serialIn2   
-0110                SERIALIN1:      
-0110   E1                     POP   HL   
-0111   F1                     POP   AF   
-0112   FB                     EI      
-0113   C9                     RET      
-0114                             ; destroys: HL
-0114                SERIALIN2:      
-0114   F5                     PUSH   AF   
-0115   3A 04 21               LD   A,(serBufUsed)   
-0118   FE 3F                  CP   SER_BUFSIZE   
-011A   20 02                  JR   nz,serialIn21   
-011C   F1                     POP   AF   
-011D   C9                     RET      
-011E                SERIALIN21:      
-011E   2A 00 21               LD   HL,(serInPtr)   
-0121   23                     INC   HL   
-0122   7D                     LD   A,L   ; Only need to check low byte becasuse lineBuf<256 bytes
-0123   FE 45                  CP   (serBuf + SER_BUFSIZE) & $FF   
-0125   20 03                  JR   nz,serialIn22   
-0127   21 06 21               LD   HL,serBuf   
-012A                SERIALIN22:      
-012A   22 00 21               LD   (serInPtr),HL   
-012D   F1                     POP   AF   
-012E   77                     LD   (HL),A   
-012F   3A 04 21               LD   A,(serBufUsed)   
-0132   3C                     INC   A   
-0133   32 04 21               LD   (serBufUsed),A   
-0136   FE 30                  CP   SER_FULLSIZE   
-0138   38 04                  JR   c,serialIn23   
-013A   3E D6                  LD   A,RTS_HIGH   
-013C   D3 80                  OUT   (IO_CTRL),A   
-013E                SERIALIN23:      
-013E   C9                     RET      
-013F                             ; 
-013F                             ; putc - output a character
-013F                             ; params: A = char to output
-013F                             ; 
-013F                PUTC:        
-013F   F5                     PUSH   AF   ; Store character
-0140                PUTC0:       
-0140   DB 80                  IN   A,(IO_CTRL)   ; Status byte
-0142   CB 4F                  BIT   1,A   ; Set Zero flag if still transmitting character
-0144   28 FA                  JR   z,putc0   
-0146   F1                     POP   AF   ; Retrieve character
-0147   D3 81                  OUT   (IO_DATA),A   ; Output the character
-0149   C9                     RET      
-014A                             ; 
-014A                             ; serReady - check if there is input waiting to be read
-014A                             ; flags: NZ if input ready
-014A                             ; 
-014A                SERREADY:      
-014A   3A 04 21               LD   A,(serBufUsed)   
-014D   FE 00                  CP   $0   
-014F   C9                     RET      
-0150                             ; 
-0150                             ; getc - input
-0150                             ; returns: A = input char
-0150                             ; 
-0150                GETC:        
-0150   E5                     PUSH   HL   
-0151                          IF   TESTMODE   
-0151   2A 55 22               LD   HL,(charPtr)   
-0154   7E                     LD   A,(HL)   
-0155   23                     INC   HL   
-0156   22 55 22               LD   (charPtr),HL   
-0159                          ELSE      
-                    GETC0:       
-                              CALL   serReady   
-                              JR   z,getc0   
-                              LD   HL,(serRdPtr)   
-                              INC   HL   
-                              LD   A,L   ; Only need to check low byte because lineBuf<256 bytes
-                              CP   (serBuf + SER_BUFSIZE) & $FF   
-                              JR   nz,getc21   
-                              LD   HL,serBuf   
-                    GETC21:      
-                              DI      
-                              LD   (serRdPtr),HL   
-                              LD   A,(serBufUsed)   
-                              DEC   A   
-                              LD   (serBufUsed),A   
-                              CP   SER_EMPTYSIZE   
-                              JR   nc,getc22   
-                              LD   A,RTS_LOW   
-                              OUT   (IO_CTRL),A   
-                    GETC22:      
-                              LD   A,(HL)   
-                              EI      
-0159                          ENDIF      
-0159   E1                     POP   HL   
-015A   C9                     RET      
-015B                             ; BC = RP
-015B                             ; HL = TOS
-015B                TOR:         
-015B   DD E1                  POP   IX   
-015D                          ;*Macro unroll:  _rpush D,E		; 34t		x		R: x
-015D   0B                     DEC   BC   ; 34t		x		R: x
-015E   7A                     LD   A,D   
-015F   02                     LD   (BC),A   
-0160   0B                     DEC   BC   
-0161   7B                     LD   A,E   
-0162   02                     LD   (BC),A   
-0163                          ;*Macro unroll: 	_drop			; 10t				R: x
-0163   D1                     POP   DE   ; 10t				R: x
-0164   DD E9                  JP   (IX)   
-0166                RFROM:       
+007B                          ;*Macro unroll:  _fetch0 initialLatest
+007B                          ;*Macro unroll:  _push initialLatest
+007B                          ;*Macro unroll:  _dup
+007B   D5                     PUSH   DE   
+007C   11 2E 03               LD   DE,initialLatest   
+007F                          ;*Macro unroll:  _at
+007F   EB                     EX   DE,HL   
+0080   7E                     LD   A,(HL)   
+0081   23                     INC   HL   
+0082   66                     LD   H,(HL)   
+0083   5F                     LD   E,A   
+0084   EB                     EX   DE,HL   
+0085                          ;*Macro unroll:  _store latest
+0085                          ;*Macro unroll:  _push var_latest
+0085                          ;*Macro unroll:  _dup
+0085   D5                     PUSH   DE   
+0086   11 51 22               LD   DE,var_latest   
+0089                          ;*Macro unroll:  _bang
+0089                          ;*Macro unroll: 	_toT				; 14t
+0089   EB                     EX   DE,HL   ; 14t
+008A   D1                     POP   DE   
+008B   73                     LD   (HL),E   
+008C   23                     INC   HL   
+008D   72                     LD   (HL),D   
+008E                          ;*Macro unroll:  _push START_USER
+008E                          ;*Macro unroll:  _dup
+008E   D5                     PUSH   DE   
+008F   11 78 22               LD   DE,START_USER   
+0092                          ;*Macro unroll:  _store here
+0092                          ;*Macro unroll:  _push var_here
+0092                          ;*Macro unroll:  _dup
+0092   D5                     PUSH   DE   
+0093   11 4F 22               LD   DE,var_here   
+0096                          ;*Macro unroll:  _bang
+0096                          ;*Macro unroll: 	_toT				; 14t
+0096   EB                     EX   DE,HL   ; 14t
+0097   D1                     POP   DE   
+0098   73                     LD   (HL),E   
+0099   23                     INC   HL   
+009A   72                     LD   (HL),D   
+009B                          ;*Macro unroll:  FEXIT
+009B   DD E9                  JP   (IX)   
+009D                             ; and    x1 x2 -- x3            logical xor
+009D                          ;*Macro unroll: CODE "and",andd	        ; bitwise xor
+009D                          ;*Macro unroll:  _CODE "and", andd, 0
+009D                HEADER_ANDD:      
+009D   00 00                  DW   backLink   
+009F                BACKLINK:   .SET   HEADER_andd   
+009F   00                     DB   0   
+00A0   03 61 6E 64            .PSTR   "and"   
+00A4                ANDD:        
+00A4                          ;*Macro unroll:  FENTER
+00A4   DD E1                  POP   IX   
+00A6   D1                     POP   DE   
+00A7   7C                     LD   A,H   
+00A8   AA                     XOR   D   
+00A9   67                     LD   H,A   
+00AA   7D                     LD   A,L   
+00AB   AB                     XOR   E   
+00AC   6F                     LD   L,A   
+00AD                          ;*Macro unroll:  FEXIT
+00AD   DD E9                  JP   (IX)   
+00AF                             ; or    x1 x2 -- x3            logical xor
+00AF                          ;*Macro unroll: CODE "or",orr	        ; bitwise xor
+00AF                          ;*Macro unroll:  _CODE "or", orr, 0
+00AF                HEADER_ORR:      
+00AF   9D 00                  DW   backLink   
+00B1                BACKLINK:   .SET   HEADER_orr   
+00B1   00                     DB   0   
+00B2   02 6F 72               .PSTR   "or"   
+00B5                ORR:         
+00B5                          ;*Macro unroll:  FENTER
+00B5   DD E1                  POP   IX   
+00B7   D1                     POP   DE   
+00B8   7C                     LD   A,H   
+00B9   AA                     XOR   D   
+00BA   67                     LD   H,A   
+00BB   7D                     LD   A,L   
+00BC   AB                     XOR   E   
+00BD   6F                     LD   L,A   
+00BE                          ;*Macro unroll:  FEXIT
+00BE   DD E9                  JP   (IX)   
+00C0                             ; xor    x1 x2 -- x3            logical xor
+00C0                          ;*Macro unroll: CODE "xor",xorr	        ; bitwise xor
+00C0                          ;*Macro unroll:  _CODE "xor", xorr, 0
+00C0                HEADER_XORR:      
+00C0   AF 00                  DW   backLink   
+00C2                BACKLINK:   .SET   HEADER_xorr   
+00C2   00                     DB   0   
+00C3   03 78 6F 72            .PSTR   "xor"   
+00C7                XORR:        
+00C7                          ;*Macro unroll:  FENTER
+00C7   DD E1                  POP   IX   
+00C9   D1                     POP   DE   
+00CA   7C                     LD   A,H   
+00CB   AA                     XOR   D   
+00CC   67                     LD   H,A   
+00CD   7D                     LD   A,L   
+00CE   AB                     XOR   E   
+00CF   6F                     LD   L,A   
+00D0                          ;*Macro unroll:  FEXIT
+00D0   DD E9                  JP   (IX)   
+00D2                             ; c@ ( a -- n )
+00D2                          ;*Macro unroll: PRIM 'c@',cAt,_cAt
+00D2                          ;*Macro unroll:  CODE "c@",cAt
+00D2                          ;*Macro unroll:  _CODE "c@", cAt, 0
+00D2                HEADER_CAT:      
+00D2   C0 00                  DW   backLink   
+00D4                BACKLINK:   .SET   HEADER_cAt   
+00D4   00                     DB   0   
+00D5   02 63 40               .PSTR   "c@"   
+00D8                CAT:         
+00D8                          ;*Macro unroll:  FENTER
+00D8   DD E1                  POP   IX   
+00DA                          ;*Macro unroll:  _cAt
+00DA   EB                     EX   DE,HL   
+00DB   6E                     LD   L,(HL)   
+00DC   26 00                  LD   H,0   
+00DE   EB                     EX   DE,HL   
+00DF                          ;*Macro unroll: 	FEXIT			    ; 4t;
+00DF   DD E9                  JP   (IX)   ; 4t;
+00E1                          ;*Macro unroll: _flags IMMED
+00E1                SAVEASMPTR:   .SET   $   
+00D4                          .ORG   backLink + 2   
+00D4   40                     DB   IMMED   
+00E1                          .ORG   saveAsmPtr   
+00E1                             ; c! ( n a -- )
+00E1                          ;*Macro unroll: PRIM 'c!',cBang,_cBang
+00E1                          ;*Macro unroll:  CODE "c!",cBang
+00E1                          ;*Macro unroll:  _CODE "c!", cBang, 0
+00E1                HEADER_CBANG:      
+00E1   D2 00                  DW   backLink   
+00E3                BACKLINK:   .SET   HEADER_cBang   
+00E3   00                     DB   0   
+00E4   02 63 21               .PSTR   "c!"   
+00E7                CBANG:       
+00E7                          ;*Macro unroll:  FENTER
+00E7   DD E1                  POP   IX   
+00E9                          ;*Macro unroll:  _cBang
+00E9                          ;*Macro unroll: 	_toT			; 14t
+00E9   EB                     EX   DE,HL   ; 14t
+00EA   D1                     POP   DE   
+00EB   73                     LD   (HL),E   
+00EC                          ;*Macro unroll: 	_drop			; 10t
+00EC   D1                     POP   DE   ; 10t
+00ED                          ;*Macro unroll: 	FEXIT			    ; 4t;
+00ED   DD E9                  JP   (IX)   ; 4t;
+00EF                             ; @ ( a -- n )
+00EF                          ;*Macro unroll: PRIM "@",at,_at
+00EF                          ;*Macro unroll:  CODE "@",at
+00EF                          ;*Macro unroll:  _CODE "@", at, 0
+00EF                HEADER_AT:      
+00EF   E1 00                  DW   backLink   
+00F1                BACKLINK:   .SET   HEADER_at   
+00F1   00                     DB   0   
+00F2   01 40                  .PSTR   "@"   
+00F4                AT:          
+00F4                          ;*Macro unroll:  FENTER
+00F4   DD E1                  POP   IX   
+00F6                          ;*Macro unroll:  _at
+00F6   EB                     EX   DE,HL   
+00F7   7E                     LD   A,(HL)   
+00F8   23                     INC   HL   
+00F9   66                     LD   H,(HL)   
+00FA   5F                     LD   E,A   
+00FB   EB                     EX   DE,HL   
+00FC                          ;*Macro unroll: 	FEXIT			    ; 4t;
+00FC   DD E9                  JP   (IX)   ; 4t;
+00FE                             ; ! ( n a -- )
+00FE                          ;*Macro unroll: PRIM "!",bang,_bang
+00FE                          ;*Macro unroll:  CODE "!",bang
+00FE                          ;*Macro unroll:  _CODE "!", bang, 0
+00FE                HEADER_BANG:      
+00FE   EF 00                  DW   backLink   
+0100                BACKLINK:   .SET   HEADER_bang   
+0100   00                     DB   0   
+0101   01 21                  .PSTR   "!"   
+0103                BANG:        
+0103                          ;*Macro unroll:  FENTER
+0103   DD E1                  POP   IX   
+0105                          ;*Macro unroll:  _bang
+0105                          ;*Macro unroll: 	_toT				; 14t
+0105   EB                     EX   DE,HL   ; 14t
+0106   D1                     POP   DE   
+0107   73                     LD   (HL),E   
+0108   23                     INC   HL   
+0109   72                     LD   (HL),D   
+010A                          ;*Macro unroll: 	FEXIT			    ; 4t;
+010A   DD E9                  JP   (IX)   ; 4t;
+010C                          ;*Macro unroll: CODE ".", dot
+010C                          ;*Macro unroll:  _CODE ".", dot, 0
+010C                HEADER_DOT:      
+010C   FE 00                  DW   backLink   
+010E                BACKLINK:   .SET   HEADER_dot   
+010E   00                     DB   0   
+010F   01 2E                  .PSTR   "."   
+0111                DOT:         
+0111                          ;*Macro unroll:  ENTER
+0111                          ;*Macro unroll:  _tdrop			    ; 10t	; x y 				TMP: a
+0111   E1                     POP   HL   ; 10t	; x y 				TMP: a
+0112                          ;*Macro unroll:  _rpush H,L		    ; 34t	; x y    	R: a	
+0112   0B                     DEC   BC   ; 34t	; x y    	R: a	
+0113   7C                     LD   A,H   
+0114   02                     LD   (BC),A   
+0115   0B                     DEC   BC   
+0116   7D                     LD   A,L   
+0117   02                     LD   (BC),A   
+0118                          ;*Macro unroll:  _isZero
+0118   7B                     LD   A,E   
+0119   B2                     OR   D   
+011A                          ;*Macro unroll:  _drop           ; 10t
+011A   D1                     POP   DE   ; 10t
+011B   28 07                  JR   z,dot1   
+011D                          ;*Macro unroll:  _pushc "?"
+011D                          ;*Macro unroll:  _dup
+011D   D5                     PUSH   DE   
+011E   1E 3F                  LD   E,"?"   
+0120   16 00                  LD   D,0   
+0122   18 05                  JR   dot2   
+0124                DOT1:        
+0124                          ;*Macro unroll:  _pushc "0"
+0124                          ;*Macro unroll:  _dup
+0124   D5                     PUSH   DE   
+0125   1E 30                  LD   E,"0"   
+0127   16 00                  LD   D,0   
+0129                DOT2:        
+0129   CD 01 02               CALL   emit   
+012C                          ;*Macro unroll:  EXIT
+012C                          ;*Macro unroll: 	_rpop H,L			; 34t			R: 		TMP: a
+012C                          ;*Macro unroll: 	_rpeek0 H,L			    ; 28t
+012C   0A                     LD   A,(BC)   ; 28t
+012D   6F                     LD   L,A   
+012E   03                     INC   BC   
+012F   0A                     LD   A,(BC)   
+0130   67                     LD   H,A   
+0131   03                     INC   BC   ; 34t			R: 		TMP: a
+0132   E9                     JP   (HL)   
+0133                             ; type  ( adr n -- )
+0133                             ; Output n characters from adr.
+0133                          ;*Macro unroll: CODE 'type',type
+0133                          ;*Macro unroll:  _CODE "type", type, 0
+0133                HEADER_TYPE:      
+0133   0C 01                  DW   backLink   
+0135                BACKLINK:   .SET   HEADER_type   
+0135   00                     DB   0   
+0136   04 74 79 70 65         .PSTR   "type"   
+013B                TYPE:        
+013B                          ;*Macro unroll:  ENTER
+013B                          ;*Macro unroll:  _tdrop			    ; 10t	; x y 				TMP: a
+013B   E1                     POP   HL   ; 10t	; x y 				TMP: a
+013C                          ;*Macro unroll:  _rpush H,L		    ; 34t	; x y    	R: a	
+013C   0B                     DEC   BC   ; 34t	; x y    	R: a	
+013D   7C                     LD   A,H   
+013E   02                     LD   (BC),A   
+013F   0B                     DEC   BC   
+0140   7D                     LD   A,L   
+0141   02                     LD   (BC),A   
+0142   E1                     POP   HL   ; len   HL = ptr
+0143                TYPE1:       
+0143                          ;*Macro unroll:  _dup
+0143   D5                     PUSH   DE   
+0144                          ;*Macro unroll:  _isZero             ; len   HL = ptr
+0144   7B                     LD   A,E   ; len   HL = ptr
+0145   B2                     OR   D   
+0146                          ;*Macro unroll:  _drop           ; 10t
+0146   D1                     POP   DE   ; 10t
+0147   28 0F                  JR   z,type2   
+0149   EB                     EX   DE,HL   ; ptr   HL = len
+014A                          ;*Macro unroll:  _dup                ; ptr ptr
+014A   D5                     PUSH   DE   ; ptr ptr
+014B                          ;*Macro unroll:  _cat                ; ptr c
+014B   EB                     EX   DE,HL   ; ptr c
+014C   6E                     LD   L,(HL)   
+014D   26 00                  LD   H,0   
+014F   EB                     EX   DE,HL   
+0150   CD 01 02               CALL   emit   ; ptr
+0153                          ;*Macro unroll:  _onePlus            ; ptr+1
+0153   13                     INC   DE   ; ptr+1
+0154   EB                     EX   DE,HL   
+0155                          ;*Macro unroll:  _oneMinus           ; len-1
+0155   1B                     DEC   DE   ; len-1
+0156   18 EB                  JR   type1   
+0158                TYPE2:       
+0158                          ;*Macro unroll:  _drop
+0158   D1                     POP   DE   
+0159                          ;*Macro unroll:  EXIT
+0159                          ;*Macro unroll: 	_rpop H,L			; 34t			R: 		TMP: a
+0159                          ;*Macro unroll: 	_rpeek0 H,L			    ; 28t
+0159   0A                     LD   A,(BC)   ; 28t
+015A   6F                     LD   L,A   
+015B   03                     INC   BC   
+015C   0A                     LD   A,(BC)   
+015D   67                     LD   H,A   
+015E   03                     INC   BC   ; 34t			R: 		TMP: a
+015F   E9                     JP   (HL)   
+0160                          ;*Macro unroll: PRIM "cr",cr,_cr
+0160                          ;*Macro unroll:  CODE "cr",cr
+0160                          ;*Macro unroll:  _CODE "cr", cr, 0
+0160                HEADER_CR:      
+0160   33 01                  DW   backLink   
+0162                BACKLINK:   .SET   HEADER_cr   
+0162   00                     DB   0   
+0163   02 63 72               .PSTR   "cr"   
+0166                CR:          
+0166                          ;*Macro unroll:  FENTER
 0166   DD E1                  POP   IX   
-0168                          ;*Macro unroll: 	_dup			; 11t			
-0168   D5                     PUSH   DE   ; 11t			
-0169                          ;*Macro unroll:  _rpop	D,E		; 34t		x 		
-0169                          ;*Macro unroll: 	_rpeek0 D,E			    ; 28t
-0169   0A                     LD   A,(BC)   ; 28t
-016A   5F                     LD   E,A   
-016B   03                     INC   BC   
-016C   0A                     LD   A,(BC)   
-016D   57                     LD   D,A   
-016E   03                     INC   BC   ; 34t		x 		
-016F   DD E9                  JP   (IX)   
-0171                RAT:         
-0171   DD E1                  POP   IX   
-0173                          ;*Macro unroll: 	_dup			; 11
-0173   D5                     PUSH   DE   ; 11
-0174                          ;*Macro unroll:  _rpeek D,E		; 34t				R: x		TMP x
-0174                          ;*Macro unroll: 	_rpeek0 D,E			    ; 28t
-0174   0A                     LD   A,(BC)   ; 28t
-0175   5F                     LD   E,A   
-0176   03                     INC   BC   
-0177   0A                     LD   A,(BC)   
-0178   57                     LD   D,A   
-0179   0B                     DEC   BC   ; 34t				R: x		TMP x
-017A   DD E9                  JP   (IX)   
-017C                TWOTOR:      ; d --
+0168                          ;*Macro unroll:  _cr
+0168                          ;*Macro unroll:  _pushStr "\r\n"
+0168   CD E0 02               CALL   litStr   
+016B   02 0D 0A               .PSTR   "\r\n"   
+016E   CD 3B 01               CALL   type   
+0171                          ;*Macro unroll: 	FEXIT			    ; 4t;
+0171   DD E9                  JP   (IX)   ; 4t;
+0173                             ; type  ( adr n -- )
+0173                             ; Output n characters from adr.
+0173                          ;*Macro unroll: CODE 'typex',typex
+0173                          ;*Macro unroll:  _CODE "typex", typex, 0
+0173                HEADER_TYPEX:      
+0173   60 01                  DW   backLink   
+0175                BACKLINK:   .SET   HEADER_typex   
+0175   00                     DB   0   
+0176   05 74 79 70 65 78      .PSTR   "typex"   
+017C                TYPEX:       
 017C                          ;*Macro unroll:  ENTER
 017C                          ;*Macro unroll:  _tdrop			    ; 10t	; x y 				TMP: a
 017C   E1                     POP   HL   ; 10t	; x y 				TMP: a
@@ -889,236 +848,729 @@
 0180   0B                     DEC   BC   
 0181   7D                     LD   A,L   
 0182   02                     LD   (BC),A   
-0183                          ;*Macro unroll:  _swap			
-0183                          ;*Macro unroll:  _toTMP			            ; 14t			x1			TMP: x2
-0183   EB                     EX   DE,HL   ; 14t			x1			TMP: x2
-0184   D1                     POP   DE   
-0185                          ;*Macro unroll:  _Tdup			            ; 11t			x2 x1
-0185   E5                     PUSH   HL   ; 11t			x2 x1
-0186   CD 5B 01               CALL   toR   
-0189   CD 5B 01               CALL   toR   
-018C                          ;*Macro unroll:  EXIT
-018C                          ;*Macro unroll: 	_rpop H,L			; 34t			R: 		TMP: a
-018C                          ;*Macro unroll: 	_rpeek0 H,L			    ; 28t
-018C   0A                     LD   A,(BC)   ; 28t
-018D   6F                     LD   L,A   
-018E   03                     INC   BC   
-018F   0A                     LD   A,(BC)   
-0190   67                     LD   H,A   
-0191   03                     INC   BC   ; 34t			R: 		TMP: a
-0192   E9                     JP   (HL)   
-0193                TWORFROM:      ; -- d
-0193                          ;*Macro unroll:  ENTER
-0193                          ;*Macro unroll:  _tdrop			    ; 10t	; x y 				TMP: a
-0193   E1                     POP   HL   ; 10t	; x y 				TMP: a
-0194                          ;*Macro unroll:  _rpush H,L		    ; 34t	; x y    	R: a	
-0194   0B                     DEC   BC   ; 34t	; x y    	R: a	
-0195   7C                     LD   A,H   
-0196   02                     LD   (BC),A   
-0197   0B                     DEC   BC   
-0198   7D                     LD   A,L   
-0199   02                     LD   (BC),A   
-019A   CD 66 01               CALL   rFrom   
-019D   CD 66 01               CALL   rFrom   
-01A0                          ;*Macro unroll:  _swap		
-01A0                          ;*Macro unroll:  _toTMP			            ; 14t			x1			TMP: x2
-01A0   EB                     EX   DE,HL   ; 14t			x1			TMP: x2
-01A1   D1                     POP   DE   
-01A2                          ;*Macro unroll:  _Tdup			            ; 11t			x2 x1
-01A2   E5                     PUSH   HL   ; 11t			x2 x1
-01A3                          ;*Macro unroll:  EXIT
-01A3                          ;*Macro unroll: 	_rpop H,L			; 34t			R: 		TMP: a
-01A3                          ;*Macro unroll: 	_rpeek0 H,L			    ; 28t
-01A3   0A                     LD   A,(BC)   ; 28t
-01A4   6F                     LD   L,A   
-01A5   03                     INC   BC   
-01A6   0A                     LD   A,(BC)   
-01A7   67                     LD   H,A   
-01A8   03                     INC   BC   ; 34t			R: 		TMP: a
-01A9   E9                     JP   (HL)   
-01AA                TWORAT:      ; a b -- a b x y  	R: x y
-01AA                          ;*Macro unroll:  ENTER
-01AA                          ;*Macro unroll:  _tdrop			    ; 10t	; x y 				TMP: a
-01AA   E1                     POP   HL   ; 10t	; x y 				TMP: a
-01AB                          ;*Macro unroll:  _rpush H,L		    ; 34t	; x y    	R: a	
-01AB   0B                     DEC   BC   ; 34t	; x y    	R: a	
-01AC   7C                     LD   A,H   
-01AD   02                     LD   (BC),A   
-01AE   0B                     DEC   BC   
-01AF   7D                     LD   A,L   
-01B0   02                     LD   (BC),A   
-01B1   CD 66 01               CALL   rFrom   ; 44t		a b y 		R: x
-01B4   CD 71 01               CALL   rAt   ; 44t		a b y x		R: x		TMP: x
-01B7                          ;*Macro unroll:  _swap           ; 20t		a b x y
-01B7                          ;*Macro unroll:  _toTMP			            ; 14t			x1			TMP: x2
-01B7   EB                     EX   DE,HL   ; 14t			x1			TMP: x2
-01B8   D1                     POP   DE   
-01B9                          ;*Macro unroll:  _Tdup			            ; 11t			x2 x1
-01B9   E5                     PUSH   HL   ; 11t			x2 x1
-01BA                          ;*Macro unroll:  _dup            ; 10t		a b x y y	R: x
-01BA   D5                     PUSH   DE   ; 10t		a b x y y	R: x
-01BB   CD 5B 01               CALL   toR   ; 45t		a b x y		R: x y
-01BE                          ;*Macro unroll:  EXIT
-01BE                          ;*Macro unroll: 	_rpop H,L			; 34t			R: 		TMP: a
-01BE                          ;*Macro unroll: 	_rpeek0 H,L			    ; 28t
-01BE   0A                     LD   A,(BC)   ; 28t
-01BF   6F                     LD   L,A   
-01C0   03                     INC   BC   
-01C1   0A                     LD   A,(BC)   
-01C2   67                     LD   H,A   
-01C3   03                     INC   BC   ; 34t			R: 		TMP: a
-01C4   E9                     JP   (HL)   
-01C5                             ;      -- c-addr u
-01C5                             ; is followed by a literal Packed (Pascal) string
-01C5                LITSTRING:      
-01C5                          ;*Macro unroll:  ENTER
-01C5                          ;*Macro unroll:  _tdrop			    ; 10t	; x y 				TMP: a
-01C5   E1                     POP   HL   ; 10t	; x y 				TMP: a
-01C6                          ;*Macro unroll:  _rpush H,L		    ; 34t	; x y    	R: a	
-01C6   0B                     DEC   BC   ; 34t	; x y    	R: a	
-01C7   7C                     LD   A,H   
-01C8   02                     LD   (BC),A   
-01C9   0B                     DEC   BC   
-01CA   7D                     LD   A,L   
-01CB   02                     LD   (BC),A   
-01CC   CD 66 01               CALL   rFrom   ; addr
-01CF   CD ED 01               CALL   count   ; addr+1 len
-01D2                          ;*Macro unroll:  _twoDup         ; addr+1 len addr+1 len
-01D2                          ;*Macro unroll:  _Tdrop			    ; 10t		; x2				TMP: x1
-01D2   E1                     POP   HL   ; 10t		; x2				TMP: x1
-01D3                          ;*Macro unroll:  _Tdup			    ; 11t			; x1 x2				TMP: x1
-01D3   E5                     PUSH   HL   ; 11t			; x1 x2				TMP: x1
-01D4                          ;*Macro unroll: 	_dup				; 11t		; x1 x2 x2			TMP: x1
-01D4   D5                     PUSH   DE   ; 11t		; x1 x2 x2			TMP: x1
-01D5                          ;*Macro unroll: 	_Tdup			    ; 11t			; x1 x2 x1 x2
-01D5   E5                     PUSH   HL   ; 11t			; x1 x2 x1 x2
-01D6                          ;*Macro unroll:  _plus           ; addr+1 len addr+len+1
-01D6                          ;*Macro unroll:  _toTMP
-01D6   EB                     EX   DE,HL   
-01D7   D1                     POP   DE   
-01D8   19                     ADD   HL,DE   ; addr+1 len addr+len+1
-01D9   EB                     EX   DE,HL   
-01DA   CD 5B 01               CALL   toR   ; addr+1 len
-01DD                          ;*Macro unroll:  EXIT            ; TODO: optimise to LD HL,BC jp (HL)
-01DD                          ;*Macro unroll: 	_rpop H,L			; 34t			R: 		TMP: a
-01DD                          ;*Macro unroll: 	_rpeek0 H,L			    ; 28t
-01DD   0A                     LD   A,(BC)   ; 28t
-01DE   6F                     LD   L,A   
-01DF   03                     INC   BC   
-01E0   0A                     LD   A,(BC)   
-01E1   67                     LD   H,A   
-01E2   03                     INC   BC   ; 34t			R: 		TMP: a
-01E3   E9                     JP   (HL)   ; TODO: optimise to LD HL,BC jp (HL)
-01E4                             ;   COUNT       ( b -- b +n )
-01E4                             ;               Return count byte of a string and add 1 to byte address.
-01E4                          ;*Macro unroll: PRIM 'COUNT',count,_count
-01E4                          ;*Macro unroll:  CODE "COUNT",count
-01E4                          ;*Macro unroll:  _CODE "COUNT", count, 0
-01E4                HEADER_COUNT:      
-01E4   C5 00                  DW   backLink   
-01E6                BACKLINK:   .SET   HEADER_count   
-01E6   00                     DB   0   
-01E7   05 43 4F 55 4E 54      .PSTR   "COUNT"   
-01ED                COUNT:       
-01ED   DD E1                  POP   IX   
-01EF                          ;*Macro unroll:  _count
-01EF                          ;*Macro unroll:  _dup
-01EF   D5                     PUSH   DE   
-01F0                          ;*Macro unroll:  _onePlus
-01F0   13                     INC   DE   
-01F1                          ;*Macro unroll:  _swap
-01F1                          ;*Macro unroll:  _toTMP			            ; 14t			x1			TMP: x2
-01F1   EB                     EX   DE,HL   ; 14t			x1			TMP: x2
-01F2   D1                     POP   DE   
-01F3                          ;*Macro unroll:  _Tdup			            ; 11t			x2 x1
-01F3   E5                     PUSH   HL   ; 11t			x2 x1
-01F4                          ;*Macro unroll:  _cat
-01F4                          ;*Macro unroll: 	_xTOS			; 4t
-01F4   EB                     EX   DE,HL   ; 4t
-01F5   5E                     LD   E,(HL)   
-01F6   16 00                  LD   D,0   
-01F8   DD E9                  JP   (IX)   
-01FA                INITIALLATEST:      
-01FA   E4 01                  DW   backLink   
-01FC                START:       
-01FC                          ;*Macro unroll:  _initKernel
-01FC   31 80 20               LD   SP,dStack   
-01FF   01 00 21               LD   BC,rStack   
-0202                          ;*Macro unroll:  _push FALSE
-0202                          ;*Macro unroll:  _dup
-0202   D5                     PUSH   DE   
-0203   11 00 00               LD   DE,FALSE   
-0206                          ;*Macro unroll:  _store state
-0206                          ;*Macro unroll:  _push var_state
-0206                          ;*Macro unroll:  _dup
-0206   D5                     PUSH   DE   
-0207   11 53 22               LD   DE,var_state   
-020A                          ;*Macro unroll:  _bang
-020A                          ;*Macro unroll: 	_toTMP				; 14t
-020A   EB                     EX   DE,HL   ; 14t
-020B   D1                     POP   DE   
-020C   73                     LD   (HL),E   
-020D   23                     INC   HL   
-020E   72                     LD   (HL),D   
-020F                          ;*Macro unroll:  _push 10
-020F                          ;*Macro unroll:  _dup
-020F   D5                     PUSH   DE   
-0210   11 0A 00               LD   DE,10   
-0213                          ;*Macro unroll:  _store base
-0213                          ;*Macro unroll:  _push var_base
-0213                          ;*Macro unroll:  _dup
-0213   D5                     PUSH   DE   
-0214   11 4D 22               LD   DE,var_base   
-0217                          ;*Macro unroll:  _bang
-0217                          ;*Macro unroll: 	_toTMP				; 14t
-0217   EB                     EX   DE,HL   ; 14t
-0218   D1                     POP   DE   
-0219   73                     LD   (HL),E   
-021A   23                     INC   HL   
-021B   72                     LD   (HL),D   
-021C                          ;*Macro unroll:  _fetch0 initialLatest
-021C                          ;*Macro unroll:  _push initialLatest
-021C                          ;*Macro unroll:  _dup
-021C   D5                     PUSH   DE   
-021D   11 FA 01               LD   DE,initialLatest   
-0220                          ;*Macro unroll:  _at
-0220                          ;*Macro unroll:  _xTOS			; 4t
-0220   EB                     EX   DE,HL   ; 4t
-0221   5E                     LD   E,(HL)   
-0222   23                     INC   HL   
-0223   56                     LD   D,(HL)   
-0224                          ;*Macro unroll:  _store latest
-0224                          ;*Macro unroll:  _push var_latest
-0224                          ;*Macro unroll:  _dup
-0224   D5                     PUSH   DE   
-0225   11 51 22               LD   DE,var_latest   
-0228                          ;*Macro unroll:  _bang
-0228                          ;*Macro unroll: 	_toTMP				; 14t
-0228   EB                     EX   DE,HL   ; 14t
-0229   D1                     POP   DE   
-022A   73                     LD   (HL),E   
-022B   23                     INC   HL   
-022C   72                     LD   (HL),D   
-022D                          ;*Macro unroll:  _push START_USER
-022D                          ;*Macro unroll:  _dup
-022D   D5                     PUSH   DE   
-022E   11 81 22               LD   DE,START_USER   
-0231                          ;*Macro unroll:  _store here
-0231                          ;*Macro unroll:  _push var_here
-0231                          ;*Macro unroll:  _dup
-0231   D5                     PUSH   DE   
-0232   11 4F 22               LD   DE,var_here   
-0235                          ;*Macro unroll:  _bang
-0235                          ;*Macro unroll: 	_toTMP				; 14t
-0235   EB                     EX   DE,HL   ; 14t
-0236   D1                     POP   DE   
-0237   73                     LD   (HL),E   
-0238   23                     INC   HL   
-0239   72                     LD   (HL),D   
-023A   CD EC 00               CALL   initSerial   
-023D                             ; call initInput
-023D                             ; end header  ============================================================
-023D   C3 5B 22               JP   TESTS_START   
+0183   CD 5E 02               CALL   toR   
+0186   18 11                  JR   typex2   
+0188                TYPEX1:      
+0188                          ;*Macro unroll:  _dup
+0188   D5                     PUSH   DE   
+0189                          ;*Macro unroll:  _cAt
+0189   EB                     EX   DE,HL   
+018A   6E                     LD   L,(HL)   
+018B   26 00                  LD   H,0   
+018D   EB                     EX   DE,HL   
+018E   CD 01 02               CALL   emit   
+0191                          ;*Macro unroll:  _push 1
+0191                          ;*Macro unroll:  _dup
+0191   D5                     PUSH   DE   
+0192   11 01 00               LD   DE,1   
+0195                          ;*Macro unroll:  _plus
+0195                          ;*Macro unroll:  _toT
+0195   EB                     EX   DE,HL   
+0196   D1                     POP   DE   
+0197   19                     ADD   HL,DE   
+0198   EB                     EX   DE,HL   
+0199                TYPEX2:      
+0199   CD 3B 00               CALL   doNext   
+019C   88 01                  DW   TYPEx1   
+019E                          ;*Macro unroll:  _drop
+019E   D1                     POP   DE   
+019F                          ;*Macro unroll:  EXIT
+019F                          ;*Macro unroll: 	_rpop H,L			; 34t			R: 		TMP: a
+019F                          ;*Macro unroll: 	_rpeek0 H,L			    ; 28t
+019F   0A                     LD   A,(BC)   ; 28t
+01A0   6F                     LD   L,A   
+01A1   03                     INC   BC   
+01A2   0A                     LD   A,(BC)   
+01A3   67                     LD   H,A   
+01A4   03                     INC   BC   ; 34t			R: 		TMP: a
+01A5   E9                     JP   (HL)   
+01A6                             ; ; DE = TOS
+01A6                             ; ; T. (x -- )
+01A6                             ; ; report the test number to a numeric output device
+01A6                             ; CODE "T.",tesDot
+01A6                             ;     ENTER
+01A6                             ;     jr z, tesDot1
+01A6                             ;     _push $58
+01A6                             ;     call emit
+01A6                             ;     EXIT
+01A6                             ; tesDot1:
+01A6                             ;     _push $4F
+01A6                             ;     call emit
+01A6                             ;     EXIT
+01A6                             ; ; hasn ( x1 h0 -- h1 )
+01A6                             ; ; compute h1 by hashing x1 and h0
+01A6                             ; CODE "hash",testHash
+01A6                             ;     ENTER
+01A6                             ;     _swap
+01A6                             ;     _onePlus
+01A6                             ;     call xorr
+01A6                             ;     EXIT
+01A6                             ; ; hash-n ( x1 x2 ... xn n -- h )
+01A6                             ; ; hash n items from the stack and return the hash code
+01A6                             ; CODE "hash-n",tesHashN
+01A6                             ;     ENTER
+01A6                             ;     _push 0
+01A6                             ;     _toR
+01A6                             ; tesHashN1:
+01A6                             ;     _dup
+01A6                             ;     _isZero
+01A6                             ;     jr z,tesHashN2
+01A6                             ;     _swap
+01A6                             ;     _rFrom
+01A6                             ;     call tesHash
+01A6                             ;     _toR
+01A6                             ;     _oneMinus
+01A6                             ;     jr tesHashN1
+01A6                             ; tesHashN2:
+01A6                             ;     _drop
+01A6                             ;     _rFrom
+01A6                             ;     EXIT
+01A6                             ; ; Tstart ( -- )
+01A6                             ; ; start testing
+01A6                             ; CODE "Tstart",tesStart
+01A6                             ;     ENTER
+01A6                             ;     _push 0
+01A6                             ;     _store tesCount
+01A6                             ;     EXIT
+01A6                             ; ; T{ ( -- )
+01A6                             ; ; start a unit test
+01A6                             ; ;  Tcount @ 1+ dup T. Tcount !
+01A6                             ; ;  depth Tdepth !
+01A6                             ; CODE "T{",tesEnter
+01A6                             ;     ENTER
+01A6                             ;     _fetch testCnt
+01A6                             ;     _onePlus
+01A6                             ;     _dup
+01A6                             ;     call tesDot
+01A6                             ;     _store tesCount
+01A6                             ;     call depth
+01A6                             ;     _store tesDepth
+01A6                             ;     EXIT
+01A6                             ; ; }T ( y1 y2 ... yn -- hy )
+01A6                             ; ; finish a unit test,
+01A6                             ; CODE "}T",tesExit
+01A6                             ;     ENTER
+01A6                             ;     call depth
+01A6                             ;     _fetch tesDepth
+01A6                             ;     call minus
+01A6                             ;     call tesHashN
+01A6                             ;     call depth
+01A6                             ;     _store tesDepth
+01A6                             ;     EXIT
+01A6                             ; ; == ( hy x1 x2 ... xn -- )
+01A6                             ; ; compare actual output with expected output
+01A6                             ; CODE "==",tesEQ
+01A6                             ;     ENTER
+01A6                             ;     call depth
+01A6                             ;     _fetch tesDepth
+01A6                             ;     call minus
+01A6                             ;     call tesHashN
+01A6                             ;     call equal
+01A6                             ;     _isZero
+01A6                             ;     jr z,tesQ1
+01A6                             ;     halt
+01A6                             ; tesQ1:
+01A6                             ;     EXIT
+01A6                             ; ; Tend ( -- )
+01A6                             ; ; signal end of testing
+01A6                             ; CODE "Tend",tesEnd
+01A6                             ;     ENTER
+01A6                             ;     _push -1
+01A6                             ;     call tesDot
+01A6                             ;     EXIT
+01A6                SER_EMPTYSIZE:   EQU   5   
+01A6                SER_FULLSIZE:   EQU   30H   
+01A6                IO_CTRL:   EQU   $80   
+01A6                IO_DATA:   EQU   $81   
+01A6                RTS_HIGH:   EQU   $D6   ; 11010110
+01A6                RTS_LOW:   EQU   $96   ; 10010110
+01A6                PORT_STATUS:   EQU   $04   
+01A6                PORT_DATA:   EQU   $03   
+01A6                             ; destroys: HL
+01A6                INITSERIAL:      
+01A6   21 00 00               LD   HL,0   
+01A9   22 04 21               LD   (serbufused),HL   
+01AC   21 06 21               LD   HL,serbuf   
+01AF   22 00 21               LD   (serinptr),HL   
+01B2   22 02 21               LD   (serrdptr),HL   
+01B5   3E 96                  LD   A,RTS_LOW   
+01B7   D3 80                  OUT   (IO_CTRL),A   
+01B9   ED 56                  IM   1   
+01BB   FB                     EI      
+01BC   C9                     RET      
+01BD                SERIALIN:      
+01BD   F5                     PUSH   AF   
+01BE   E5                     PUSH   HL   
+01BF   DB 80                  IN   A,(IO_CTRL)   
+01C1   E6 01                  AND   $01   
+01C3   28 05                  JR   z,serialIn1   
+01C5   DB 81                  IN   A,(IO_DATA)   
+01C7   CD CE 01               CALL   serialIn2   
+01CA                SERIALIN1:      
+01CA   E1                     POP   HL   
+01CB   F1                     POP   AF   
+01CC   FB                     EI      
+01CD   C9                     RET      
+01CE                             ; destroys: HL
+01CE                SERIALIN2:      
+01CE   F5                     PUSH   AF   
+01CF   3A 04 21               LD   A,(serBufUsed)   
+01D2   FE 3F                  CP   SER_BUFSIZE   
+01D4   20 02                  JR   nz,serialIn21   
+01D6   F1                     POP   AF   
+01D7   C9                     RET      
+01D8                SERIALIN21:      
+01D8   2A 00 21               LD   HL,(serInPtr)   
+01DB   23                     INC   HL   
+01DC   7D                     LD   A,L   ; Only need to check low byte becasuse lineBuf<256 bytes
+01DD   FE 45                  CP   (serBuf + SER_BUFSIZE) & $FF   
+01DF   20 03                  JR   nz,serialIn22   
+01E1   21 06 21               LD   HL,serBuf   
+01E4                SERIALIN22:      
+01E4   22 00 21               LD   (serInPtr),HL   
+01E7   F1                     POP   AF   
+01E8   77                     LD   (HL),A   
+01E9   3A 04 21               LD   A,(serBufUsed)   
+01EC   3C                     INC   A   
+01ED   32 04 21               LD   (serBufUsed),A   
+01F0   FE 30                  CP   SER_FULLSIZE   
+01F2   38 04                  JR   c,serialIn23   
+01F4   3E D6                  LD   A,RTS_HIGH   
+01F6   D3 80                  OUT   (IO_CTRL),A   
+01F8                SERIALIN23:      
+01F8   C9                     RET      
+01F9                             ; emit  ( c -- )
+01F9                          ;*Macro unroll: CODE "emit",emit
+01F9                          ;*Macro unroll:  _CODE "emit", emit, 0
+01F9                HEADER_EMIT:      
+01F9   73 01                  DW   backLink   
+01FB                BACKLINK:   .SET   HEADER_emit   
+01FB   00                     DB   0   
+01FC   04 65 6D 69 74         .PSTR   "emit"   
+0201                EMIT:        
+0201                          ;*Macro unroll:  FENTER
+0201   DD E1                  POP   IX   
+0203                EMIT1:       
+0203   DB 80                  IN   A,(IO_CTRL)   ; Status byte
+0205   CB 4F                  BIT   1,A   ; Set Zero flag if still transmitting character
+0207   28 FA                  JR   z,emit1   
+0209   7B                     LD   A,E   
+020A                          ;*Macro unroll:  _drop
+020A   D1                     POP   DE   
+020B   D3 81                  OUT   (IO_DATA),A   ; Output the character
+020D                          ;*Macro unroll:  FEXIT
+020D   DD E9                  JP   (IX)   
+020F                             ; 
+020F                             ; serReady - check if there is input waiting to be read
+020F                             ; flags: NZ if input ready
+020F                             ; 
+020F                SERREADY:      
+020F   3A 04 21               LD   A,(serBufUsed)   
+0212   FE 00                  CP   $0   
+0214   C9                     RET      
+0215                             ; key   ( -- c )
+0215                             ; Wait for and return an input character.
+0215                          ;*Macro unroll: CODE "key",key
+0215                          ;*Macro unroll:  _CODE "key", key, 0
+0215                HEADER_KEY:      
+0215   F9 01                  DW   backLink   
+0217                BACKLINK:   .SET   HEADER_key   
+0217   00                     DB   0   
+0218   03 6B 65 79            .PSTR   "key"   
+021C                KEY:         
+021C                          ;*Macro unroll:  ENTER
+021C                          ;*Macro unroll:  _tdrop			    ; 10t	; x y 				TMP: a
+021C   E1                     POP   HL   ; 10t	; x y 				TMP: a
+021D                          ;*Macro unroll:  _rpush H,L		    ; 34t	; x y    	R: a	
+021D   0B                     DEC   BC   ; 34t	; x y    	R: a	
+021E   7C                     LD   A,H   
+021F   02                     LD   (BC),A   
+0220   0B                     DEC   BC   
+0221   7D                     LD   A,L   
+0222   02                     LD   (BC),A   
+0223                KEY1:        
+0223   CD 3A 02               CALL   qkey   
+0226                          ;*Macro unroll:  _isZero
+0226   7B                     LD   A,E   
+0227   B2                     OR   D   
+0228                          ;*Macro unroll:  _drop           ; 10t
+0228   D1                     POP   DE   ; 10t
+0229   28 F8                  JR   z,key1   
+022B                          ;*Macro unroll:  EXIT
+022B                          ;*Macro unroll: 	_rpop H,L			; 34t			R: 		TMP: a
+022B                          ;*Macro unroll: 	_rpeek0 H,L			    ; 28t
+022B   0A                     LD   A,(BC)   ; 28t
+022C   6F                     LD   L,A   
+022D   03                     INC   BC   
+022E   0A                     LD   A,(BC)   
+022F   67                     LD   H,A   
+0230   03                     INC   BC   ; 34t			R: 		TMP: a
+0231   E9                     JP   (HL)   
+0232                             ; ?key  ( -- c T | F )
+0232                             ; Return input character and true, or a false if no input.
+0232                          ;*Macro unroll: CODE "?key",qkey
+0232                          ;*Macro unroll:  _CODE "?key", qkey, 0
+0232                HEADER_QKEY:      
+0232   15 02                  DW   backLink   
+0234                BACKLINK:   .SET   HEADER_qkey   
+0234   00                     DB   0   
+0235   04 3F 6B 65 79         .PSTR   "?key"   
+023A                QKEY:        
+023A                          ;*Macro unroll:  FENTER
+023A   DD E1                  POP   IX   
+023C                          IF   TESTMODE   
+023C                          ;*Macro unroll:  _fetch0 charPtr
+023C                          ;*Macro unroll:  _push charPtr
+023C                          ;*Macro unroll:  _dup
+023C   D5                     PUSH   DE   
+023D   11 55 22               LD   DE,charPtr   
+0240                          ;*Macro unroll:  _at
+0240   EB                     EX   DE,HL   
+0241   7E                     LD   A,(HL)   
+0242   23                     INC   HL   
+0243   66                     LD   H,(HL)   
+0244   5F                     LD   E,A   
+0245   EB                     EX   DE,HL   
+0246                          ;*Macro unroll:  _dup
+0246   D5                     PUSH   DE   
+0247                          ;*Macro unroll:  _cat
+0247   EB                     EX   DE,HL   
+0248   6E                     LD   L,(HL)   
+0249   26 00                  LD   H,0   
+024B   EB                     EX   DE,HL   
+024C                          ;*Macro unroll:  _swap
+024C                          ;*Macro unroll:  _toT			            ; 14t			x1			T: x2
+024C   EB                     EX   DE,HL   ; 14t			x1			T: x2
+024D   D1                     POP   DE   
+024E                          ;*Macro unroll:  _Tdup			            ; 11t			x2 x1
+024E   E5                     PUSH   HL   ; 11t			x2 x1
+024F                          ;*Macro unroll:  _store0 charPtr
+024F                          ;*Macro unroll:  _push charPtr
+024F                          ;*Macro unroll:  _dup
+024F   D5                     PUSH   DE   
+0250   11 55 22               LD   DE,charPtr   
+0253                          ;*Macro unroll:  _bang
+0253                          ;*Macro unroll: 	_toT				; 14t
+0253   EB                     EX   DE,HL   ; 14t
+0254   D1                     POP   DE   
+0255   73                     LD   (HL),E   
+0256   23                     INC   HL   
+0257   72                     LD   (HL),D   
+0258                          ;*Macro unroll:  _push TRUE
+0258                          ;*Macro unroll:  _dup
+0258   D5                     PUSH   DE   
+0259   11 FF FF               LD   DE,TRUE   
+025C                          ELSE      
+                              LD   A,(serBufUsed)   
+                              CP   $0   
+                              JR   nz,qkey1   
+                              ;*Macro unroll:  _push FALSE
+                              ;*Macro unroll:  _dup
+                              PUSH   DE   
+                              LD   DE,FALSE   
+                              ;*Macro unroll:  FEXIT
+                              JP   (IX)   
+                    QKEY1:       
+                              LD   HL,(serRdPtr)   
+                              INC   HL   
+                              LD   A,L   ; Only need to check low byte because lineBuf<256 bytes
+                              CP   (serBuf + SER_BUFSIZE) & $FF   
+                              JR   nz,qkey2   
+                              LD   HL,serBuf   
+                    QKEY2:       
+                              DI      
+                              LD   (serRdPtr),HL   
+                              LD   A,(serBufUsed)   
+                              DEC   A   
+                              LD   (serBufUsed),A   
+                              CP   SER_EMPTYSIZE   
+                              JR   nc,qkey3   
+                              LD   A,RTS_LOW   
+                              OUT   (IO_CTRL),A   
+                    QKEY3:       
+                              LD   A,(HL)   
+                              ;*Macro unroll:  _push TRUE
+                              ;*Macro unroll:  _dup
+                              PUSH   DE   
+                              LD   DE,TRUE   
+                              EI      
+025C                          ENDIF      
+025C                          ;*Macro unroll:  FEXIT
+025C   DD E9                  JP   (IX)   
+025E                             ; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+025E                             ; ; getc - input
+025E                             ; ; returns: A = input char
+025E                             ; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+025E                             ; getc:
+025E                             ;     push HL
+025E                             ;     .if TESTMODE
+025E                             ;     ld HL, (charPtr)
+025E                             ;     ld A, (HL)
+025E                             ;     inc HL
+025E                             ;     ld (charPtr), HL
+025E                             ;     .else
+025E                             ; getc0:
+025E                             ;     call serReady
+025E                             ;     jr z, getc0
+025E                             ;     ld HL,(serRdPtr)
+025E                             ;     inc HL
+025E                             ;     ld A,L             ; Only need to check low byte because lineBuf<256 bytes
+025E                             ;     cp (serBuf + SER_BUFSIZE) & $FF
+025E                             ;     jr nz,getc21
+025E                             ;     ld HL,serBuf
+025E                             ; getc21:
+025E                             ;     di
+025E                             ;     ld (serRdPtr),HL
+025E                             ;     ld A,(serBufUsed)
+025E                             ;     dec A
+025E                             ;     ld (serBufUsed),A
+025E                             ;     cp SER_EMPTYSIZE
+025E                             ;     jr nc,getc22
+025E                             ;     ld A,RTS_LOW
+025E                             ;     out (IO_CTRL),A
+025E                             ; getc22:
+025E                             ;     ld A,(HL)
+025E                             ;     ei
+025E                             ;     .endif
+025E                             ;     pop HL
+025E                             ;     ret
+025E                             ; BC = RP
+025E                             ; HL = TOS
+025E                TOR:         
+025E                          ;*Macro unroll:  FENTER
+025E   DD E1                  POP   IX   
+0260                          ;*Macro unroll:  _rpush D,E		; 34t		x		R: x
+0260   0B                     DEC   BC   ; 34t		x		R: x
+0261   7A                     LD   A,D   
+0262   02                     LD   (BC),A   
+0263   0B                     DEC   BC   
+0264   7B                     LD   A,E   
+0265   02                     LD   (BC),A   
+0266                          ;*Macro unroll: 	_drop			; 10t				R: x
+0266   D1                     POP   DE   ; 10t				R: x
+0267                          ;*Macro unroll:  FEXIT
+0267   DD E9                  JP   (IX)   
+0269                RFROM:       ; 45t + 15t
+0269                          ;*Macro unroll:  FENTER
+0269   DD E1                  POP   IX   
+026B                          ;*Macro unroll: 	_dup			; 11t			
+026B   D5                     PUSH   DE   ; 11t			
+026C                          ;*Macro unroll:  _rpop	D,E		; 34t		x 		
+026C                          ;*Macro unroll: 	_rpeek0 D,E			    ; 28t
+026C   0A                     LD   A,(BC)   ; 28t
+026D   5F                     LD   E,A   
+026E   03                     INC   BC   
+026F   0A                     LD   A,(BC)   
+0270   57                     LD   D,A   
+0271   03                     INC   BC   ; 34t		x 		
+0272                          ;*Macro unroll:  FEXIT
+0272   DD E9                  JP   (IX)   
+0274                RAT:         
+0274                          ;*Macro unroll:  FENTER
+0274   DD E1                  POP   IX   
+0276                          ;*Macro unroll: 	_dup			; 11
+0276   D5                     PUSH   DE   ; 11
+0277                          ;*Macro unroll:  _rpeek D,E		; 34t				R: x		TMP x
+0277                          ;*Macro unroll: 	_rpeek0 D,E			    ; 28t
+0277   0A                     LD   A,(BC)   ; 28t
+0278   5F                     LD   E,A   
+0279   03                     INC   BC   
+027A   0A                     LD   A,(BC)   
+027B   57                     LD   D,A   
+027C   0B                     DEC   BC   ; 34t				R: x		TMP x
+027D                          ;*Macro unroll:  FEXIT
+027D   DD E9                  JP   (IX)   
+027F                TWOTOR:      ; d --
+027F                          ;*Macro unroll:  ENTER
+027F                          ;*Macro unroll:  _tdrop			    ; 10t	; x y 				TMP: a
+027F   E1                     POP   HL   ; 10t	; x y 				TMP: a
+0280                          ;*Macro unroll:  _rpush H,L		    ; 34t	; x y    	R: a	
+0280   0B                     DEC   BC   ; 34t	; x y    	R: a	
+0281   7C                     LD   A,H   
+0282   02                     LD   (BC),A   
+0283   0B                     DEC   BC   
+0284   7D                     LD   A,L   
+0285   02                     LD   (BC),A   
+0286                          ;*Macro unroll:  _swap			
+0286                          ;*Macro unroll:  _toT			            ; 14t			x1			T: x2
+0286   EB                     EX   DE,HL   ; 14t			x1			T: x2
+0287   D1                     POP   DE   
+0288                          ;*Macro unroll:  _Tdup			            ; 11t			x2 x1
+0288   E5                     PUSH   HL   ; 11t			x2 x1
+0289   CD 5E 02               CALL   toR   
+028C   CD 5E 02               CALL   toR   
+028F                          ;*Macro unroll:  EXIT
+028F                          ;*Macro unroll: 	_rpop H,L			; 34t			R: 		TMP: a
+028F                          ;*Macro unroll: 	_rpeek0 H,L			    ; 28t
+028F   0A                     LD   A,(BC)   ; 28t
+0290   6F                     LD   L,A   
+0291   03                     INC   BC   
+0292   0A                     LD   A,(BC)   
+0293   67                     LD   H,A   
+0294   03                     INC   BC   ; 34t			R: 		TMP: a
+0295   E9                     JP   (HL)   
+0296                TWORFROM:      ; -- d
+0296                          ;*Macro unroll:  ENTER
+0296                          ;*Macro unroll:  _tdrop			    ; 10t	; x y 				TMP: a
+0296   E1                     POP   HL   ; 10t	; x y 				TMP: a
+0297                          ;*Macro unroll:  _rpush H,L		    ; 34t	; x y    	R: a	
+0297   0B                     DEC   BC   ; 34t	; x y    	R: a	
+0298   7C                     LD   A,H   
+0299   02                     LD   (BC),A   
+029A   0B                     DEC   BC   
+029B   7D                     LD   A,L   
+029C   02                     LD   (BC),A   
+029D   CD 69 02               CALL   rFrom   
+02A0   CD 69 02               CALL   rFrom   
+02A3                          ;*Macro unroll:  _swap		
+02A3                          ;*Macro unroll:  _toT			            ; 14t			x1			T: x2
+02A3   EB                     EX   DE,HL   ; 14t			x1			T: x2
+02A4   D1                     POP   DE   
+02A5                          ;*Macro unroll:  _Tdup			            ; 11t			x2 x1
+02A5   E5                     PUSH   HL   ; 11t			x2 x1
+02A6                          ;*Macro unroll:  EXIT
+02A6                          ;*Macro unroll: 	_rpop H,L			; 34t			R: 		TMP: a
+02A6                          ;*Macro unroll: 	_rpeek0 H,L			    ; 28t
+02A6   0A                     LD   A,(BC)   ; 28t
+02A7   6F                     LD   L,A   
+02A8   03                     INC   BC   
+02A9   0A                     LD   A,(BC)   
+02AA   67                     LD   H,A   
+02AB   03                     INC   BC   ; 34t			R: 		TMP: a
+02AC   E9                     JP   (HL)   
+02AD                TWORAT:      ; a b -- a b x y  	R: x y
+02AD                          ;*Macro unroll:  ENTER
+02AD                          ;*Macro unroll:  _tdrop			    ; 10t	; x y 				TMP: a
+02AD   E1                     POP   HL   ; 10t	; x y 				TMP: a
+02AE                          ;*Macro unroll:  _rpush H,L		    ; 34t	; x y    	R: a	
+02AE   0B                     DEC   BC   ; 34t	; x y    	R: a	
+02AF   7C                     LD   A,H   
+02B0   02                     LD   (BC),A   
+02B1   0B                     DEC   BC   
+02B2   7D                     LD   A,L   
+02B3   02                     LD   (BC),A   
+02B4   CD 69 02               CALL   rFrom   ; 44t		a b y 		R: x
+02B7   CD 74 02               CALL   rAt   ; 44t		a b y x		R: x		TMP: x
+02BA                          ;*Macro unroll:  _swap           ; 20t		a b x y
+02BA                          ;*Macro unroll:  _toT			            ; 14t			x1			T: x2
+02BA   EB                     EX   DE,HL   ; 14t			x1			T: x2
+02BB   D1                     POP   DE   
+02BC                          ;*Macro unroll:  _Tdup			            ; 11t			x2 x1
+02BC   E5                     PUSH   HL   ; 11t			x2 x1
+02BD                          ;*Macro unroll:  _dup            ; 10t		a b x y y	R: x
+02BD   D5                     PUSH   DE   ; 10t		a b x y y	R: x
+02BE   CD 5E 02               CALL   toR   ; 45t		a b x y		R: x y
+02C1                          ;*Macro unroll:  EXIT
+02C1                          ;*Macro unroll: 	_rpop H,L			; 34t			R: 		TMP: a
+02C1                          ;*Macro unroll: 	_rpeek0 H,L			    ; 28t
+02C1   0A                     LD   A,(BC)   ; 28t
+02C2   6F                     LD   L,A   
+02C3   03                     INC   BC   
+02C4   0A                     LD   A,(BC)   
+02C5   67                     LD   H,A   
+02C6   03                     INC   BC   ; 34t			R: 		TMP: a
+02C7   E9                     JP   (HL)   
+02C8                          ;*Macro unroll: CODE "lit", lit
+02C8                          ;*Macro unroll:  _CODE "lit", lit, 0
+02C8                HEADER_LIT:      
+02C8   32 02                  DW   backLink   
+02CA                BACKLINK:   .SET   HEADER_lit   
+02CA   00                     DB   0   
+02CB   03 6C 69 74            .PSTR   "lit"   
+02CF                LIT:         
+02CF   E1                     POP   HL   ; HL = return adr
+02D0                          ;*Macro unroll:  _dup            ; push current TOS
+02D0   D5                     PUSH   DE   ; push current TOS
+02D1   5E                     LD   E,(HL)   
+02D2   23                     INC   HL   
+02D3   56                     LD   D,(HL)   ; TOS = word data at return adr
+02D4   23                     INC   HL   ; HL = return adr + 2
+02D5   E9                     JP   (HL)   ; return to adr2 + 2
+02D6                             ; -- p n
+02D6                             ; is followed by a literal Packed (Pascal) string
+02D6                          ;*Macro unroll: CODE "litStr", litStr
+02D6                          ;*Macro unroll:  _CODE "litStr", litStr, 0
+02D6                HEADER_LITSTR:      
+02D6   C8 02                  DW   backLink   
+02D8                BACKLINK:   .SET   HEADER_litStr   
+02D8   00                     DB   0   
+02D9   06 6C 69 74 53 74 72   .PSTR   "litStr"   
+02E0                LITSTR:      
+02E0                          ;*Macro unroll:  _swap           ; adr - return address
+02E0                          ;*Macro unroll:  _toT			            ; 14t			x1			T: x2
+02E0   EB                     EX   DE,HL   ; 14t			x1			T: x2
+02E1   D1                     POP   DE   
+02E2                          ;*Macro unroll:  _Tdup			            ; 11t			x2 x1
+02E2   E5                     PUSH   HL   ; 11t			x2 x1
+02E3   CD FA 02               CALL   count   ; adr+1 len
+02E6                          ;*Macro unroll:  _twoDup         ; adr+1 len adr+1 len
+02E6                          ;*Macro unroll:  _Tdrop			    ; 10t		; x2				T: x1
+02E6   E1                     POP   HL   ; 10t		; x2				T: x1
+02E7                          ;*Macro unroll:  _Tdup			    ; 11t			; x1 x2				T: x1
+02E7   E5                     PUSH   HL   ; 11t			; x1 x2				T: x1
+02E8                          ;*Macro unroll: 	_dup				; 11t		; x1 x2 x2			T: x1
+02E8   D5                     PUSH   DE   ; 11t		; x1 x2 x2			T: x1
+02E9                          ;*Macro unroll: 	_Tdup			    ; 11t			; x1 x2 x1 x2
+02E9   E5                     PUSH   HL   ; 11t			; x1 x2 x1 x2
+02EA                          ;*Macro unroll:  _plus           ; adr+1 len adr'
+02EA                          ;*Macro unroll:  _toT
+02EA   EB                     EX   DE,HL   
+02EB   D1                     POP   DE   
+02EC   19                     ADD   HL,DE   ; adr+1 len adr'
+02ED   EB                     EX   DE,HL   
+02EE                          ;*Macro unroll:  _toT            ; adr+1 len             HL: adr'
+02EE   EB                     EX   DE,HL   ; adr+1 len             HL: adr'
+02EF   D1                     POP   DE   
+02F0   E9                     JP   (HL)   
+02F1                             ; count ( b -- b +n )
+02F1                             ; Return count byte of a string and add 1 to byte address.
+02F1                          ;*Macro unroll: CODE 'count',count
+02F1                          ;*Macro unroll:  _CODE "count", count, 0
+02F1                HEADER_COUNT:      
+02F1   D6 02                  DW   backLink   
+02F3                BACKLINK:   .SET   HEADER_count   
+02F3   00                     DB   0   
+02F4   05 63 6F 75 6E 74      .PSTR   "count"   
+02FA                COUNT:       
+02FA                          ;*Macro unroll:  FENTER
+02FA   DD E1                  POP   IX   
+02FC                          ;*Macro unroll:  _dup
+02FC   D5                     PUSH   DE   
+02FD                          ;*Macro unroll:  _onePlus
+02FD   13                     INC   DE   
+02FE                          ;*Macro unroll:  _swap
+02FE                          ;*Macro unroll:  _toT			            ; 14t			x1			T: x2
+02FE   EB                     EX   DE,HL   ; 14t			x1			T: x2
+02FF   D1                     POP   DE   
+0300                          ;*Macro unroll:  _Tdup			            ; 11t			x2 x1
+0300   E5                     PUSH   HL   ; 11t			x2 x1
+0301                          ;*Macro unroll:  _cat
+0301   EB                     EX   DE,HL   
+0302   6E                     LD   L,(HL)   
+0303   26 00                  LD   H,0   
+0305   EB                     EX   DE,HL   
+0306                          ;*Macro unroll:  FEXIT
+0306   DD E9                  JP   (IX)   
+0308                          ;*Macro unroll: CODE 'ok',ok
+0308                          ;*Macro unroll:  _CODE "ok", ok, 0
+0308                HEADER_OK:      
+0308   F1 02                  DW   backLink   
+030A                BACKLINK:   .SET   HEADER_ok   
+030A   00                     DB   0   
+030B   02 6F 6B               .PSTR   "ok"   
+030E                OK:          
+030E                          ;*Macro unroll:  ENTER
+030E                          ;*Macro unroll:  _tdrop			    ; 10t	; x y 				TMP: a
+030E   E1                     POP   HL   ; 10t	; x y 				TMP: a
+030F                          ;*Macro unroll:  _rpush H,L		    ; 34t	; x y    	R: a	
+030F   0B                     DEC   BC   ; 34t	; x y    	R: a	
+0310   7C                     LD   A,H   
+0311   02                     LD   (BC),A   
+0312   0B                     DEC   BC   
+0313   7D                     LD   A,L   
+0314   02                     LD   (BC),A   
+0315                          ;*Macro unroll:  _println "ok"
+0315                          ;*Macro unroll:  _pushStr "ok"
+0315   CD E0 02               CALL   litStr   
+0318   02 6F 6B               .PSTR   "ok"   
+031B   CD 3B 01               CALL   type   
+031E                          ;*Macro unroll:  _cr
+031E                          ;*Macro unroll:  _pushStr "\r\n"
+031E   CD E0 02               CALL   litStr   
+0321   02 0D 0A               .PSTR   "\r\n"   
+0324   CD 3B 01               CALL   type   
+0327                          ;*Macro unroll:  EXIT
+0327                          ;*Macro unroll: 	_rpop H,L			; 34t			R: 		TMP: a
+0327                          ;*Macro unroll: 	_rpeek0 H,L			    ; 28t
+0327   0A                     LD   A,(BC)   ; 28t
+0328   6F                     LD   L,A   
+0329   03                     INC   BC   
+032A   0A                     LD   A,(BC)   
+032B   67                     LD   H,A   
+032C   03                     INC   BC   ; 34t			R: 		TMP: a
+032D   E9                     JP   (HL)   
+032E                INITIALLATEST:      
+032E   08 03                  DW   backLink   
+0330                START:       
+0330                          ;*Macro unroll:  _initKernel
+0330   31 80 20               LD   SP,dStack   
+0333   01 00 21               LD   BC,rStack   
+0336                          ;*Macro unroll:  _push FALSE
+0336                          ;*Macro unroll:  _dup
+0336   D5                     PUSH   DE   
+0337   11 00 00               LD   DE,FALSE   
+033A                          ;*Macro unroll:  _store state
+033A                          ;*Macro unroll:  _push var_state
+033A                          ;*Macro unroll:  _dup
+033A   D5                     PUSH   DE   
+033B   11 53 22               LD   DE,var_state   
+033E                          ;*Macro unroll:  _bang
+033E                          ;*Macro unroll: 	_toT				; 14t
+033E   EB                     EX   DE,HL   ; 14t
+033F   D1                     POP   DE   
+0340   73                     LD   (HL),E   
+0341   23                     INC   HL   
+0342   72                     LD   (HL),D   
+0343                          ;*Macro unroll:  _push 10
+0343                          ;*Macro unroll:  _dup
+0343   D5                     PUSH   DE   
+0344   11 0A 00               LD   DE,10   
+0347                          ;*Macro unroll:  _store base
+0347                          ;*Macro unroll:  _push var_base
+0347                          ;*Macro unroll:  _dup
+0347   D5                     PUSH   DE   
+0348   11 4D 22               LD   DE,var_base   
+034B                          ;*Macro unroll:  _bang
+034B                          ;*Macro unroll: 	_toT				; 14t
+034B   EB                     EX   DE,HL   ; 14t
+034C   D1                     POP   DE   
+034D   73                     LD   (HL),E   
+034E   23                     INC   HL   
+034F   72                     LD   (HL),D   
+0350                          ;*Macro unroll:  _fetch0 initialLatest
+0350                          ;*Macro unroll:  _push initialLatest
+0350                          ;*Macro unroll:  _dup
+0350   D5                     PUSH   DE   
+0351   11 2E 03               LD   DE,initialLatest   
+0354                          ;*Macro unroll:  _at
+0354   EB                     EX   DE,HL   
+0355   7E                     LD   A,(HL)   
+0356   23                     INC   HL   
+0357   66                     LD   H,(HL)   
+0358   5F                     LD   E,A   
+0359   EB                     EX   DE,HL   
+035A                          ;*Macro unroll:  _store latest
+035A                          ;*Macro unroll:  _push var_latest
+035A                          ;*Macro unroll:  _dup
+035A   D5                     PUSH   DE   
+035B   11 51 22               LD   DE,var_latest   
+035E                          ;*Macro unroll:  _bang
+035E                          ;*Macro unroll: 	_toT				; 14t
+035E   EB                     EX   DE,HL   ; 14t
+035F   D1                     POP   DE   
+0360   73                     LD   (HL),E   
+0361   23                     INC   HL   
+0362   72                     LD   (HL),D   
+0363                          ;*Macro unroll:  _push START_USER
+0363                          ;*Macro unroll:  _dup
+0363   D5                     PUSH   DE   
+0364   11 78 22               LD   DE,START_USER   
+0367                          ;*Macro unroll:  _store here
+0367                          ;*Macro unroll:  _push var_here
+0367                          ;*Macro unroll:  _dup
+0367   D5                     PUSH   DE   
+0368   11 4F 22               LD   DE,var_here   
+036B                          ;*Macro unroll:  _bang
+036B                          ;*Macro unroll: 	_toT				; 14t
+036B   EB                     EX   DE,HL   ; 14t
+036C   D1                     POP   DE   
+036D   73                     LD   (HL),E   
+036E   23                     INC   HL   
+036F   72                     LD   (HL),D   
+0370   CD A6 01               CALL   initSerial   
+0373                             ; call initInput
+0373                             ; end header  ============================================================
+0373   C3 5B 22               JP   TESTS_START   
 2000                          .ORG   START_RAM   
 2000                          DS   DSTACK_SIZE   
 2080                DSTACK:      ; grows down
@@ -1153,49 +1605,30 @@
 225F   D5                     PUSH   DE   
 2260   11 4D 22               LD   DE,var_base   
 2263                          ;*Macro unroll:  _bang
-2263                          ;*Macro unroll: 	_toTMP				; 14t
+2263                          ;*Macro unroll: 	_toT				; 14t
 2263   EB                     EX   DE,HL   ; 14t
 2264   D1                     POP   DE   
 2265   73                     LD   (HL),E   
 2266   23                     INC   HL   
 2267   72                     LD   (HL),D   
-2268                          ;*Macro unroll:  _push 1
-2268                          ;*Macro unroll:  _dup
-2268   D5                     PUSH   DE   
-2269   11 01 00               LD   DE,1   
-226C                          ;*Macro unroll:  _push 2
-226C                          ;*Macro unroll:  _dup
-226C   D5                     PUSH   DE   
-226D   11 02 00               LD   DE,2   
-2270                          ;*Macro unroll:  _plus
-2270                          ;*Macro unroll:  _toTMP
-2270   EB                     EX   DE,HL   
-2271   D1                     POP   DE   
-2272   19                     ADD   HL,DE   
-2273   EB                     EX   DE,HL   
-2274                          ;*Macro unroll:  _push 3
-2274                          ;*Macro unroll:  _dup
-2274   D5                     PUSH   DE   
-2275   11 03 00               LD   DE,3   
-2278                          ;*Macro unroll:  _minus
-2278                          ;*Macro unroll:  _Tdrop
-2278   E1                     POP   HL   
-2279   B7                     OR   A   
-227A   ED 52                  SBC   HL,DE   
-227C   EB                     EX   DE,HL   
-227D   CD CA 00               CALL   dot   
-2280                             ; call tesStart
-2280                             ; call tesEnter
-2280                             ; _push 1
-2280                             ; _dup
-2280                             ; call tesExit
-2280                             ; _push 1
-2280                             ; _push 1
-2280                             ; call tesEq
-2280                             ; call tesEnd
-2280                             ; _printString "\r\nDone! \r\n"
-2280   76                     HALT      
-2281                START_USER:      
+2268                          ;*Macro unroll:  _print "Hello!\r\n"
+2268                          ;*Macro unroll:  _pushStr "Hello!\r\n"
+2268   CD E0 02               CALL   litStr   
+226B   08 48 65 6C 6C 6F 21 0D 0A .PSTR   "Hello!\r\n"   
+2274   CD 7C 01               CALL   typex   
+2277                             ; call ok
+2277                             ; call tesStart
+2277                             ; call tesEnter
+2277                             ; _push 1
+2277                             ; _dup
+2277                             ; call tesExit
+2277                             ; _push 1
+2277                             ; _push 1
+2277                             ; call tesEq
+2277                             ; call tesEnd
+2277                             ; _printString "\r\nDone! \r\n"
+2277   76                     HALT      
+2278                START_USER:      
 
 
 TESTMODE:           0001 DEFINED AT LINE 3
@@ -1217,10 +1650,10 @@ LINE_BUFSIZE:       0080 DEFINED AT LINE 8 IN constants.z80
                     > USED AT LINE 15 IN variables.z80
 START_ROM:          0000 DEFINED AT LINE 10 IN constants.z80
                     > USED AT LINE 11 IN constants.z80
-                    > USED AT LINE 15
+                    > USED AT LINE 16
 START_RAM:          2000 DEFINED AT LINE 11 IN constants.z80
                     > USED AT LINE 12 IN constants.z80
-                    > USED AT LINE 50
+                    > USED AT LINE 53
 END_RAM:            10000 DEFINED AT LINE 12 IN constants.z80
                     > USED AT LINE 13 IN constants.z80
 RET_STACK:          10000 DEFINED AT LINE 13 IN constants.z80
@@ -1228,14 +1661,18 @@ IMMED:              0040 DEFINED AT LINE 15 IN constants.z80
                     > USED AT LINE 40
 HIDE:               0080 DEFINED AT LINE 16 IN constants.z80
 FALSE:              0000 DEFINED AT LINE 18 IN constants.z80
-                    > USED AT LINE 36
-                    > USED AT LINE 36
+                    > USED AT LINE 41
+                    > USED AT LINE 41
                     > USED AT LINE 23 IN variables.z80
 TRUE:               00-1 DEFINED AT LINE 19 IN constants.z80
+                    > USED AT LINE 41
 CALL_OPCODE:        00CD DEFINED AT LINE 21 IN constants.z80
 JP_OPCODE:          00C3 DEFINED AT LINE 22 IN constants.z80
 RET_OPCODE:         00C9 DEFINED AT LINE 23 IN constants.z80
-BACKLINK:           01E4 DEFINED AT LINE 7
+BACKLINK:           0308 DEFINED AT LINE 7
+                    > USED AT LINE 6
+                    > USED AT LINE 6
+                    > USED AT LINE 6
                     > USED AT LINE 6
                     > USED AT LINE 39
                     > USED AT LINE 6
@@ -1244,37 +1681,76 @@ BACKLINK:           01E4 DEFINED AT LINE 7
                     > USED AT LINE 6
                     > USED AT LINE 6
                     > USED AT LINE 6
-                    > USED AT LINE 37
-SAVEASMPTR:         008B DEFINED AT LINE 38
+                    > USED AT LINE 6
+                    > USED AT LINE 6
+                    > USED AT LINE 6
+                    > USED AT LINE 6
+                    > USED AT LINE 6
+                    > USED AT LINE 6
+                    > USED AT LINE 6
+                    > USED AT LINE 6
+                    > USED AT LINE 40
+SAVEASMPTR:         00E1 DEFINED AT LINE 38
                     > USED AT LINE 41
-RST00:              0000 DEFINED AT LINE 16
-RST08:              0008 DEFINED AT LINE 21
-RST38:              0038 DEFINED AT LINE 25
-INITKERNEL:         003B DEFINED AT LINE 2 IN core-kernel.z80
-HEADER_CAT:         007D DEFINED AT LINE 5
+RST00:              0000 DEFINED AT LINE 17
+RST08:              0008 DEFINED AT LINE 22
+RST38:              0038 DEFINED AT LINE 26
+DONEXT:             003B DEFINED AT LINE 3 IN core-control.z80
+                    > USED AT LINE 50 IN core-print.z80
+DONEXT1:            0053 DEFINED AT LINE 13 IN core-control.z80
+                    > USED AT LINE 8 IN core-control.z80
+DONEXT2:            0056 DEFINED AT LINE 16 IN core-control.z80
+                    > USED AT LINE 12 IN core-control.z80
+INITKERNEL:         0059 DEFINED AT LINE 2 IN core-kernel.z80
+HEADER_ANDD:        009D DEFINED AT LINE 5
                     > USED AT LINE 7
-CAT:                0083 DEFINED AT LINE 10
-HEADER_CBANG:       008B DEFINED AT LINE 5
+ANDD:               00A4 DEFINED AT LINE 10
+HEADER_ORR:         00AF DEFINED AT LINE 5
                     > USED AT LINE 7
-CBANG:              0091 DEFINED AT LINE 10
-HEADER_AT:          0099 DEFINED AT LINE 5
+ORR:                00B5 DEFINED AT LINE 10
+HEADER_XORR:        00C0 DEFINED AT LINE 5
                     > USED AT LINE 7
-AT:                 009E DEFINED AT LINE 10
-HEADER_BANG:        00A6 DEFINED AT LINE 5
+XORR:               00C7 DEFINED AT LINE 10
+HEADER_CAT:         00D2 DEFINED AT LINE 5
                     > USED AT LINE 7
-BANG:               00AB DEFINED AT LINE 10
-HEADER_EMIT:        00B4 DEFINED AT LINE 5
+CAT:                00D8 DEFINED AT LINE 10
+HEADER_CBANG:       00E1 DEFINED AT LINE 5
                     > USED AT LINE 7
-EMIT:               00BC DEFINED AT LINE 10
-                    > USED AT LINE 17 IN core-print.z80
-HEADER_DOT:         00C5 DEFINED AT LINE 5
+CBANG:              00E7 DEFINED AT LINE 10
+HEADER_AT:          00EF DEFINED AT LINE 5
                     > USED AT LINE 7
-DOT:                00CA DEFINED AT LINE 10
-                    > USED AT LINE 66
-DOT1:               00DD DEFINED AT LINE 14 IN core-print.z80
-                    > USED AT LINE 11 IN core-print.z80
-DOT2:               00E2 DEFINED AT LINE 16 IN core-print.z80
-                    > USED AT LINE 13 IN core-print.z80
+AT:                 00F4 DEFINED AT LINE 10
+HEADER_BANG:        00FE DEFINED AT LINE 5
+                    > USED AT LINE 7
+BANG:               0103 DEFINED AT LINE 10
+HEADER_DOT:         010C DEFINED AT LINE 5
+                    > USED AT LINE 7
+DOT:                0111 DEFINED AT LINE 10
+DOT1:               0124 DEFINED AT LINE 7 IN core-print.z80
+                    > USED AT LINE 4 IN core-print.z80
+DOT2:               0129 DEFINED AT LINE 9 IN core-print.z80
+                    > USED AT LINE 6 IN core-print.z80
+HEADER_TYPE:        0133 DEFINED AT LINE 5
+                    > USED AT LINE 7
+TYPE:               013B DEFINED AT LINE 10
+                    > USED AT LINE 73
+                    > USED AT LINE 67
+                    > USED AT LINE 73
+TYPE1:              0143 DEFINED AT LINE 18 IN core-print.z80
+                    > USED AT LINE 29 IN core-print.z80
+TYPE2:              0158 DEFINED AT LINE 30 IN core-print.z80
+                    > USED AT LINE 21 IN core-print.z80
+HEADER_CR:          0160 DEFINED AT LINE 5
+                    > USED AT LINE 7
+CR:                 0166 DEFINED AT LINE 10
+HEADER_TYPEX:       0173 DEFINED AT LINE 5
+                    > USED AT LINE 7
+TYPEX:              017C DEFINED AT LINE 10
+                    > USED AT LINE 62
+TYPEX1:             0188 DEFINED AT LINE 43 IN core-print.z80
+                    > USED AT LINE 51 IN core-print.z80
+TYPEX2:             0199 DEFINED AT LINE 49 IN core-print.z80
+                    > USED AT LINE 42 IN core-print.z80
 SER_EMPTYSIZE:      0005 DEFINED AT LINE 1 IN core-serial.z80
 SER_FULLSIZE:       0030 DEFINED AT LINE 2 IN core-serial.z80
                     > USED AT LINE 64 IN core-serial.z80
@@ -1282,61 +1758,86 @@ IO_CTRL:            0080 DEFINED AT LINE 4 IN core-serial.z80
                     > USED AT LINE 22 IN core-serial.z80
                     > USED AT LINE 31 IN core-serial.z80
                     > USED AT LINE 67 IN core-serial.z80
-                    > USED AT LINE 79 IN core-serial.z80
+                    > USED AT LINE 75 IN core-serial.z80
 IO_DATA:            0081 DEFINED AT LINE 5 IN core-serial.z80
                     > USED AT LINE 34 IN core-serial.z80
-                    > USED AT LINE 83 IN core-serial.z80
+                    > USED AT LINE 80 IN core-serial.z80
 RTS_HIGH:           00D6 DEFINED AT LINE 6 IN core-serial.z80
                     > USED AT LINE 66 IN core-serial.z80
 RTS_LOW:            0096 DEFINED AT LINE 7 IN core-serial.z80
                     > USED AT LINE 21 IN core-serial.z80
 PORT_STATUS:        0004 DEFINED AT LINE 9 IN core-serial.z80
 PORT_DATA:          0003 DEFINED AT LINE 10 IN core-serial.z80
-INITSERIAL:         00EC DEFINED AT LINE 13 IN core-serial.z80
-                    > USED AT LINE 41
-SERIALIN:           0103 DEFINED AT LINE 28 IN core-serial.z80
-                    > USED AT LINE 26
-SERIALIN1:          0110 DEFINED AT LINE 36 IN core-serial.z80
+INITSERIAL:         01A6 DEFINED AT LINE 13 IN core-serial.z80
+                    > USED AT LINE 44
+SERIALIN:           01BD DEFINED AT LINE 28 IN core-serial.z80
+                    > USED AT LINE 27
+SERIALIN1:          01CA DEFINED AT LINE 36 IN core-serial.z80
                     > USED AT LINE 33 IN core-serial.z80
-SERIALIN2:          0114 DEFINED AT LINE 43 IN core-serial.z80
+SERIALIN2:          01CE DEFINED AT LINE 43 IN core-serial.z80
                     > USED AT LINE 35 IN core-serial.z80
-SERIALIN21:         011E DEFINED AT LINE 50 IN core-serial.z80
+SERIALIN21:         01D8 DEFINED AT LINE 50 IN core-serial.z80
                     > USED AT LINE 47 IN core-serial.z80
-SERIALIN22:         012A DEFINED AT LINE 57 IN core-serial.z80
+SERIALIN22:         01E4 DEFINED AT LINE 57 IN core-serial.z80
                     > USED AT LINE 55 IN core-serial.z80
-SERIALIN23:         013E DEFINED AT LINE 68 IN core-serial.z80
+SERIALIN23:         01F8 DEFINED AT LINE 68 IN core-serial.z80
                     > USED AT LINE 65 IN core-serial.z80
-PUTC:               013F DEFINED AT LINE 76 IN core-serial.z80
-                    > USED AT LINE 4 IN core-print.z80
-PUTC0:              0140 DEFINED AT LINE 78 IN core-serial.z80
-                    > USED AT LINE 81 IN core-serial.z80
-SERREADY:           014A DEFINED AT LINE 91 IN core-serial.z80
-GETC:               0150 DEFINED AT LINE 102 IN core-serial.z80
-TOR:                015B DEFINED AT LINE 4 IN core-stack.z80
+HEADER_EMIT:        01F9 DEFINED AT LINE 5
+                    > USED AT LINE 7
+EMIT:               0201 DEFINED AT LINE 10
+                    > USED AT LINE 10 IN core-print.z80
+                    > USED AT LINE 25 IN core-print.z80
+                    > USED AT LINE 46 IN core-print.z80
+EMIT1:              0203 DEFINED AT LINE 74 IN core-serial.z80
+                    > USED AT LINE 77 IN core-serial.z80
+SERREADY:           020F DEFINED AT LINE 88 IN core-serial.z80
+HEADER_KEY:         0215 DEFINED AT LINE 5
+                    > USED AT LINE 7
+KEY:                021C DEFINED AT LINE 10
+KEY1:               0223 DEFINED AT LINE 97 IN core-serial.z80
+                    > USED AT LINE 100 IN core-serial.z80
+HEADER_QKEY:        0232 DEFINED AT LINE 5
+                    > USED AT LINE 7
+QKEY:               023A DEFINED AT LINE 10
+                    > USED AT LINE 98 IN core-serial.z80
+TOR:                025E DEFINED AT LINE 4 IN core-stack.z80
+                    > USED AT LINE 10 IN core-control.z80
+                    > USED AT LINE 41 IN core-print.z80
                     > USED AT LINE 25 IN core-stack.z80
                     > USED AT LINE 26 IN core-stack.z80
                     > USED AT LINE 42 IN core-stack.z80
-                    > USED AT LINE 53 IN core-stack.z80
-RFROM:              0166 DEFINED AT LINE 10 IN core-stack.z80
+RFROM:              0269 DEFINED AT LINE 10 IN core-stack.z80
+                    > USED AT LINE 5 IN core-control.z80
                     > USED AT LINE 31 IN core-stack.z80
                     > USED AT LINE 32 IN core-stack.z80
                     > USED AT LINE 38 IN core-stack.z80
-                    > USED AT LINE 49 IN core-stack.z80
-RAT:                0171 DEFINED AT LINE 16 IN core-stack.z80
+RAT:                0274 DEFINED AT LINE 16 IN core-stack.z80
                     > USED AT LINE 39 IN core-stack.z80
-TWOTOR:             017C DEFINED AT LINE 22 IN core-stack.z80
-TWORFROM:           0193 DEFINED AT LINE 29 IN core-stack.z80
-TWORAT:             01AA DEFINED AT LINE 36 IN core-stack.z80
-LITSTRING:          01C5 DEFINED AT LINE 47 IN core-stack.z80
-HEADER_COUNT:       01E4 DEFINED AT LINE 5
+TWOTOR:             027F DEFINED AT LINE 22 IN core-stack.z80
+TWORFROM:           0296 DEFINED AT LINE 29 IN core-stack.z80
+TWORAT:             02AD DEFINED AT LINE 36 IN core-stack.z80
+HEADER_LIT:         02C8 DEFINED AT LINE 5
                     > USED AT LINE 7
-COUNT:              01ED DEFINED AT LINE 10
-                    > USED AT LINE 50 IN core-stack.z80
-INITIALLATEST:      01FA DEFINED AT LINE 36
-                    > USED AT LINE 36
-                    > USED AT LINE 36
-START:              01FC DEFINED AT LINE 39
-                    > USED AT LINE 18
+LIT:                02CF DEFINED AT LINE 10
+HEADER_LITSTR:      02D6 DEFINED AT LINE 5
+                    > USED AT LINE 7
+LITSTR:             02E0 DEFINED AT LINE 10
+                    > USED AT LINE 56
+                    > USED AT LINE 56
+                    > USED AT LINE 56
+                    > USED AT LINE 56
+HEADER_COUNT:       02F1 DEFINED AT LINE 5
+                    > USED AT LINE 7
+COUNT:              02FA DEFINED AT LINE 10
+                    > USED AT LINE 58 IN core-stack.z80
+HEADER_OK:          0308 DEFINED AT LINE 5
+                    > USED AT LINE 7
+OK:                 030E DEFINED AT LINE 10
+INITIALLATEST:      032E DEFINED AT LINE 39
+                    > USED AT LINE 41
+                    > USED AT LINE 41
+START:              0330 DEFINED AT LINE 42
+                    > USED AT LINE 19
 DSTACK:             2080 DEFINED AT LINE 2 IN variables.z80
                     > USED AT LINE 2
                     > USED AT LINE 2
@@ -1354,7 +1855,7 @@ SERBUFUSED:         2104 DEFINED AT LINE 8 IN variables.z80
                     > USED AT LINE 45 IN core-serial.z80
                     > USED AT LINE 61 IN core-serial.z80
                     > USED AT LINE 63 IN core-serial.z80
-                    > USED AT LINE 92 IN core-serial.z80
+                    > USED AT LINE 89 IN core-serial.z80
 SERBUF:             2106 DEFINED AT LINE 9 IN variables.z80
                     > USED AT LINE 17 IN core-serial.z80
                     > USED AT LINE 54 IN core-serial.z80
@@ -1367,25 +1868,25 @@ LINEBUF:            214D DEFINED AT LINE 15 IN variables.z80
 WORDBUF1:           21CD DEFINED AT LINE 17 IN variables.z80
 WORDBUF2:           220D DEFINED AT LINE 18 IN variables.z80
 VAR_BASE:           224D DEFINED AT LINE 20 IN variables.z80
-                    > USED AT LINE 36
-                    > USED AT LINE 36
-                    > USED AT LINE 36
+                    > USED AT LINE 41
+                    > USED AT LINE 41
+                    > USED AT LINE 41
 VAR_HERE:           224F DEFINED AT LINE 21 IN variables.z80
-                    > USED AT LINE 36
-                    > USED AT LINE 36
+                    > USED AT LINE 41
+                    > USED AT LINE 41
 VAR_LATEST:         2251 DEFINED AT LINE 22 IN variables.z80
-                    > USED AT LINE 36
-                    > USED AT LINE 36
+                    > USED AT LINE 41
+                    > USED AT LINE 41
 VAR_STATE:          2253 DEFINED AT LINE 23 IN variables.z80
-                    > USED AT LINE 36
-                    > USED AT LINE 36
-CHARPTR:            2255 DEFINED AT LINE 53
-                    > USED AT LINE 107 IN core-serial.z80
-                    > USED AT LINE 110 IN core-serial.z80
-TESCOUNT:           2257 DEFINED AT LINE 54
-TESDEPTH:           2259 DEFINED AT LINE 55
-TESTS_START:        225B DEFINED AT LINE 57
-                    > USED AT LINE 48
-START_USER:         2281 DEFINED AT LINE 86
-                    > USED AT LINE 36
-                    > USED AT LINE 36
+                    > USED AT LINE 41
+                    > USED AT LINE 41
+CHARPTR:            2255 DEFINED AT LINE 56
+                    > USED AT LINE 41
+                    > USED AT LINE 41
+TESCOUNT:           2257 DEFINED AT LINE 57
+TESDEPTH:           2259 DEFINED AT LINE 58
+TESTS_START:        225B DEFINED AT LINE 60
+                    > USED AT LINE 51
+START_USER:         2278 DEFINED AT LINE 85
+                    > USED AT LINE 41
+                    > USED AT LINE 41
