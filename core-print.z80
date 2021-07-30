@@ -1,12 +1,10 @@
-; emit ( n -- )
-CODE "emit", emit                            
+CODE "emit", emit                            ; --
     pop IX
     ld A,C
     call putc
     _drop
     JP (IX)
     
-; . ( n -- )
 CODE ".", dot
     ENTER
     _isZero

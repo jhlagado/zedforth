@@ -1,4 +1,5 @@
+; resets the stacks so it must only be called from the top-level routine
 initKernel:
-    POP IX
+    pop IX
     _initKernel
     jp (IX)

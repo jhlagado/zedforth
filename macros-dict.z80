@@ -1,20 +1,26 @@
 backLink: .set 0                            ; assembler var, link to previous word
+saveAsmPtr .set 0
 
-.macro _CODE, name, flags, label
+.macro _CODE, name, label, flags 
 HEADER_label:
-    DW backLink                             ; link to previous word
+    dw backLink                             ; link to previous word
 backLink: .set HEADER_label
-    DB flags                                ; flags
+    db flags                                ; flags
     .pstr name                              ; name string
 label:                                      ; body
 .endm
 
 .macro CODE, name, label
-    _CODE name, 0, label
+    _CODE name, label, 0
 .endm
 
-.macro ICODE, name, label                   ; immediately executed code
-    _CODE name, IMMED, label
+; Prims are words which do not call other words. 
+; Enter and Exit do not use RSTACK.
+.macro PRIM, name, label, bodyMacro
+    CODE name,label
+    pop IX
+    bodyMacro
+	jp (IX)			    ; 4t;
 .endm
 
 .macro CONST, name, label, value
@@ -26,4 +32,11 @@ label:                                      ; body
 
 .macro VAR, name, label, variable
     CONST name, label, variable
+.endm
+
+.macro _flags, flags
+    saveAsmPtr .set $
+    .org backLink + 2
+    db flags
+    .org saveAsmPtr
 .endm

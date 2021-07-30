@@ -1,7 +1,3 @@
-; IX = RTOS
-; BC = RP
-; HL = TOS
-
 .macro _initKernel
     push IX
     ld SP,dStack
@@ -17,12 +13,13 @@
     jp (IX)
 .endm
 
+; enter and exit for normal colon words 
 .macro ENTER        ; 53t		x a ? --      5 bytes 
-    _tdrop			    ; 10t	; x y 				T: a
+    _tdrop			    ; 10t	; x y 				TMP: a
     _rpush H,L		    ; 34t	; x y    	R: a	
 .endm
 
 .macro EXIT         ; 38t       x -- x a    R: a --          5 bytes
-	_rpop H,L			; 34t			R: 		T: a
+	_rpop H,L			; 34t			R: 		TMP: a
 	jp (HL)			    ; 4t;
 .endm

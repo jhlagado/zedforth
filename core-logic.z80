@@ -1,11 +1,24 @@
-; xor ( x1 x2 -- x3 )       
+; xor    x1 x2 -- x3            logical xor
 CODE "xorr",XORR	        ; bitwise xor
-    ENTER
-    _toT
-    ld A,L
-    xor E
-    ld E,A
+    _binaryOp xor
+    ; FENTER
+    ; pop DE
+    ; ld A,H
+    ; xor D
+    ; ld H,A
+    ; ld A,L
+    ; xor E
+    ; ld L,A
+    ; FEXIT
+
+.macro _binaryOp op
+    FENTER
+    pop DE
     ld A,H
-    xor D
-    ld D,A
-    EXIT
+    op D
+    ld H,A
+    ld A,L
+    op E
+    ld L,A
+    FEXIT
+.endm

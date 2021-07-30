@@ -1,22 +1,13 @@
-; c@ ( CODE 'c@',cat )                                 
-    ENTER
-    _cAt
-    EXIT
+; c@ ( a -- n )
+PRIM 'c@',cAt,_cAt
+_flags IMMED
 
-; c! ( n ptr -- ) 
-CODE 'c!',cbang                              
-    ENTER
-    _cBang
-    EXIT
 
-; ! ( a -- n )
-CODE "@",at 
-    ENTER
-    _at
-    EXIT
+; c! ( n a -- )
+PRIM 'c!',cBang,_cBang
+
+; @ ( a -- n )
+PRIM "@",at,_at
 
 ; ! ( n a -- )
-CODE "!",bang 
-    ENTER
-    _bang    
-    EXIT
+PRIM "!",bang,_bang

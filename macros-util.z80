@@ -1,12 +1,12 @@
 
 .macro _plus                         
-    _toT
+    _toTMP
     add HL,DE    
     ex DE,HL
 .endm
 
 .macro _minus                         
-    POP HL
+    _Tdrop
     or A    
     sbc HL,DE
     ex DE,HL
@@ -31,20 +31,17 @@
     _drop
 .endm
 
-; put src (value or memory) location on top of param stack
-.macro _push, src                           
+.macro _push, src                           ; put src (value or memory) location on top of param stack
     _dup
     ld DE, src
 .endm
 
-; put top of param stack into dest
-.macro _pop, dest                           
+.macro _pop, dest                           ; put top of param stack into dest
     ld dest, DE
     _drop
 .endm
 
-; put src (value or memory) location on top of param stack
-.macro _pushc, src                           
+.macro _pushc, src                           ; put src (value or memory) location on top of param stack
     _dup
     ld E, src
     ld D,0
@@ -80,3 +77,9 @@
     .pstr s1
 .endm    
 
+.macro _count
+    _dup
+    _onePlus
+    _swap
+    _cat
+.endm

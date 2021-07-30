@@ -1,54 +1,54 @@
-CODE ">r",toR
+; BC = RP
+; HL = TOS
+
+toR:
     pop IX
-    _rpush D,E		; 34t		x		R x 
-	_drop			; 10t				R x
+    _rpush D,E		; 34t		x		R: x 
+	_drop			; 10t				R: x
     jp (IX)
 
-CODE "r>",rFrom
+rFrom:
     pop IX
 	_dup			; 11t			
     _rpop	D,E		; 34t		x 		
     jp (IX)
 
-CODE "r@",rAt
+rAt:
     pop IX
 	_dup			; 11
-    _rpeek D,E		; 34t				R x		T x
+    _rpeek D,E		; 34t				R: x		TMP x
     jp (IX)
 
-; d --          
-CODE "2>r",twoToR		        
+twoToR:		        ; d --          
     ENTER
     _swap			
     call toR        
     call toR        
     EXIT
 
-; -- d           
-CODE "2r>",twoRFrom	        
+twoRFrom:	        ; -- d           
     ENTER
     call rFrom		
     call rFrom		
     _swap		
     EXIT
 
-; a b -- a b x y  	R x y
-CODE "2r@",twoRAt             
+twoRAt:             ; a b -- a b x y  	R: x y
     ENTER
-    call rFrom      ; 44t		a b y 		R x
-    call rAt        ; 44t		a b y x		R x		T x
+    call rFrom      ; 44t		a b y 		R: x
+    call rAt        ; 44t		a b y x		R: x		TMP: x
     _swap           ; 20t		a b x y  
-    _dup            ; 10t		a b x y y	R x
-    call toR        ; 45t		a b x y		R x y
+    _dup            ; 10t		a b x y y	R: x
+    call toR        ; 45t		a b x y		R: x y
     EXIT
 
 ;      -- c-addr u   
 ; is followed by a literal Packed (Pascal) string
-litString                         
+litString:                         
     ENTER
-    call rFrom          ; addr
-    call count          ; addr+1 len
-    _twoDup             ; addr+1 len addr+1 len
-    _plus               ; addr+1 len addr+len+1
-    call toR            ; addr+1 len
-    EXIT                ; TODO optimise to LD HL,BC jp (HL)
+    call rFrom      ; addr
+    call count      ; addr+1 len
+    _twoDup         ; addr+1 len addr+1 len
+    _plus           ; addr+1 len addr+len+1
+    call toR        ; addr+1 len
+    EXIT            ; TODO: optimise to LD HL,BC jp (HL)
