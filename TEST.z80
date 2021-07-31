@@ -15,7 +15,7 @@ TESTMODE equ 1
 
 .org START_ROM
 RST00:                                      ; Reset
-    di                                          ; Disable interrupts
+    di                                          
     jp start
 
 .org $0008
@@ -59,7 +59,7 @@ org START_RAM
 
 TESTS_START:
     _push 16
-    _store base
+    _store var_base
 
     _print "Hello!\r\n"
     ; call ok

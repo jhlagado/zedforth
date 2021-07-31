@@ -1,20 +1,20 @@
 toR:
-    pop IX
+    pop HL
     _rpush D,E		; 34t		x		R: x 
 	_drop			; 10t				R: x
-    jp (IX)
+    jp (HL)
 
 rFrom:              ; 45t + 15t
-    pop IX
+    pop HL
 	_dup			; 11t			
     _rpop	D,E		; 34t		x 		
-    jp (IX)
+    jp (HL)
 
 rAt:
-    pop IX
+    pop HL
 	_dup			; 11
     _rpeek D,E		; 34t				R: x		TMP x
-    jp (IX)
+    jp (HL)
 
 twoToR:		        ; d --          
     ENTER

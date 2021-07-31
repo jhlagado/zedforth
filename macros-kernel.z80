@@ -2,13 +2,13 @@
     ld SP,dStack
     ld BC,rStack 
     _push FALSE
-    _store state
+    _store var_state
     _push 10
-    _store base
-    _fetch0 initialLatest
-    _store latest
+    _store var_base
+    _fetch initialLatest
+    _store var_latest
     _push START_USER
-    _store here
+    _store var_here
 .endm
 
 ; enter and exit for normal colon words 

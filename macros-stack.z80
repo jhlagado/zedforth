@@ -45,33 +45,33 @@
 .endm
 
 .macro _drop                ; 10t			x1 --  
-    pop DE			            ; 10t
+    pop DE			            
 .endm
 
 .macro _swap                ; 25t			x1 x2 -- x2 x1
     ex DE,HL		
     pop DE		
-    push HL			            ; 11t			x2 x1
+    push HL			        ; 11t			x2 x1
 .endm
 
 .macro _over 	            ; 35t			x1 x2 -- x1 x2 x1
     pop HL			            ; 10t		x2			T: x1
-    push HL			            ; 11t			x1 x2			T: x1
+    push HL			            ; 11t		x1 x2		T: x1
 	_dup			            ; 11t
 	EX DE,HL			        ; 4t
 .endm
 
-.macro _nip 	; 12t			x1 x2 -- x2  		
-    INC SP			; 6t
-    INC SP			; 6t
+.macro _nip 	    ; 12t			x1 x2 -- x2  		
+    INC SP			    ; 6t
+    INC SP			    ; 6t
 .endm
 
-.macro _tuck				; x1 x2 -- x2 x1 x2
-	_swap				        ; 25t
-    _over				        ; 35t
+.macro _tuck				        ; x1 x2 -- x2 x1 x2
+	_swap				; 25t
+    _over				; 35t
 .endm
 
-.macro _rot	    ; 53t			( x1 x2 x3 -- x2 x3 x1 )
+.macro _rot	        ; 53t			( x1 x2 x3 -- x2 x3 x1 )
     ex DE,HL		
     pop DE		
     EX DE,HL			; 4t			x1 x3 			T: x2
@@ -80,14 +80,14 @@
 	EX DE,HL			; 4t
 .endm
 
-.macro _twoDup      ; 43t         		; x1 x2 -- x1 x2 x1 x2
+.macro _twoDup      ; 43t         	; x1 x2 -- x1 x2 x1 x2
     pop HL			    ; 10t		; x2				T: x1
-    push HL			    ; 11t			; x1 x2				T: x1
+    push HL			    ; 11t		; x1 x2				T: x1
 	_dup				; 11t		; x1 x2 x2			T: x1
-	push HL			    ; 11t			; x1 x2 x1 x2
+	push HL			    ; 11t		; x1 x2 x1 x2
 .endm
 
-.macro _twoDrop     ; 20t       		; x x --     
+.macro _twoDrop     ; 20t       	; x x --     
     _drop				; 10t
 	_drop				; 10t
 .endm
@@ -95,24 +95,24 @@
 .macro _twoswap	    ; 99t 			x1 x2 x3 x4 -- x3 x4 x1 x2 	
     ex DE,HL		
     pop DE		
-    EX(SP),HL			; 19			x1 x4 x3			T x2
-    _nip			    ; 12			x1 x3		N x4   		T x2
-    EX DE,HL			; 4			x1 x2               		T x3
-    EX(SP),HL			; 19			x3 x2				T x1
+    EX(SP),HL			; 19		x1 x4 x3			T x2
+    _nip			    ; 12		x1 x3		N x4   	T x2
+    EX DE,HL			; 4			x1 x2               T x3
+    EX(SP),HL			; 19		x3 x2				T x1
     EX DE,HL			; 4			x3 x1				T x2
-    UNnip			    ; 12			x3 x4 x1			T x1
+    UNnip			    ; 12		x3 x4 x1			T x1
 	_dup			    ; 11t
 	EX DE,HL			; 4t
 .endm
 
 .macro _twoOver	    ; 114t			x1 x2 x3 x4 -- x1 x2 x3 x4 x1 x2	       
     _dup				; 11t		x1 x2 x3 x4 x4
-	_twoNip				; 24t		x1 x2 x4	      N: x3 x4
-	_drop				; 10t		x1 x2	                  N: x2 x3 x4
-	pop HL			    ; 10t		x2		      N: x1 x2 x3 x4  T = x1
-    _twoUnnip			; 24t		x1 x2 x2   	      N: x3 x4            T = x1
-	_twoUnnip			; 24t		x1 x2 x3 x4 x2                                T = x1
-    push HL			    ; 11t			x1 x2 x3 x4 x1 x2	
+	_twoNip				; 24t		x1 x2 x4	    N: x3 x4
+	_drop				; 10t		x1 x2	        N: x2 x3 x4
+	pop HL			    ; 10t		x2		        N: x1 x2 x3 x4      T = x1
+    _twoUnnip			; 24t		x1 x2 x2   	    N: x3 x4            T = x1
+	_twoUnnip			; 24t		x1 x2 x3 x4 x2                      T = x1
+    push HL			    ; 11t		x1 x2 x3 x4 x1 x2	
 .endm
 
 .macro _twonip      ; 24t			n1 n2 n3 -- n3 		

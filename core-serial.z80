@@ -105,11 +105,11 @@ key1:
 CODE "?key",qkey
     pop IX
     .if TESTMODE
-        _fetch0 charPtr
+        _fetch charPtr
         _dup
         _cat
         _swap
-        _store0 charPtr
+        _store charPtr
         _push TRUE
     .else
         ld A,(serBufUsed)

@@ -1,7 +1,7 @@
 .macro TEST_SET_TEXT, s1
-    _fetch0 lineBufStart
-    _store0 lineBufTop
-    _store0 currkey
+    _fetch lineBufStart
+    _store lineBufTop
+    _store currkey
     call litString
     .pstr "\r\n",-1,"\r\n"
     _store charPtr

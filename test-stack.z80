@@ -1,6 +1,6 @@
     _initKernel
     _push 16
-    _store base
+    _store var_base
 
     call lit
     dw $123

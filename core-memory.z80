@@ -2,7 +2,6 @@
 PRIM 'c@',cAt,_cAt
 _flags IMMED
 
-
 ; c! ( n a -- )
 PRIM 'c!',cBang,_cBang
 
@@ -11,3 +10,53 @@ PRIM "@",at,_at
 
 ; ! ( n a -- )
 PRIM "!",bang,_bang
+
+; @ ( a -- n )
+PRIM "2@",twoAt,_twoAt
+
+; ! ( n a -- )
+PRIM "2!",twoBang,_twoBang
+
+; ! ( n a -- )
+PRIM "+!",plusBang,_plusBang
+
+; , ( w -- )
+; Compile an integer into the code dictionary.
+CODE ",",COMMA
+    ENTER
+    _fetch var_here                             ; w here
+    _dup                                        ; w here here
+    call tor                                    ; w here        R: here
+    _bang                                  
+    call rfrom                                  ; here                                  
+    _cellPlus                                   ; here+2
+    _store var_here                             ; here+2 &here
+    EXIT                                                     
+
+CODE "c,",CCOMMA
+    ENTER
+    _fetch var_here                             ; w here
+    _dup                                 
+    call tor                                    ; w here r: here
+    _bang                                  
+    call rfrom                                  ; here                                  
+    _onePlus                                    ; here+1
+    _cstore var_here                            ; here+1 &here
+    EXIT                                                     
+
+; call,       ( adr -- )
+; Assemble a call instruction to adr
+CODE 'call,',0,CALLC
+    ENTER
+    _push CALL_OPCODE
+    call ccomma
+    call comma
+    EXIT                                                     
+
+; ALLOT       ( n -- )
+; Allocate n bytes to the code dictionary.
+CODE "allot",allot               
+    ENTER
+    _fetch var_here 
+    call plusBang                               ; adds n to here
+    EXIT                                                     

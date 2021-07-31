@@ -1,21 +1,21 @@
-.macro _fetch0, name
+.macro _fetch, name
     _push name
     _at
 .endm
 
-.macro _store0, name
+.macro _cfetch, name
     _push name
-    _bang
-.endm
-
-.macro _fetch, name
-    _push var_name
     _at
 .endm
 
 .macro _store, name
-    _push var_name
+    _push name
     _bang
+.endm
+
+.macro _cstore, name
+    _push name
+    _cBang
 .endm
 
 .macro _cAt     ; 18t			a -- c
@@ -63,4 +63,15 @@
 	_bang			    ; 46t		x a
 	_cellPlus			; 12t		x a+1
 	_bang			    ; 46t
+.endm
+
+; +! ( n a -- )
+; Add n to the contents at address a.
+.macro _plusBang
+    _swap                                   ; a n
+    _over                                   ; a n a
+    _at                                     ; a n d
+    _plus                                   ; a n+d
+    _swap                                   ; n+d a
+    _bang
 .endm
