@@ -1,5 +1,5 @@
 ; resets the stacks so it must only be called from the top-level routine
 initKernel:
-    FENTER
+    pop IX
     _initKernel
-    FEXIT
+    jp (IX)

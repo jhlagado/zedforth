@@ -26,7 +26,8 @@
 .endm
 
 .macro _cBang   ; 31t			c a --
-	_toT			; 14t
+    ex DE,HL		
+    pop DE		
     ld (HL),E		; 7t
 	_drop			; 10t
 .endm
@@ -41,7 +42,8 @@
 .endm
 
 .macro _bang        ; 34t			n a --
-	_toT				; 14t
+    ex DE,HL		
+    pop DE		
     ld (HL),E			; 7
 	INC HL			    ; 6
     ld (HL),D			; 7

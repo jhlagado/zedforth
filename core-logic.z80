@@ -1,6 +1,6 @@
 ; and    x1 x2 -- x3            logical xor
 CODE "and",andd	        ; bitwise xor
-    FENTER
+    pop IX
     pop DE
     ld A,H
     xor D
@@ -8,11 +8,11 @@ CODE "and",andd	        ; bitwise xor
     ld A,L
     xor E
     ld L,A
-    FEXIT
+    jp (IX)
 
 ; or    x1 x2 -- x3            logical xor
 CODE "or",orr	        ; bitwise xor
-    FENTER
+    pop IX
     pop DE
     ld A,H
     xor D
@@ -20,11 +20,11 @@ CODE "or",orr	        ; bitwise xor
     ld A,L
     xor E
     ld L,A
-    FEXIT
+    jp (IX)
 
 ; xor    x1 x2 -- x3            logical xor
 CODE "xor",xorr	        ; bitwise xor
-    FENTER
+    pop IX
     pop DE
     ld A,H
     xor D
@@ -32,5 +32,5 @@ CODE "xor",xorr	        ; bitwise xor
     ld A,L
     xor E
     ld L,A
-    FEXIT
+    jp (IX)
 

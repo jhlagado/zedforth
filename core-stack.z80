@@ -1,23 +1,20 @@
-; BC = RP
-; HL = TOS
-
 toR:
-    FENTER
+    pop IX
     _rpush D,E		; 34t		x		R: x 
 	_drop			; 10t				R: x
-    FEXIT
+    jp (IX)
 
 rFrom:              ; 45t + 15t
-    FENTER
+    pop IX
 	_dup			; 11t			
     _rpop	D,E		; 34t		x 		
-    FEXIT
+    jp (IX)
 
 rAt:
-    FENTER
+    pop IX
 	_dup			; 11
     _rpeek D,E		; 34t				R: x		TMP x
-    FEXIT
+    jp (IX)
 
 twoToR:		        ; d --          
     ENTER
@@ -58,5 +55,6 @@ CODE "litStr", litStr
     call count      ; adr+1 len
     _twoDup         ; adr+1 len adr+1 len
     _plus           ; adr+1 len adr'
-    _toT            ; adr+1 len             HL: adr'
+    ex DE,HL		; adr+1 len ?           HL: adr'
+    pop DE		    ; adr+1 len             HL: adr'
     jp (HL)
