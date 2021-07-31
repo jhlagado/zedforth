@@ -150,7 +150,7 @@
 0000                 ld A,(HL)		; 7t
 0000                	INC HL			; 6t
 0000                 ld H,(HL)		; 7t
-0000                 ld E,A          ; 4t
+0000                 ld L,A          ; 4t
 0000                 EX DE,HL		; 4t
 0000                .endm
 0000                 
@@ -455,16 +455,16 @@
 0047                          ;*Macro unroll:  _oneMinus           ; 4t    ; ret idx'
 0047   1B                     DEC   DE   ; 4t    ; ret idx'
 0048   CD 5E 02               CALL   tor   ; 60t   ; ret   R: idx'
-004B                          ;*Macro unroll:  _at                 ; 32t   ; ret'  R: idx'
-004B   EB                     EX   DE,HL   ; 32t   ; ret"  R: idx"
+004B                          ;*Macro unroll:  _at                 ; 32t   ; ret@  R: idx'
+004B   EB                     EX   DE,HL   ; 32t   ; ret@  R: idx'
 004C   7E                     LD   A,(HL)   
 004D   23                     INC   HL   
 004E   66                     LD   H,(HL)   
-004F   5F                     LD   E,A   
+004F   6F                     LD   L,A   
 0050   EB                     EX   DE,HL   
 0051   18 03                  JR   doNext2   ; 12t
 0053                DONEXT1:      
-0053                          ;*Macro unroll:  _drop           ; 10t   ; ret
+0053                          ;*Macro unroll:  _drop               ; 10t   ; ret
 0053   D1                     POP   DE   ; 10t   ; ret
 0054                          ;*Macro unroll:  _twoPlus            ; 12t   ; ret'
 0054                          ;*Macro unroll:  _onePlus
@@ -472,7 +472,7 @@
 0055                          ;*Macro unroll:  _onePlus
 0055   13                     INC   DE   
 0056                DONEXT2:      
-0056   EB                     EX   DE,HL   ; 4t    ;       R: idx"     HL: ret"
+0056   EB                     EX   DE,HL   ; 4t    ;       R: idx'     HL: ret@
 0057                          ;*Macro unroll:  _drop               ; 10t   ;
 0057   D1                     POP   DE   ; 10t   ;
 0058   E9                     JP   (HL)   ; 4t
@@ -525,7 +525,7 @@
 0080   7E                     LD   A,(HL)   
 0081   23                     INC   HL   
 0082   66                     LD   H,(HL)   
-0083   5F                     LD   E,A   
+0083   6F                     LD   L,A   
 0084   EB                     EX   DE,HL   
 0085                          ;*Macro unroll:  _store latest
 0085                          ;*Macro unroll:  _push var_latest
@@ -679,7 +679,7 @@
 00F7   7E                     LD   A,(HL)   
 00F8   23                     INC   HL   
 00F9   66                     LD   H,(HL)   
-00FA   5F                     LD   E,A   
+00FA   6F                     LD   L,A   
 00FB   EB                     EX   DE,HL   
 00FC                          ;*Macro unroll: 	FEXIT			    ; 4t;
 00FC   DD E9                  JP   (IX)   ; 4t;
@@ -1129,7 +1129,7 @@
 0241   7E                     LD   A,(HL)   
 0242   23                     INC   HL   
 0243   66                     LD   H,(HL)   
-0244   5F                     LD   E,A   
+0244   6F                     LD   L,A   
 0245   EB                     EX   DE,HL   
 0246                          ;*Macro unroll:  _dup
 0246   D5                     PUSH   DE   
@@ -1537,7 +1537,7 @@
 0355   7E                     LD   A,(HL)   
 0356   23                     INC   HL   
 0357   66                     LD   H,(HL)   
-0358   5F                     LD   E,A   
+0358   6F                     LD   L,A   
 0359   EB                     EX   DE,HL   
 035A                          ;*Macro unroll:  _store latest
 035A                          ;*Macro unroll:  _push var_latest

@@ -36,7 +36,7 @@
     ld A,(HL)		; 7t
 	INC HL			; 6t
     ld H,(HL)		; 7t
-    ld E,A          ; 4t
+    ld L,A          ; 4t
     EX DE,HL		; 4t
 .endm
 
