@@ -1,18 +1,27 @@
+vvCodePtr0 .set 0
 vvCodePtr .set 0
 vvNamePtr .set END_ROM
-vvBackLink .set 0                               ;back link is null
+vvBackLink .set 0                           ;back link is null
 
 .macro MCODE, aaNAME, aaLEN, aaLABEL
 aaLABEL:                                    ; assembly label
+    vvCodePtr0 .set vvCodePtr               ; save code pointer
     vvCodePtr .set $                        ; save code pointer
+    
+    .if vvBackLink                          ; back patch code length
+        .org vvNamePtr + 4
+        dw (vvCodePtr - vvCodePtr0)
+    .endif
+    
     vvLEN  .set (aaLEN & 01FH)              ; length byte in 5 least sig bits
     
-    .org vvNamePtr - (vvLEN + 5)            ; header -= (link + token + len)                                     ; ? needed
+    .org vvNamePtr - (vvLEN + 8)            ; header -= (link + token + codelen + len + len byte)                                     ; ? needed
     vvNamePtr .set $                        ; save start of header
     
     dw vvBackLink                           ; back link       
     dw vvCodePtr                            ; execution token
-    
+    dw 0                                    ; execution token
+
     vvBackLink .set $                       ; link points to a name string (NFA)
     db aaLEN, aaNAME                        ; name string
     
