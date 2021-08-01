@@ -74,3 +74,8 @@
     call type
 .endm    
 
+.macro _compile, label
+    _push label
+    call callc
+.endm    
+

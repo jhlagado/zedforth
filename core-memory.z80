@@ -1,26 +1,26 @@
 ; c@ ( a -- n )
 MCODE 'c@',IMMED+2,cAt
-POP IX
+POP HL
 _cAt
-JP (IX)
+JP (HL)
 
 ; c! ( n a -- )
 MCODE 'c!',2,cBang
-POP IX
+POP HL
 _cBang
-JP (IX)
+JP (HL)
 
 ; @ ( a -- n )
 MCODE "@",2,at
-POP IX
+POP HL
 _at
-JP (IX)
+JP (HL)
 
 ; ! ( n a -- )
 MCODE "!",1,bang
-POP IX
+POP HL
 _bang
-JP (IX)
+JP (HL)
 
 ; @ ( a -- n )
 MCODE "2@",2,twoAt

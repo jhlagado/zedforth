@@ -28,8 +28,7 @@ RST08:                                      ; rst 38
 RST38:                                      ; rst 38
     jp serialIn
 
-VVCODE  .set $ 
-VVCODE  .set END_ROM 
+codePtr  .set $ 
 
     .include "core-control.z80"
     .include "core-kernel.z80"
@@ -40,11 +39,6 @@ VVCODE  .set END_ROM
     .include "core-serial.z80"
     .include "core-stack.z80"
     .include "core-util.z80"
-
-    mCODE "hello",5,hello
-    halt
-    mCODE "there",5,there
-    halt
 
 LASTN       EQU     vvNAME+4             ;last name address
 
@@ -72,7 +66,7 @@ TESTS_START:
     _push 16
     _store var_base
 
-    ; _print "Hello!\r\n"
+    _print "Hello!\r\n"
     ;; call ok
 
     ;; call tesStart
@@ -95,5 +89,10 @@ TESTS_START:
     
 START_USER:
 
+CPP:                    ; grows up
+                .ORG END_RAM - 2
+NPP:                    ; grows down
+
 vvCODE .set CPP
 vvNAME .set NPP
+

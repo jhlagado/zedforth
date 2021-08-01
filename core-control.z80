@@ -1,5 +1,5 @@
 ; doNext ( -- ) ( r: idx ) followed by address of loop start
-; Run time code for the single index loop.
+; Run time MCODE for the single index loop.
 doNext:                 ; ~274t
     _swap               ; 25t   ; ret 
     call rfrom          ; 60t   ; ret idx 
@@ -18,3 +18,131 @@ doNext2:
     _drop               ; 10t   ; 
     jp (HL)             ; 4t
 
+MCODE "?branch", 7, qbranch           
+    _isZero
+    jr z, branch
+    pop HL
+    inc HL
+    inc HL
+    jp (HL)
+
+MCODE "branch", 6, branch           
+    pop HL
+    ld A,(HL)
+    inc HL
+    ld H,(HL)
+    ld L,A
+    jp (HL)
+
+MCODE "execute", 7, execute
+    ld HL,BC
+    _drop
+    jp (HL)
+
+; FOR         ( -- a )
+; Start a FOR-NEXT loop structure in a colon definition.
+MCODE 'for',IMMED+3,for    
+    ENTER
+    _compile toR
+    _fetch var_here
+    EXIT
+
+; NEXT        ( a -- )
+; Terminate a FOR-NEXT loop structure.
+MCODE 'next',IMMED+4,next    
+    ENTER
+    _compile doNext
+    call COMMA
+    EXIT    
+    
+; AHEAD       ( -- A )
+; Compile a forward branch instruction.
+MCODE 'ahead',IMMED+5,ahead
+    ENTER
+    _compile branch
+    _fetch var_here
+    _push 0
+    call comma
+    EXIT
+
+; IF          ( -- A )
+; Begin a conditional branch structure.
+
+MCODE 'if',IMMED+2,iff
+    ENTER
+    _compile qbranch
+    _fetch var_here
+    _push 0
+    call comma
+    EXIT
+
+; ELSE        ( A -- A )
+; Start the false clause in an IF-ELSE-THEN structure.
+MCODE 'else',IMMED+4,else
+    ENTER
+    call ahead
+    _swap
+    call thenn
+    EXIT
+
+; THEN        ( A -- )
+; Terminate a conditional branch structure.
+MCODE 'then',IMMED+4,thenn
+    ENTER
+    _fetch var_here
+    _swap
+    _bang
+    EXIT
+
+; AFT         ( a -- a A )
+; Jump to THEN in a FOR-AFT-THEN-NEXT loop the 1st time through.
+MCODE 'aft',IMMED+3,aft
+    ENTER
+    _drop
+    call ahead
+    call begin
+    _swap
+    EXIT
+
+; BEGIN       ( -- a )
+; Start an infinite or indefinite loop structure.
+MCODE 'begin',IMMED+5,begin
+    ENTER
+    _fetch var_here
+    EXIT
+
+; UNTIL       ( a -- )
+; Terminate a BEGIN-UNTIL indefinite loop structure.
+MCODE 'until',IMMED+5,until
+    ENTER
+    _compile qbranch
+    call comma
+    EXIT
+
+; AGAIN       ( a -- )
+; Terminate a BEGIN-AGAIN infinite loop structure.
+
+MCODE 'again',IMMED+5,again
+    ENTER
+    _push jp_opcode
+    call ccomma
+    call comma
+    EXIT
+
+; REPEAT      ( A a -- )
+; Terminate a BEGIN-WHILE-REPEAT indefinite loop.
+MCODE 'repeat',IMMED+6,repeat
+    ENTER
+    call again
+    _fetch var_here
+    _swap
+    _bang
+    EXIT
+
+; WHILE       ( a -- A a )
+; Conditional branch out of a BEGIN-WHILE-REPEAT loop.
+MCODE 'while',IMMED+5,while
+    ENTER
+    call iff
+    _swap
+    EXIT

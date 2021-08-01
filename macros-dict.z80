@@ -1,57 +1,32 @@
-vvCodePtr0 .set 0
-vvCodePtr .set 0
-vvNamePtr .set END_ROM
-vvBackLink .set 0                           ;back link is null
+codePtr0 .set 0
+codePtr .set 0
+namePtr .set END_ROM
+backLink .set 0                           ;back link is null
 
 .macro MCODE, aaNAME, aaLEN, aaLABEL
 aaLABEL:                                    ; assembly label
-    vvCodePtr0 .set vvCodePtr               ; save code pointer
-    vvCodePtr .set $                        ; save code pointer
+    codePtr0 .set codePtr               ; save code pointer
+    codePtr .set $                        ; save code pointer
     
-    .if vvBackLink                          ; back patch code length
-        .org vvNamePtr + 4
-        dw (vvCodePtr - vvCodePtr0)
+    .if backLink                          ; back patch code length
+        .org namePtr + 4
+        dw (codePtr - codePtr0)
     .endif
     
     vvLEN  .set (aaLEN & 01FH)              ; length byte in 5 least sig bits
     
-    .org vvNamePtr - (vvLEN + 8)            ; header -= (link + token + codelen + len + len byte)                                     ; ? needed
-    vvNamePtr .set $                        ; save start of header
+    .org namePtr - (vvLEN + 8)            ; header -= (link + token + codelen + len + len byte)                                     ; ? needed
+    namePtr .set $                        ; save start of header
     
-    dw vvBackLink                           ; back link       
-    dw vvCodePtr                            ; execution token
+    dw backLink                           ; back link       
+    dw codePtr                            ; execution token
     dw 0                                    ; execution token
 
-    vvBackLink .set $                       ; link points to a name string (NFA)
+    backLink .set $                       ; link points to a name string (NFA)
     db aaLEN, aaNAME                        ; name string
     
-    .org vvCodePtr                          ; restore code pointer
+    .org codePtr                          ; restore code pointer
 .endm
-
-backLink: .set 0                            ; assembler var, link to previous word
-; saveAsmPtr .set 0
-
-; .macro _CODE, name, label, flags 
-; HEADER_label:
-;     dw backLink                             ; link to previous word
-; backLink: .set HEADER_label
-;     db flags                                ; flags
-;     .pstr name                              ; name string
-; label:                                      ; body
-; .endm
-
-; .macro CODE, name, label
-;     _CODE name, label, 0
-; .endm
-
-; ; Prims are words which do not call other words. 
-; ; Enter and Exit do not use RSTACK.
-; .macro PRIM, name, label, bodyMacro
-;     CODE name,label
-;     pop IX
-;     bodyMacro
-; 	jp (IX)			    ; 4t;
-; .endm
 
 ; .macro CONST, name, label, value
 ;     CODE name, label
@@ -62,11 +37,4 @@ backLink: .set 0                            ; assembler var, link to previous wo
 
 ; .macro VAR, name, label, variable
 ;     CONST name, label, variable
-; .endm
-
-; .macro _flags, flags
-;     saveAsmPtr .set $
-;     .org backLink + 2
-;     db flags
-;     .org saveAsmPtr
 ; .endm
