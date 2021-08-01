@@ -1,6 +1,6 @@
 ; count ( b -- b +n )
 ; Return count byte of a string and add 1 to byte address.
-CODE 'count',count
+MCODE 'count',5,count
     pop IX
     _dup
     _onePlus
@@ -8,7 +8,7 @@ CODE 'count',count
     _cat
     jp (IX)
     
-CODE 'ok',ok
+MCODE 'ok',2,ok
     ENTER
     _println "ok"
     EXIT

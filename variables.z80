@@ -21,3 +21,7 @@ var_base:           dw 0
 var_here:           dw 0
 var_latest:         dw 0
 var_state:          dw FALSE
+
+CPP:                    ; grows up
+                .ORG END_RAM - 2
+NPP:                    ; grows down

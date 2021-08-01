@@ -39,7 +39,7 @@ twoRAt:             ; a b -- a b x y  	R: x y
     call toR        ; 45t		a b x y		R: x y
     EXIT
 
-CODE "lit", lit
+lit:
     pop HL          ; HL = return adr
     _dup            ; push current TOS
     ld E,(HL)       
@@ -50,7 +50,7 @@ CODE "lit", lit
 
 ; -- p n   
 ; is followed by a literal Packed (Pascal) string
-CODE "litStr", litStr                         
+litStr:                         
     _swap           ; adr - return address
     call count      ; adr+1 len
     _twoDup         ; adr+1 len adr+1 len

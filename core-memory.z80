@@ -1,28 +1,48 @@
 ; c@ ( a -- n )
-PRIM 'c@',cAt,_cAt
-_flags IMMED
+MCODE 'c@',IMMED+2,cAt
+POP IX
+_cAt
+JP (IX)
 
 ; c! ( n a -- )
-PRIM 'c!',cBang,_cBang
+MCODE 'c!',2,cBang
+POP IX
+_cBang
+JP (IX)
 
 ; @ ( a -- n )
-PRIM "@",at,_at
+MCODE "@",2,at
+POP IX
+_at
+JP (IX)
 
 ; ! ( n a -- )
-PRIM "!",bang,_bang
+MCODE "!",1,bang
+POP IX
+_bang
+JP (IX)
 
 ; @ ( a -- n )
-PRIM "2@",twoAt,_twoAt
+MCODE "2@",2,twoAt
+POP IX
+_twoAt
+JP (IX)
 
 ; ! ( n a -- )
-PRIM "2!",twoBang,_twoBang
+MCODE "2!",2,twoBang
+POP IX
+_twoBang
+JP (IX)
 
 ; ! ( n a -- )
-PRIM "+!",plusBang,_plusBang
+MCODE "+!",2,plusBang
+POP IX
+_plusBang
+JP (IX)
 
 ; , ( w -- )
 ; Compile an integer into the code dictionary.
-CODE ",",COMMA
+MCODE ",",1,COMMA
     ENTER
     _fetch var_here                             ; w here
     _dup                                        ; w here here
@@ -33,7 +53,7 @@ CODE ",",COMMA
     _store var_here                             ; here+2 &here
     EXIT                                                     
 
-CODE "c,",CCOMMA
+MCODE "c,",1,CCOMMA
     ENTER
     _fetch var_here                             ; w here
     _dup                                 
@@ -46,7 +66,7 @@ CODE "c,",CCOMMA
 
 ; call,       ( adr -- )
 ; Assemble a call instruction to adr
-CODE 'call,',0,CALLC
+MCODE 'call,',5,CALLC
     ENTER
     _push CALL_OPCODE
     call ccomma
@@ -55,7 +75,7 @@ CODE 'call,',0,CALLC
 
 ; ALLOT       ( n -- )
 ; Allocate n bytes to the code dictionary.
-CODE "allot",allot               
+MCODE "allot",5,allot               
     ENTER
     _fetch var_here 
     call plusBang                               ; adds n to here
