@@ -1,9 +1,9 @@
 
-.macro _plus                         
-    ex DE,HL		
-    pop DE		
-    add HL,DE    
-    ex DE,HL
+.macro _plus            ; 29t             
+    ex DE,HL	            ; 4t	
+    pop DE		            ; 10t
+    add HL,DE               ; 11t
+    ex DE,HL                ; 4t
 .endm
 
 .macro _minus                         
@@ -60,7 +60,7 @@
 
 .macro _print, s1
     _pushStr s1
-    call typex
+    call type
 .endm    
 
 .macro _println, s1

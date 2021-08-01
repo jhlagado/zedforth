@@ -14,40 +14,15 @@ dot2:
 ; Output n characters from adr.
 CODE 'type',type
     ENTER
-    pop HL              ; len   HL = ptr
-type1:
-    _dup
-    _isZero             ; len   HL = ptr
-    jr z,type2
-    ex DE,HL            ; ptr   HL = len
-    _dup                ; ptr ptr
-    _cat                ; ptr c
-    call emit           ; ptr
-    _onePlus            ; ptr+1
-    ex DE,HL
-    _oneMinus           ; len-1
-    jr type1
-type2:    
-    _drop
+    _swap               ; 25t
+TYPE1:          
+    _dup                ; 11t
+    _cAt                ; 18t
+    call emit           ; 
+    _push 1             ; 11t
+    _plus               ; 29t
+    _loopNext TYPE1     ; 12t
+    _drop               ; 10t
+    _drop               ; 10t
     EXIT
 
-PRIM "cr",cr,_cr
-
-
-; type  ( adr n -- )
-; Output n characters from adr.
-CODE 'typex',typex
-    ENTER
-    call toR
-    jr typex2
-TYPEx1:          
-    _dup
-    _cAt
-    call emit
-    _push 1
-    _plus
-TYPEx2:          
-    call doNext
-    dw TYPEx1
-    _drop
-    EXIT

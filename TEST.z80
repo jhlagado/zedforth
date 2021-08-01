@@ -6,12 +6,14 @@ TESTMODE equ 1
 
 ;===============================================================================
 
-.include "constants.z80"
-.include "macros-dict.z80"
-.include "macros-kernel.z80"
-.include "macros-memory.z80"
-.include "macros-stack.z80"
-.include "macros-util.z80"
+    .include "constants.z80"
+    .include "macros-control.z80"
+    .include "macros-device.z80"
+    .include "macros-dict.z80"
+    .include "macros-kernel.z80"
+    .include "macros-memory.z80"
+    .include "macros-stack.z80"
+    .include "macros-util.z80"
 
 .org START_ROM
 RST00:                                      ; Reset
@@ -26,15 +28,15 @@ RST08:                                      ; rst 38
 RST38:                                      ; rst 38
     jp serialIn
 
-.include "core-control.z80"
-.include "core-kernel.z80"
-.include "core-logic.z80"
-.include "core-memory.z80"
-.include "core-print.z80"
-.include "core-tester.z80"
-.include "core-serial.z80"
-.include "core-stack.z80"
-.include "core-util.z80"
+    .include "core-control.z80"
+    .include "core-kernel.z80"
+    .include "core-logic.z80"
+    .include "core-memory.z80"
+    .include "core-print.z80"
+    .include "core-tester.z80"
+    .include "core-serial.z80"
+    .include "core-stack.z80"
+    .include "core-util.z80"
 
 initialLatest:
     dw backLink

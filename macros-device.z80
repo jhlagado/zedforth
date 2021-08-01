@@ -1,0 +1,61 @@
+
+;   PC!         ( uc p --  )
+;               output uc to IO port p
+.macro _pcBang
+    ld HL,BC            ; 8t
+    ld C,E
+    _drop
+    ld A,E
+    OUT (C), A          ; 12t
+    ld BC,HL            ; 8t
+.endm
+
+;   PC@         ( p -- uc )
+;               output uc to IO port p
+.macro _pcAt
+    ld HL,BC            ; 8t
+    ld C,E
+    IN A,(C)            ; 12t
+    ld E,A
+    ld D,0
+    ld BC,HL
+.endm
+
+.macro _shadowAt, rp  ;   28t
+    exx                 ; 4t
+    push BC             ; 10t
+    exx                 ; 4t
+    _drop               ; 10t
+.endm
+
+.macro _shadowBang, rp    ; 40t
+    _dup                ; 11t
+    exx                 ; 4t
+    pop rp              ; 11t
+    exx                 ; 4t
+    _drop               ; 10t
+.endm
+
+.macro _xAt     
+    _shadowAt BC
+.endm
+
+.macro _xBang   ; 39t
+    _shadowBang BC
+.endm
+
+.macro _yAt     
+    _shadowAt DE
+.endm
+
+.macro _yBang   ; 39t
+    _shadowBang DE
+.endm
+
+.macro _zAt     
+    _shadowAt HL
+.endm
+
+.macro _zBang   ; 39t
+    _shadowBang HL
+.endm
