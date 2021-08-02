@@ -43,7 +43,7 @@ JP (IX)
 ; , ( w -- )
 ; Compile an integer into the code dictionary.
 MCODE ",",1,COMMA
-    ENTER
+    ENTER 0
     _fetch var_here                             ; w here
     _dup                                        ; w here here
     call tor                                    ; w here        R: here
@@ -51,10 +51,10 @@ MCODE ",",1,COMMA
     call rfrom                                  ; here                                  
     _cellPlus                                   ; here+2
     _store var_here                             ; here+2 &here
-    EXIT                                                     
+    EXIT 0                                                     
 
 MCODE "c,",1,CCOMMA
-    ENTER
+    ENTER 0
     _fetch var_here                             ; w here
     _dup                                 
     call tor                                    ; w here r: here
@@ -62,21 +62,21 @@ MCODE "c,",1,CCOMMA
     call rfrom                                  ; here                                  
     _onePlus                                    ; here+1
     _cstore var_here                            ; here+1 &here
-    EXIT                                                     
+    EXIT 0                                                     
 
 ; call,       ( adr -- )
 ; Assemble a call instruction to adr
 MCODE 'call,',5,CALLC
-    ENTER
+    ENTER 0
     _push CALL_OPCODE
     call ccomma
     call comma
-    EXIT                                                     
+    EXIT 0                                                     
 
 ; ALLOT       ( n -- )
 ; Allocate n bytes to the code dictionary.
 MCODE "allot",5,allot               
-    ENTER
+    ENTER 0
     _fetch var_here 
     call plusBang                               ; adds n to here
-    EXIT                                                     
+    EXIT 0                                                     

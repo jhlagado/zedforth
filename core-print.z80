@@ -1,5 +1,5 @@
 MCODE ".",1,dot
-    ENTER
+    ENTER 0
     _isZero
     jr z,dot1
     _pushc "?"
@@ -8,12 +8,12 @@ dot1:
     _pushc "0"
 dot2:
     call emit
-    EXIT
+    EXIT 0
     
 ; type  ( adr n -- )
 ; Output n characters from adr.
 MCODE 'type',4,type
-    ENTER
+    ENTER 0
     _swap               ; 25t
 TYPE1:          
     _dup                ; 11t
@@ -24,5 +24,5 @@ TYPE1:
     _loopNext TYPE1     ; 12t
     _drop               ; 10t
     _drop               ; 10t
-    EXIT
+    EXIT 0
 

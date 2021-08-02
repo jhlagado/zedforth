@@ -12,12 +12,27 @@
 .endm
 
 ; enter and exit for normal colon words 
-.macro ENTER        ; 53t		x a ? --      5 bytes 
-    pop HL			    ; 10t	; x y 				TMP: a
-    _rpush H,L		    ; 34t	; x y    	R: a	
+; 0 - word that calls other words
+; 1 - word that does not call other words but may alter HL
+; 2 - word that does not call other words and does not alter HL
+.macro ENTER,arg       ; 53t		x a ? --      5 bytes 
+    .if arg = 1
+        pop IX			    ; 14t	; x y 				TMP: a
+    .else
+        pop HL			    ; 10t	; x y 				TMP: a
+        .if arg = 0
+            _rpush H,L		    ; 34t	; x y    	R: a	
+        .endif
+    .endif
 .endm
 
-.macro EXIT         ; 38t       x -- x a    R: a --          5 bytes
-	_rpop H,L			; 34t			R: 		TMP: a
-	jp (HL)			    ; 4t;
+.macro EXIT,arg        ; 38t       x -- x a    R: a --          5 bytes
+    .if arg = 1
+        jp (IX)             ; 7t
+    .else 
+        .if arg = 0
+        	_rpop H,L			; 34t			R: 		TMP: a
+        .endif
+    	jp (HL)			    ; 4t;
+    .endif
 .endm

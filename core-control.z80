@@ -48,107 +48,107 @@ MCODE "execute", 7, execute
 ; FOR         ( -- a )
 ; Start a FOR-NEXT loop structure in a colon definition.
 MCODE 'for',IMMED+3,for    
-    ENTER
+    ENTER 0
     _compile toR
     _fetch var_here
-    EXIT
+    EXIT 0
 
 ; NEXT        ( a -- )
 ; Terminate a FOR-NEXT loop structure.
 MCODE 'next',IMMED+4,next    
-    ENTER
+    ENTER 0
     _compile doNext
     call COMMA
-    EXIT    
+    EXIT 0    
     
 ; AHEAD       ( -- A )
 ; Compile a forward branch instruction.
 MCODE 'ahead',IMMED+5,ahead
-    ENTER
+    ENTER 0
     _compile branch
     _fetch var_here
     _push 0
     call comma
-    EXIT
+    EXIT 0
 
 ; IF          ( -- A )
 ; Begin a conditional branch structure.
 
 MCODE 'if',IMMED+2,iff
-    ENTER
+    ENTER 0
     _compile qbranch
     _fetch var_here
     _push 0
     call comma
-    EXIT
+    EXIT 0
 
 ; ELSE        ( A -- A )
 ; Start the false clause in an IF-ELSE-THEN structure.
 MCODE 'else',IMMED+4,else
-    ENTER
+    ENTER 0
     call ahead
     _swap
     call thenn
-    EXIT
+    EXIT 0
 
 ; THEN        ( A -- )
 ; Terminate a conditional branch structure.
 MCODE 'then',IMMED+4,thenn
-    ENTER
+    ENTER 0
     _fetch var_here
     _swap
     _bang
-    EXIT
+    EXIT 0
 
 ; AFT         ( a -- a A )
 ; Jump to THEN in a FOR-AFT-THEN-NEXT loop the 1st time through.
 MCODE 'aft',IMMED+3,aft
-    ENTER
+    ENTER 0
     _drop
     call ahead
     call begin
     _swap
-    EXIT
+    EXIT 0
 
 ; BEGIN       ( -- a )
 ; Start an infinite or indefinite loop structure.
 MCODE 'begin',IMMED+5,begin
-    ENTER
+    ENTER 0
     _fetch var_here
-    EXIT
+    EXIT 0
 
 ; UNTIL       ( a -- )
 ; Terminate a BEGIN-UNTIL indefinite loop structure.
 MCODE 'until',IMMED+5,until
-    ENTER
+    ENTER 0
     _compile qbranch
     call comma
-    EXIT
+    EXIT 0
 
 ; AGAIN       ( a -- )
 ; Terminate a BEGIN-AGAIN infinite loop structure.
 
 MCODE 'again',IMMED+5,again
-    ENTER
+    ENTER 0
     _push jp_opcode
     call ccomma
     call comma
-    EXIT
+    EXIT 0
 
 ; REPEAT      ( A a -- )
 ; Terminate a BEGIN-WHILE-REPEAT indefinite loop.
 MCODE 'repeat',IMMED+6,repeat
-    ENTER
+    ENTER 0
     call again
     _fetch var_here
     _swap
     _bang
-    EXIT
+    EXIT 0
 
 ; WHILE       ( a -- A a )
 ; Conditional branch out of a BEGIN-WHILE-REPEAT loop.
 MCODE 'while',IMMED+5,while
-    ENTER
+    ENTER 0
     call iff
     _swap
-    EXIT
+    EXIT 0

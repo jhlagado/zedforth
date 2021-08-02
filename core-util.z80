@@ -9,6 +9,6 @@ MCODE 'count',5,count
     jp (IX)
     
 MCODE 'ok',2,ok
-    ENTER
+    ENTER 0
     _println "ok"
-    EXIT
+    EXIT 0

@@ -17,27 +17,27 @@ rAt:
     jp (HL)
 
 twoToR:		        ; d --          
-    ENTER
+    ENTER 0
     _swap			
     call toR        
     call toR        
-    EXIT
+    EXIT 0
 
 twoRFrom:	        ; -- d           
-    ENTER
+    ENTER 0
     call rFrom		
     call rFrom		
     _swap		
-    EXIT
+    EXIT 0
 
 twoRAt:             ; a b -- a b x y  	R: x y
-    ENTER
+    ENTER 0
     call rFrom      ; 44t		a b y 		R: x
     call rAt        ; 44t		a b y x		R: x		TMP: x
     _swap           ; 20t		a b x y  
     _dup            ; 10t		a b x y y	R: x
     call toR        ; 45t		a b x y		R: x y
-    EXIT
+    EXIT 0
 
 lit:
     pop HL          ; HL = return adr
