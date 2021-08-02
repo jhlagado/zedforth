@@ -10,9 +10,11 @@ TESTMODE equ 1
     .include "macros-control.z80"
     .include "macros-device.z80"
     .include "macros-dict.z80"
+    .include "macros-input.z80"
     .include "macros-kernel.z80"
     .include "macros-memory.z80"
     .include "macros-stack.z80"
+    .include "macros-testing.z80"
     .include "macros-util.z80"
 
 .org START_ROM
@@ -48,8 +50,7 @@ initialLatest:
     dw backLink
 
 start:
-    _initKernel
-    call initSerial
+    call init
 
     
 ; end header  ============================================================  
@@ -68,8 +69,15 @@ TESTS_START:
     _push 16
     _store var_base
 
-    _print "Hello!\r\n"
-    ;; call ok
+    ; _push 1
+    ; expect 0, "should be 0"
+
+    _setInputText "xyz"
+    call key
+    call emit
+
+    ; .include "test-stack.z80" 
+
 
     ;; call tesStart
     ;; call tesEnter

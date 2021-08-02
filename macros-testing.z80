@@ -1,9 +1,10 @@
-.macro TEST_SET_TEXT, s1
+.macro _setInputText, s1
     _fetch lineBufStart
     _store lineBufTop
     _store currkey
-    call litString
-    .pstr "\r\n",-1,"\r\n"
+    call litStr
+    .pstr s1,"\r\n",-1,"\r\n"
+    _drop
     _store charPtr
 .endm
 
@@ -13,18 +14,14 @@
     _push expectVal
     _dup
     call dot
-    ex DE,HL
-    _drop
-    or A
-    sbc HL,BC
-    call drop
-    _compareZero H,L
+    _minus
+    _isZero
     jp z, tf_done%%M            
-    _printString "\r\rFailed: "
-    _printString failTxt
+    _print "\r\nFailed: "
+    _print failTxt
     halt
 tf_done%%M:
-    call cr
+    _cr
 .endm
 
 .macro _printDepth

@@ -1,0 +1,11 @@
+.macro _initInput
+    _push lineBuf
+    _dup
+    _store lineBufStart
+    _dup
+    _store currkey
+    _dup
+    _store linebuftop
+    _push LINE_BUFSIZE
+    _store lineBufSize
+.endm

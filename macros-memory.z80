@@ -47,6 +47,7 @@
     ld (HL),E			; 7
 	INC HL			    ; 6
     ld (HL),D			; 7
+    _drop
 .endm
 
 .macro _twoAt	    ; 81t			a -- x y

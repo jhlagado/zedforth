@@ -9,8 +9,7 @@ RTS_LOW         equ $96                ; 10010110
 PORT_STATUS     equ $04
 PORT_DATA       equ $03
 
-; destroys: HL
-initSerial:
+.macro _initSerial
     ld HL,0
     ld (serbufused),HL
 
@@ -23,7 +22,7 @@ initSerial:
 
     im 1
     ei
-    ret
+.endm
 
 serialIn:
     push AF
@@ -105,12 +104,13 @@ key1:
 CODE "?key",4,qkey
     ENTER 1
     .if TESTMODE
-        _fetch charPtr
-        _dup
-        _cat
-        _swap
-        _store charPtr
-        _push TRUE
+        _fetch charPtr              ; adr
+        _dup                        ; adr adr
+        _cat                        ; adr c
+        _swap                       ; c adr
+        _onePlus                    ; c adr+1
+        _store charPtr              ; c
+        _push TRUE                  ; c true
     .else
         ld A,(serBufUsed)
         cp $0

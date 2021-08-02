@@ -2,6 +2,9 @@
     _push 16
     _store var_base
 
+    _print "Hello!\r\n"
+    call ok
+
     call lit
     dw $123
     _push $123 

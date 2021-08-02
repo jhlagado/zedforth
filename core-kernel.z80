@@ -1,5 +1,9 @@
 ; resets the stacks so it must only be called from the top-level routine
-initKernel:
+init:
     ENTER 1
     _initKernel
+    _initSerial
+    _initInput
     EXIT 1
+
+
