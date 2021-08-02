@@ -3,7 +3,7 @@ codePtr .set 0
 namePtr .set END_ROM
 backLink .set 0                             ;back link is null
 
-.macro MCODE, nameStr, lenFlags, label
+.macro CODE, nameStr, lenFlags, label
 
 label:                                      ; assembly label
     codePtr0 .set codePtr                   ; save code pointer
