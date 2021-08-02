@@ -19,8 +19,7 @@ TYPE1:
     _dup                ; 11t
     _cAt                ; 18t
     call emit           ; 
-    _push 1             ; 11t
-    _plus               ; 29t
+    _onePlus            ; 6t
     _loopNext TYPE1     ; 12t
     _drop               ; 10t
     _drop               ; 10t

@@ -26,19 +26,19 @@ JP (HL)
 MCODE "2@",2,twoAt
 POP IX
 _twoAt
-JP (IX)
+EXIT 1
 
 ; ! ( n a -- )
 MCODE "2!",2,twoBang
 POP IX
 _twoBang
-JP (IX)
+EXIT 1
 
 ; ! ( n a -- )
 MCODE "+!",2,plusBang
 POP IX
 _plusBang
-JP (IX)
+EXIT 1
 
 ; , ( w -- )
 ; Compile an integer into the code dictionary.

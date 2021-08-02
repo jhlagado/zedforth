@@ -19,7 +19,7 @@
 .endm
 
 .macro _onePlus
-    inc DE 
+    inc DE              ; 6t
 .endm
 
 .macro _oneMinus

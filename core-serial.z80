@@ -70,7 +70,7 @@ serialIn23:
 
 ; emit  ( c -- )
 MCODE "emit",4,emit
-    pop IX
+    ENTER 1
 emit1:
     in A,(IO_CTRL)      ; Status byte
     bit 1,A             ; Set Zero flag if still transmitting character
@@ -78,7 +78,7 @@ emit1:
     ld A,E
     _drop
     out (IO_DATA),A         ; Output the character
-    jp (IX)
+    EXIT 1
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; serReady - check if there is input waiting to be read
@@ -103,7 +103,7 @@ key1:
 ; ?key  ( -- c T | F )
 ; Return input character and true, or a false if no input.
 MCODE "?key",4,qkey
-    pop IX
+    ENTER 1
     .if TESTMODE
         _fetch charPtr
         _dup
@@ -116,7 +116,7 @@ MCODE "?key",4,qkey
         cp $0
         jr nz, qkey1
         _push FALSE
-        jp (IX)
+        jr qkey4
 qkey1:
         ld HL,(serRdPtr)
         inc HL
@@ -138,8 +138,9 @@ qkey3:
         ld A,(HL)
         _push TRUE
         ei
+qkey4:
     .endif
-    jp (IX)
+    EXIT 1
 
 ; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; ; getc - input

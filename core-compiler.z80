@@ -2,10 +2,10 @@
 ; [compile]   ( -- ; <string> )
 ; Compile the next immediate word into MCODE dictionary.
 MCODE "[compile]",9,bracCompile
-    pop IX
+    ENTER 1
     call tick
     call comma
-    jp (IX)
+    EXIT 1
 
 ; compile     ( -- )
 ; Compile the next address in colon list to MCODE dictionary.
@@ -117,20 +117,20 @@ MCODE "immediate",9,immediate
     EXIT 0
 
 MCODE ":noname",7,colonNoName
-    pop IX
+    ENTER 1
     _fetch var_here                             ; TOS = here
     call rbrac                                  ; go into compile mode.
-    jp (IX)                                 
+    EXIT 1                                 
 
 MCODE "does>", IMMED+5, does                  ; --
-    pop IX
+    ENTER 1
     _compile xdoes                          ; compile two calls 
     _compile rfrom                          ; address of body of created word                            
-    jp (IX)                                 
+    EXIT 1                                 
 
 xdoes:                                      ; --
     _drop                      ;call rfrom  ; TOS = ptr to body after does> word
-    pop IX                                  ; caller of caller?
+    ENTER 1                                  ; caller of caller?
 
     _fetch var_latest                           ; ptr to created word
     call toBody                            
@@ -139,17 +139,17 @@ xdoes:                                      ; --
     _cBang
     _onePlus
     _bang                                   ; rewrite with address of body after does>
-    jp (IX)                                 ; return to caller of caller (terminate caller)
+    EXIT 1                                 ; return to caller of caller (terminate caller)
 
 ;Z IMMED?    nfa -- f      fetch immediate flag
 ;   1- C@ ;                     nonzero if ``immed''
 MCODE "immed?",6,IMMEDQ
-    POP IX
+    ENTER 1
     _oneMinus
     _at
     _push IMMED
     call andd
-    jp (IX)
+    EXIT 1
 
 ; NFA>LFA   nfa -- lfa    
 ; name adr -> link field

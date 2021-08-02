@@ -1,12 +1,12 @@
 ; count ( b -- b +n )
 ; Return count byte of a string and add 1 to byte address.
 MCODE 'count',5,count
-    pop IX
+    ENTER 1
     _dup
     _onePlus
     _swap
     _cat
-    jp (IX)
+    EXIT 1
     
 MCODE 'ok',2,ok
     ENTER 0
