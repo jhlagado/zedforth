@@ -1,12 +1,12 @@
 ; word ( delim "<chars>ccc<char>" -- c-addr ) 
 ; read a word from input stream
 ; Skip leading delimiters. Parse characters ccc delimited by char. 
-MCODE "word",4,word
+CODE "word",4,word
     ret
     
-MCODE "find",4,find
+CODE "find",4,find
     ret    
     
-MCODE "abort",5,abort
+CODE "abort",5,abort
     ret
     

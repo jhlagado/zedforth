@@ -1,5 +1,5 @@
 ; doNext ( -- ) ( r: idx ) followed by address of loop start
-; Run time MCODE for the single index loop.
+; Run time CODE for the single index loop.
 doNext:                 ; ~274t
     _swap               ; 25t   ; ret 
     call rfrom          ; 60t   ; ret idx 
@@ -18,7 +18,7 @@ doNext2:
     _drop               ; 10t   ; 
     jp (HL)             ; 4t
 
-MCODE "?branch", 7, qbranch           
+CODE "?branch", 7, qbranch           
     pop IX
     _dup
     _isZero
@@ -30,7 +30,7 @@ MCODE "?branch", 7, qbranch
 
     jp (HL)
 
-MCODE "branch", 6, branch           
+CODE "branch", 6, branch           
     pop HL
     ld A,(HL)
     inc HL
@@ -38,7 +38,7 @@ MCODE "branch", 6, branch
     ld L,A
     jp (HL)
 
-MCODE "execute", 7, execute
+CODE "execute", 7, execute
     pop IX
     ld HL,BC
     _drop
@@ -47,7 +47,7 @@ MCODE "execute", 7, execute
 
 ; FOR         ( -- a )
 ; Start a FOR-NEXT loop structure in a colon definition.
-MCODE 'for',IMMED+3,for    
+CODE 'for',IMMED+3,for    
     ENTER 0
     _compile toR
     _fetch var_here
@@ -55,7 +55,7 @@ MCODE 'for',IMMED+3,for
 
 ; NEXT        ( a -- )
 ; Terminate a FOR-NEXT loop structure.
-MCODE 'next',IMMED+4,next    
+CODE 'next',IMMED+4,next    
     ENTER 0
     _compile doNext
     call COMMA
@@ -63,7 +63,7 @@ MCODE 'next',IMMED+4,next
     
 ; AHEAD       ( -- A )
 ; Compile a forward branch instruction.
-MCODE 'ahead',IMMED+5,ahead
+CODE 'ahead',IMMED+5,ahead
     ENTER 0
     _compile branch
     _fetch var_here
@@ -74,7 +74,7 @@ MCODE 'ahead',IMMED+5,ahead
 ; IF          ( -- A )
 ; Begin a conditional branch structure.
 
-MCODE 'if',IMMED+2,iff
+CODE 'if',IMMED+2,iff
     ENTER 0
     _compile qbranch
     _fetch var_here
@@ -84,7 +84,7 @@ MCODE 'if',IMMED+2,iff
 
 ; ELSE        ( A -- A )
 ; Start the false clause in an IF-ELSE-THEN structure.
-MCODE 'else',IMMED+4,else
+CODE 'else',IMMED+4,else
     ENTER 0
     call ahead
     _swap
@@ -93,7 +93,7 @@ MCODE 'else',IMMED+4,else
 
 ; THEN        ( A -- )
 ; Terminate a conditional branch structure.
-MCODE 'then',IMMED+4,thenn
+CODE 'then',IMMED+4,thenn
     ENTER 0
     _fetch var_here
     _swap
@@ -102,7 +102,7 @@ MCODE 'then',IMMED+4,thenn
 
 ; AFT         ( a -- a A )
 ; Jump to THEN in a FOR-AFT-THEN-NEXT loop the 1st time through.
-MCODE 'aft',IMMED+3,aft
+CODE 'aft',IMMED+3,aft
     ENTER 0
     _drop
     call ahead
@@ -112,14 +112,14 @@ MCODE 'aft',IMMED+3,aft
 
 ; BEGIN       ( -- a )
 ; Start an infinite or indefinite loop structure.
-MCODE 'begin',IMMED+5,begin
+CODE 'begin',IMMED+5,begin
     ENTER 0
     _fetch var_here
     EXIT 0
 
 ; UNTIL       ( a -- )
 ; Terminate a BEGIN-UNTIL indefinite loop structure.
-MCODE 'until',IMMED+5,until
+CODE 'until',IMMED+5,until
     ENTER 0
     _compile qbranch
     call comma
@@ -128,7 +128,7 @@ MCODE 'until',IMMED+5,until
 ; AGAIN       ( a -- )
 ; Terminate a BEGIN-AGAIN infinite loop structure.
 
-MCODE 'again',IMMED+5,again
+CODE 'again',IMMED+5,again
     ENTER 0
     _push jp_opcode
     call ccomma
@@ -137,7 +137,7 @@ MCODE 'again',IMMED+5,again
 
 ; REPEAT      ( A a -- )
 ; Terminate a BEGIN-WHILE-REPEAT indefinite loop.
-MCODE 'repeat',IMMED+6,repeat
+CODE 'repeat',IMMED+6,repeat
     ENTER 0
     call again
     _fetch var_here
@@ -147,7 +147,7 @@ MCODE 'repeat',IMMED+6,repeat
 
 ; WHILE       ( a -- A a )
 ; Conditional branch out of a BEGIN-WHILE-REPEAT loop.
-MCODE 'while',IMMED+5,while
+CODE 'while',IMMED+5,while
     ENTER 0
     call iff
     _swap

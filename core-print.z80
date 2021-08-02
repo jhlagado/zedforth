@@ -1,4 +1,4 @@
-MCODE ".",1,dot
+CODE ".",1,dot
     ENTER 0
     _isZero
     jr z,dot1
@@ -12,10 +12,10 @@ dot2:
     
 ; type  ( adr n -- )
 ; Output n characters from adr.
-MCODE 'type',4,type
+CODE 'type',4,type
     ENTER 0
     _swap               ; 25t
-TYPE1:          
+type1:          
     _dup                ; 11t
     _cAt                ; 18t
     call emit           ; 

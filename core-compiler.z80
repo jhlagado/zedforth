@@ -1,15 +1,15 @@
 
 ; [compile]   ( -- ; <string> )
-; Compile the next immediate word into MCODE dictionary.
-MCODE "[compile]",9,bracCompile
+; Compile the next immediate word into CODE dictionary.
+CODE "[compile]",9,bracCompile
     ENTER 1
     call tick
     call comma
     EXIT 1
 
 ; compile     ( -- )
-; Compile the next address in colon list to MCODE dictionary.
-MCODE 'compile',7,compile
+; Compile the next address in colon list to CODE dictionary.
+CODE 'compile',7,compile
     _drop                                   ; ret
     _dup                                    ; ret ret
     _at                                     ; ret ret@
@@ -21,16 +21,16 @@ MCODE 'compile',7,compile
     jp (HL)
 
 ; literal     ( w -- )
-; Compile tos to MCODE dictionary as an integer literal.
-MCODE 'literal',IMMED+7,literal
+; Compile tos to CODE dictionary as an integer literal.
+CODE 'literal',IMMED+7,literal
     ENTER 0
     _compile lit
     call comma
     EXIT 0
 
 ; CREATE ( -- ; <string> )
-; Compile a new array entry without allocating MCODE space.
-MCODE "create",6,create             
+; Compile a new array entry without allocating CODE space.
+CODE "create",6,create             
     ENTER 0
     _fetch var_here                         ; &here
     _fetch var_latest                           ; here latest
@@ -52,7 +52,7 @@ create1:
     call rfrom                              ; push onto stack
     EXIT 0
     
-MCODE ":",1,colon
+CODE ":",1,colon
     ENTER 0
     call create                             ; create the dictionary entry / header
     _push -3
@@ -64,7 +64,7 @@ MCODE ":",1,colon
 
 ; ( -- )
 ; immediately enter interpretation state. 
-MCODE "[",IMMED+1,lbrac
+CODE "[",IMMED+1,lbrac
     ENTER 0
 	_push FALSE
 	_bang 
@@ -72,7 +72,7 @@ MCODE "[",IMMED+1,lbrac
 
 ; ( -- )
 ; enter compilation state. 
-MCODE "]",1,rbrac
+CODE "]",1,rbrac
     ENTER 0
 	_push TRUE
 	_bang 
@@ -81,7 +81,7 @@ MCODE "]",1,rbrac
 ; ( -- )
 ; immediately finish definition and leave compilation state.
 ; allow defintion to be visible in dictionary
-MCODE ";",IMMED+1,semicolon
+CODE ";",IMMED+1,semicolon
     ENTER 0
     _push RET_opcode 
     call ccomma                             ; compile ret
@@ -105,7 +105,7 @@ toggleHidden:
 
 ; IMMEDIATE   --   
 ; make last definition immediate
-MCODE "immediate",9,immediate
+CODE "immediate",9,immediate
     ENTER 0
     _fetch var_latest
     _cellPlus
@@ -116,13 +116,13 @@ MCODE "immediate",9,immediate
     _cBang
     EXIT 0
 
-MCODE ":noname",7,colonNoName
+CODE ":noname",7,colonNoName
     ENTER 1
     _fetch var_here                             ; TOS = here
     call rbrac                                  ; go into compile mode.
     EXIT 1                                 
 
-MCODE "does>", IMMED+5, does                  ; --
+CODE "does>", IMMED+5, does                  ; --
     ENTER 1
     _compile xdoes                          ; compile two calls 
     _compile rfrom                          ; address of body of created word                            
@@ -143,7 +143,7 @@ xdoes:                                      ; --
 
 ;Z IMMED?    nfa -- f      fetch immediate flag
 ;   1- C@ ;                     nonzero if ``immed''
-MCODE "immed?",6,IMMEDQ
+CODE "immed?",6,IMMEDQ
     ENTER 1
     _oneMinus
     _at
@@ -154,7 +154,7 @@ MCODE "immed?",6,IMMEDQ
 ; NFA>LFA   nfa -- lfa    
 ; name adr -> link field
 ;   4 - ;
-MCODE "LFA>NFA",7,LFAtoNFA
+CODE "LFA>NFA",7,LFAtoNFA
     ENTER 0
     _cellPlus
     _onePlus
@@ -163,15 +163,15 @@ MCODE "LFA>NFA",7,LFAtoNFA
 ; NFA>LFA   nfa -- lfa    
 ; name adr -> link field
 ;   4 - ;
-MCODE "NFA>LFA",0,NFAtoLFA
+CODE "NFA>LFA",0,NFAtoLFA
     ENTER 0
     _oneMinus
     _twoMinus
     EXIT 0
 
-; NFA>CFA   nfa -- cfa    name adr -> MCODE field
+; NFA>CFA   nfa -- cfa    name adr -> CODE field
 ;   COUNT 7F AND + ;       mask off 'smudge' bit
-MCODE "NFA>body",0,NFAtoBody
+CODE "NFA>body",0,NFAtoBody
     ENTER 0
     _dup
     _cat
@@ -180,7 +180,7 @@ MCODE "NFA>body",0,NFAtoBody
     EXIT 0
 
 ; >body     ( ptr -- ptr' )
-MCODE ">body",0,toBody
+CODE ">body",0,toBody
     ENTER 0
     _cellPlus                              ; skip over backlink
     _onePlus                               ; skip over flags
@@ -191,7 +191,7 @@ MCODE ">body",0,toBody
     _plus
     EXIT 0
 
-MCODE "'",0,tick
+CODE "'",0,tick
     ENTER 0
     _pushc " "
     call word
@@ -199,14 +199,14 @@ MCODE "'",0,tick
     _drop
     EXIT 0
 
-MCODE "[']",IMMED,bracTick
+CODE "[']",IMMED,bracTick
     ENTER 0
     call tick               ; get xt of 'xxx'
     call literal
     EXIT 0
 
 ; ( "<spaces>name" -- )
-MCODE "defer",0,defer
+CODE "defer",0,defer
     ENTER 0
     call create
     _compile abort
@@ -216,21 +216,21 @@ MCODE "defer",0,defer
     EXIT 0
 
 ; ( xt2 xt1 -- )
-MCODE "defer!",0,deferstore
+CODE "defer!",0,deferstore
     ENTER 0
     call toBody
     _bang
     EXIT 0
 
 ; ( xt1 -- xt2 )
-MCODE "defer@",0,deferAt
+CODE "defer@",0,deferAt
     ENTER 0
     call toBody
     _at
     EXIT 0
 
 ; ( xt "<spaces>name" -- )
-MCODE "is",IMMED,is
+CODE "is",IMMED,is
     ENTER 0
     _fetch var_state 
     _isZero
