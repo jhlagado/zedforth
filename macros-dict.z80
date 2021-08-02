@@ -1,31 +1,32 @@
 codePtr0 .set 0
 codePtr .set 0
 namePtr .set END_ROM
-backLink .set 0                           ;back link is null
+backLink .set 0                             ;back link is null
 
-.macro MCODE, aaNAME, aaLEN, aaLABEL
-aaLABEL:                                    ; assembly label
-    codePtr0 .set codePtr               ; save code pointer
-    codePtr .set $                        ; save code pointer
+.macro MCODE, nameStr, lenFlags, label
+
+label:                                      ; assembly label
+    codePtr0 .set codePtr                   ; save code pointer
+    codePtr .set $                          ; save code pointer
     
-    .if backLink                          ; back patch code length
+    .if backLink                            ; back patch code length
         .org namePtr + 4
         dw (codePtr - codePtr0)
     .endif
     
-    vvLEN  .set (aaLEN & 01FH)              ; length byte in 5 least sig bits
+    vvLEN  .set (lenFlags & 01FH)           ; length byte in 5 least sig bits
     
-    .org namePtr - (vvLEN + 8)            ; header -= (link + token + codelen + len + len byte)                                     ; ? needed
-    namePtr .set $                        ; save start of header
+    .org namePtr - (vvLEN + 8)              ; header -= (link + token + codelen + len + len byte)                                     ; ? needed
+    namePtr .set $                          ; save start of header
     
-    dw backLink                           ; back link       
-    dw codePtr                            ; execution token
+    dw backLink                             ; back link       
+    dw codePtr                              ; execution token
     dw 0                                    ; execution token
 
-    backLink .set $                       ; link points to a name string (NFA)
-    db aaLEN, aaNAME                        ; name string
+    backLink .set $                         ; link points to a name string (NFA)
+    db lenFlags, nameStr                    ; name string
     
-    .org codePtr                          ; restore code pointer
+    .org codePtr                            ; restore code pointer
 .endm
 
 ; .macro CONST, name, label, value

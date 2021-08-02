@@ -19,11 +19,15 @@ doNext2:
     jp (HL)             ; 4t
 
 MCODE "?branch", 7, qbranch           
+    pop IX
+    _dup
     _isZero
+    push IX
     jr z, branch
     pop HL
     inc HL
     inc HL
+
     jp (HL)
 
 MCODE "branch", 6, branch           
@@ -35,8 +39,10 @@ MCODE "branch", 6, branch
     jp (HL)
 
 MCODE "execute", 7, execute
+    pop IX
     ld HL,BC
     _drop
+    push IX
     jp (HL)
 
 ; FOR         ( -- a )

@@ -30,10 +30,12 @@ RST38:                                      ; rst 38
 
 codePtr  .set $ 
 
+    .include "core-compiler.z80"
     .include "core-control.z80"
     .include "core-kernel.z80"
     .include "core-logic.z80"
     .include "core-memory.z80"
+    .include "core-parse.z80"
     .include "core-print.z80"
     .include "core-tester.z80"
     .include "core-serial.z80"
