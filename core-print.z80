@@ -1,12 +1,13 @@
 CODE ".",1,dot
     ENTER 0
-    _isZero
-    jr z,dot1
-    _pushc "?"
-    jr dot2
-dot1:    
-    _pushc "0"
-dot2:
+    ld  A,E
+    and $0F
+    add a,$90
+    daa
+    adc a,$40
+    daa
+    ld E,A
+    ld D,0
     call emit
     EXIT 0
     

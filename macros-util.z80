@@ -36,6 +36,11 @@
     _oneMinus
 .endm
 
+.macro _twoSlash                            ; n -- n/2
+    srl D
+    rr E
+.endm
+
 .macro _isZero      ; 18t
     ld A, E         ; 4t
     or D            ; 4t

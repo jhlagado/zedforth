@@ -1,74 +1,66 @@
-; ; DE = TOS
+; T. (x -- )
+; report the test number to a numeric output device
+CODE "T.",2,tesDot
+    ENTER 0
+    call dot
+    EXIT 0                      
 
-; ; T. (x -- )
-; ; report the test number to a numeric output device
-; CODE "T.",tesDot
-;     ENTER
-;     jr z, tesDot1
-;     _push $58
-;     call emit
-;     EXIT
-; tesDot1:
-;     _push $4F
-;     call emit
-;     EXIT                      
+; hasn ( x1 h0 -- h1 )
+; compute h1 by hashing x1 and h0
+CODE "hash",4,tesHash
+    ENTER 0
+    _swap
+    _onePlus
+    call xorr
+    EXIT 0
 
-; ; hasn ( x1 h0 -- h1 )
-; ; compute h1 by hashing x1 and h0
-; CODE "hash",testHash
-;     ENTER
-;     _swap
-;     _onePlus
-;     call xorr
-;     EXIT
+; hash-n ( x1 x2 ... xn n -- h )
+; hash n items from the stack and return the hash code
+CODE "hash-n",6,tesHashN 
+    ENTER 0
+    _push 0
+    call toR
+tesHashN1:
+    _dup
+    _isZero
+    jr z,tesHashN2
+    _swap
+    call rFrom
+    call tesHash
+    call toR
+    _oneMinus
+    jr tesHashN1
+tesHashN2:
+    _drop
+    call rFrom
+    EXIT 0                     
 
-; ; hash-n ( x1 x2 ... xn n -- h )
-; ; hash n items from the stack and return the hash code
-; CODE "hash-n",tesHashN 
-;     ENTER
-;     _push 0
-;     _toR
-; tesHashN1:
-;     _dup
-;     _isZero
-;     jr z,tesHashN2
-;     _swap
-;     _rFrom
-;     call tesHash
-;     _toR
-;     _oneMinus
-;     jr tesHashN1
-; tesHashN2:
-;     _drop
-;     _rFrom
-;     EXIT                      
+; Tstart ( -- )
+; start testing
+CODE "Tstart",6,tesStart 
+    ENTER 0
+    _push 0
+    _store tesCount
+    EXIT 0
 
-; ; Tstart ( -- )
-; ; start testing
-; CODE "Tstart",tesStart 
-;     ENTER
-;     _push 0
-;     _store tesCount
-;     EXIT
-
-; ; T{ ( -- )
-; ; start a unit test
-; ;  Tcount @ 1+ dup T. Tcount !
-; ;  depth Tdepth !
-; CODE "T{",tesEnter 
-;     ENTER
-;     _fetch testCnt
-;     _onePlus
-;     _dup
-;     call tesDot
-;     _store tesCount
-;     call depth
-;     _store tesDepth
-;     EXIT
+; T{ ( -- )
+; start a unit test
+;  Tcount @ 1+ dup T. Tcount !
+;  depth Tdepth !
+CODE "T{",2,tesEnter 
+    ENTER 0
+    _fetch tesCount
+    _onePlus
+    _dup
+    call tesDot
+    _store tesCount
+    call depth
+    _store tesDepth
+    EXIT 0
 
 ; ; }T ( y1 y2 ... yn -- hy )
 ; ; finish a unit test,
-; CODE "}T",tesExit 
+; CODE "}T",2,tesExit 
 ;     ENTER
 ;     call depth
 ;     _fetch tesDepth
@@ -80,7 +72,7 @@
 
 ; ; == ( hy x1 x2 ... xn -- )
 ; ; compare actual output with expected output
-; CODE "==",tesEQ 
+; CODE "==",2,tesEQ 
 ;     ENTER
 ;     call depth
 ;     _fetch tesDepth
@@ -95,7 +87,7 @@
 
 ; ; Tend ( -- )
 ; ; signal end of testing
-; CODE "Tend",tesEnd 
+; CODE "Tend",4,tesEnd 
 ;     ENTER
 ;     _push -1
 ;     call tesDot

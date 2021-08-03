@@ -58,3 +58,17 @@ litStr:
     ex DE,HL		; adr+1 len ?           HL: adr'
     pop DE		    ; adr+1 len             HL: adr'
     jp (HL)
+
+; depth of data stack
+; destroys: HL
+CODE "depth", 0, depth                       ; -- n
+    ENTER 0
+    ld HL,0
+    add HL,SP
+    _dup
+    ex DE,HL
+    _push dStack
+    _swap
+    _minus    
+    _twoSlash
+    EXIT 0

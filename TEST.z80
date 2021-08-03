@@ -69,12 +69,18 @@ TESTS_START:
     _push 16
     _store var_base
 
-    ; _push 1
+    _push $00
+    _push $01
+    _push $02
+    _push $03
+    call depth
+    call dot
+
     ; expect 0, "should be 0"
 
-    _setInputText "xyz"
-    call key
-    call emit
+    ; _setInputText "xyz"
+    ; call key
+    ; call emit
 
     ; .include "test-stack.z80" 
 
