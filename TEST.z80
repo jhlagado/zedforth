@@ -36,6 +36,7 @@ codePtr  .set $
     .include "core-control.z80"
     .include "core-kernel.z80"
     .include "core-logic.z80"
+    .include "core-math.z80"
     .include "core-memory.z80"
     .include "core-parse.z80"
     .include "core-print.z80"
@@ -69,14 +70,7 @@ TESTS_START:
     _push 16
     _store var_base
 
-    _push $00
-    _push $01
-    _push $02
-    _push $03
-    call depth
-    call dot
 
-    ; expect 0, "should be 0"
 
     ; _setInputText "xyz"
     ; call key
@@ -85,22 +79,23 @@ TESTS_START:
     ; .include "test-stack.z80" 
 
 
-    ;; call tesStart
-    ;; call tesEnter
+    call tesStart
     
-    ;; _push 1 
-    ;; _dup 
-
-    ;; call tesExit
-
-    ;; _push 1 
-    ;; _push 1 
-
-    ;; call tesEq
+    call tesEnter
     
-    ;; call tesEnd
+    _push 1 
+    _dup 
 
-    ;; _printString "\r\nDone! \r\n"
+    call tesExit
+
+    _push 1 
+    _push 1 
+
+    call tesEq
+    
+    call tesEnd
+
+    ; _print "\r\nDone! \r\n"
     halt
     
 START_USER:

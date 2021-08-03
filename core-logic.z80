@@ -1,36 +1,54 @@
 ; and    x1 x2 -- x3            logical xor
 CODE "and",3,andd	        ; bitwise xor
     ENTER 1
-    pop DE
+    pop HL
     ld A,H
     xor D
-    ld H,A
+    ld D,A
     ld A,L
     xor E
-    ld L,A
+    ld E,A
     EXIT 1
 
 ; or    x1 x2 -- x3            logical xor
 CODE "or",2,orr	        ; bitwise xor
     ENTER 1
-    pop DE
+    pop HL
     ld A,H
     xor D
-    ld H,A
+    ld D,A
     ld A,L
     xor E
-    ld L,A
+    ld E,A
     EXIT 1
 
 ; xor    x1 x2 -- x3            logical xor
 CODE "xor",3,xorr	        ; bitwise xor
     ENTER 1
-    pop DE
+    pop HL
     ld A,H
     xor D
-    ld H,A
+    ld D,A
     ld A,L
     xor E
-    ld L,A
+    ld E,A
     EXIT 1
 
+; INVERT x1 -- x2               ; bitwise complement
+CODE "not",3,nott
+    ENTER 0
+    _push -1 
+    call xorr 
+    EXIT 0
+
+; =      x1 x2 -- flag         test x1=x2
+CODE "=",1,EQ
+    ENTER 0
+    call XORR
+    _dup
+    _isZero
+    jr z,EQ1
+    ld DE,TRUE 
+EQ1:           
+    EXIT 0
+    

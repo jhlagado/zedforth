@@ -58,37 +58,37 @@ CODE "T{",2,tesEnter
     _store tesDepth
     EXIT 0
 
-; ; }T ( y1 y2 ... yn -- hy )
-; ; finish a unit test,
-; CODE "}T",2,tesExit 
-;     ENTER
-;     call depth
-;     _fetch tesDepth
-;     call minus
-;     call tesHashN
-;     call depth
-;     _store tesDepth
-;     EXIT
+; }T ( y1 y2 ... yn -- hy )
+; finish a unit test,
+CODE "}T",2,tesExit 
+    ENTER 0
+    call depth
+    _fetch tesDepth
+    _minus
+    call tesHashN
+    call depth
+    _store tesDepth
+    EXIT 0
 
-; ; == ( hy x1 x2 ... xn -- )
-; ; compare actual output with expected output
-; CODE "==",2,tesEQ 
-;     ENTER
-;     call depth
-;     _fetch tesDepth
-;     call minus
-;     call tesHashN
-;     call equal
-;     _isZero
-;     jr z,tesQ1
-;     halt
-; tesQ1:
-;     EXIT
+; == ( hy x1 x2 ... xn -- )
+; compare actual output with expected output
+CODE "==",2,tesEQ 
+    ENTER 0
+    call depth
+    _fetch tesDepth
+    _minus
+    call tesHashN
+    call EQ
+    _isZero
+    jr z,tesQ1
+    _print "\r\nFailed! \r\n"
+    halt
+tesQ1:
+    EXIT 0
 
-; ; Tend ( -- )
-; ; signal end of testing
-; CODE "Tend",4,tesEnd 
-;     ENTER
-;     _push -1
-;     call tesDot
-;     EXIT
+; Tend ( -- )
+; signal end of testing
+CODE "Tend",4,tesEnd 
+    ENTER 0
+    _print "\r\nDone!\r\n"
+    EXIT 0

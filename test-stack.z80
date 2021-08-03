@@ -17,3 +17,19 @@
     _push 3
     _minus
     call dot
+
+    _push $1
+    _push $1
+    call xorr
+    expect 0, "should be 0"
+
+    _push $0
+    _push $1
+    call xorr
+    expect 1, "should be 1"
+
+    _push $01
+    _push $02
+    _push $03
+    call depth
+    expect 3, "should be 3"

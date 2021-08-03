@@ -1,0 +1,68 @@
+;   0<          ( n -- t )
+;               Return true if n is negative.
+CODE '0<',2,zeroLT
+	ENTER 1
+	SLA B	; sign bit -> cy flag
+	SBC	A,A	; propagate cy through A
+	LD	B,A	; put 0000 or FFFF in TOS
+	LD	C,A
+	EXIT 1
+
+;   U<          ( u u -- t )
+;               Unsigned compare of top two items.
+CODE "U<",2,uLT	        ; less than
+	ENTER 0
+    _twoDup
+    call xorr
+    call zeroLT
+    _isZero
+    jr z,uLT1
+    _swap
+    _drop
+    call zeroLT
+    EXIT 0
+uLT1:          
+    _minus
+    call zeroLT
+	EXIT 0
+
+;   <           ( n1 n2 -- t )
+;               is less than
+CODE "<",1,LT	        ; less than
+	ENTER 0
+    _twoDup
+	call xorr 
+    _isZero
+    jr z,LT1
+    _drop
+    call zeroLT
+	EXIT 0
+LT1:		
+    _minus 
+    call zeroLT
+	EXIT 0
+
+; >      n1 n2 -- flag          test n1 > n2
+CODE ">",1,GT
+	ENTER 0
+    _swap
+    jr LT
+
+; max   n1 n2 -- u                      maximum
+CODE "max",3,max
+	ENTER 0
+    _twoDup
+	call LT 
+    _isZero
+    jr z,max1
+    _swap
+max1:		
+    _drop
+	EXIT 0
+
+; min   n1 n2 -- u                      minimum
+CODE "min",3,MIN
+	ENTER 0
+	_swap
+	call max
+	EXIT 0
