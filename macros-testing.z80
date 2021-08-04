@@ -30,3 +30,19 @@ tf_done%%M:
     halt
 .endm
 
+.macro _init
+    call TStart
+.endm
+
+.macro _test
+    call Tenter
+.endm
+
+.macro _expect
+    call Texit
+.endm
+
+.macro _end, failTxt
+    call Texpect
+    .pstr failTxt
+.endm

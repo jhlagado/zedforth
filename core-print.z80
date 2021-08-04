@@ -15,12 +15,13 @@ CODE ".",1,dot
 ; Output n characters from adr.
 CODE 'type',4,type
     ENTER 0
-    _swap               ; 25t
 type1:          
+    _swap               ; 25t
     _dup                ; 11t
     _cAt                ; 18t
     call emit           ; 
     _onePlus            ; 6t
+    _swap
     _loopNext TYPE1     ; 12t
     _drop               ; 10t
     _drop               ; 10t

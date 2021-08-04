@@ -63,14 +63,12 @@ org START_RAM
     .include "variables.z80"
     
     charPtr:    dw 0            ; mocking getc
-    tesCount:   dw 0            ; core-tester
-    tesDepth:   dw 0            ; core-tester
+    TCount:   dw 0            ; core-tester
+    TDepth:   dw 0            ; core-tester
 
 TESTS_START:
     _push 16
     _store var_base
-
-
 
     ; _setInputText "xyz"
     ; call key
@@ -79,23 +77,16 @@ TESTS_START:
     ; .include "test-stack.z80" 
 
 
-    call tesStart
+    _init
+    _test
+        _push 1 
+        _dup 
+    _expect
+        _push 1 
+        ; _push 1 
+    _end "should be identical"
     
-    call tesEnter
-    
-    _push 1 
-    _dup 
-
-    call tesExit
-
-    _push 1 
-    _push 1 
-
-    call tesEq
-    
-    call tesEnd
-
-    ; _print "\r\nDone! \r\n"
+    _print "\r\nDone! \r\n"
     halt
     
 START_USER:

@@ -1,8 +1,6 @@
 .macro _loopNext, label ; 97t
-    _swap               ; 25t
     _oneMinus           ; 6t
     _dup                ; 11t
     _isZero             ; 18t
-    _swap               ; 25t
     jr nz,label         ; 12t
 .endm

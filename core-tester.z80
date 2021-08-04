@@ -1,13 +1,13 @@
 ; T. (x -- )
 ; report the test number to a numeric output device
-CODE "T.",2,tesDot
+CODE "T.",2,TDot
     ENTER 0
     call dot
     EXIT 0                      
 
 ; hasn ( x1 h0 -- h1 )
 ; compute h1 by hashing x1 and h0
-CODE "hash",4,tesHash
+CODE "hash",4,THash
     ENTER 0
     _swap
     _onePlus
@@ -16,79 +16,105 @@ CODE "hash",4,tesHash
 
 ; hash-n ( x1 x2 ... xn n -- h )
 ; hash n items from the stack and return the hash code
-CODE "hash-n",6,tesHashN 
+CODE "hash-n",6,THashN 
     ENTER 0
     _push 0
     call toR
-tesHashN1:
+THashN1:
     _dup
     _isZero
-    jr z,tesHashN2
+    jr z,THashN2
     _swap
     call rFrom
-    call tesHash
+    call THash
     call toR
     _oneMinus
-    jr tesHashN1
-tesHashN2:
+    jr THashN1
+THashN2:
     _drop
     call rFrom
     EXIT 0                     
 
 ; Tstart ( -- )
 ; start testing
-CODE "Tstart",6,tesStart 
+CODE "Tstart",6,TStart 
     ENTER 0
     _push 0
-    _store tesCount
+    _store TCount
     EXIT 0
 
 ; T{ ( -- )
 ; start a unit test
 ;  Tcount @ 1+ dup T. Tcount !
 ;  depth Tdepth !
-CODE "T{",2,tesEnter 
+CODE "T{",2,TEnter 
     ENTER 0
-    _fetch tesCount
+    _fetch TCount
     _onePlus
     _dup
-    call tesDot
-    _store tesCount
+    call TDot
+    _store TCount
     call depth
-    _store tesDepth
+    _store TDepth
     EXIT 0
 
 ; }T ( y1 y2 ... yn -- hy )
 ; finish a unit test,
-CODE "}T",2,tesExit 
+CODE "}T",2,TExit 
     ENTER 0
     call depth
-    _fetch tesDepth
+    _fetch TDepth
     _minus
-    call tesHashN
+    call THashN
     call depth
-    _store tesDepth
+    _store TDepth
     EXIT 0
 
 ; == ( hy x1 x2 ... xn -- )
 ; compare actual output with expected output
-CODE "==",2,tesEQ 
+CODE "==",2,TEQ 
     ENTER 0
     call depth
-    _fetch tesDepth
+    _fetch TDepth
     _minus
-    call tesHashN
+    call THashN
     call EQ
     _isZero
-    jr z,tesQ1
+    jr z,TQ1
     _print "\r\nFailed! \r\n"
     halt
-tesQ1:
+TQ1:
     EXIT 0
+
+
+; == ( hy x1 x2 ... xn -- )
+; compare actual output with expected output
+CODE "Texpect",2,TExpect 
+    ENTER 0
+    call depth
+    _fetch TDepth
+    _minus
+    call THashN
+    call EQ
+    _isZero
+    jr z,TExpect1
+    _print "\r\nFailed! \r\n"
+    call rFrom
+    call count      ; adr+1 len
+    call type
+    _print "\r\n"
+    halt
+TExpect1:
+    call rFrom
+    call count      ; adr+1 len
+    _plus           ; adr'
+    ex DE,HL		; 
+    _drop
+    jp (HL)
 
 ; Tend ( -- )
 ; signal end of testing
-CODE "Tend",4,tesEnd 
+CODE "Tend",4,TEnd 
     ENTER 0
     _print "\r\nDone!\r\n"
     EXIT 0
