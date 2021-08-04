@@ -35,32 +35,18 @@ THashN2:
     call rFrom
     EXIT 0                     
 
-; Tstart ( -- )
-; start testing
-CODE "Tstart",6,TStart 
-    ENTER 0
-    _push 0
-    _store TCount
-    EXIT 0
-
 ; T{ ( -- )
-; start a unit test
-;  Tcount @ 1+ dup T. Tcount !
-;  depth Tdepth !
-CODE "T{",2,TEnter 
+; begin test
+CODE "T{",2,Tbegin 
     ENTER 0
-    _fetch TCount
-    _onePlus
-    _dup
-    call TDot
-    _store TCount
+    _print "."
     call depth
     _store TDepth
     EXIT 0
 
-; }T ( y1 y2 ... yn -- hy )
+; => ( y1 y2 ... yn -- hy )
 ; finish a unit test,
-CODE "}T",2,TExit 
+CODE "->",2,TExpect 
     ENTER 0
     call depth
     _fetch TDepth
@@ -70,26 +56,9 @@ CODE "}T",2,TExit
     _store TDepth
     EXIT 0
 
-; == ( hy x1 x2 ... xn -- )
+; }T ( "fail text" --) 
 ; compare actual output with expected output
-CODE "==",2,TEQ 
-    ENTER 0
-    call depth
-    _fetch TDepth
-    _minus
-    call THashN
-    call EQ
-    _isZero
-    jr z,TQ1
-    _print "\r\nFailed! \r\n"
-    halt
-TQ1:
-    EXIT 0
-
-
-; == ( hy x1 x2 ... xn -- )
-; compare actual output with expected output
-CODE "Texpect",2,TExpect 
+CODE "}T",2,Tend 
     ENTER 0
     call depth
     _fetch TDepth
@@ -98,7 +67,7 @@ CODE "Texpect",2,TExpect
     call EQ
     _isZero
     jr z,TExpect1
-    _print "\r\nFailed! \r\n"
+    _print "Failed! \r\n"
     call rFrom
     call count      ; adr+1 len
     call type
@@ -111,10 +80,3 @@ TExpect1:
     ex DE,HL		; 
     _drop
     jp (HL)
-
-; Tend ( -- )
-; signal end of testing
-CODE "Tend",4,TEnd 
-    ENTER 0
-    _print "\r\nDone!\r\n"
-    EXIT 0

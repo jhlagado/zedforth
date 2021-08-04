@@ -31,18 +31,18 @@ tf_done%%M:
 .endm
 
 .macro _init
-    call TStart
+    call Tinit
 .endm
 
 .macro _test
-    call Tenter
+    call Tbegin
 .endm
 
 .macro _expect
-    call Texit
+    call Texpect
 .endm
 
 .macro _end, failTxt
-    call Texpect
+    call Tend
     .pstr failTxt
 .endm
