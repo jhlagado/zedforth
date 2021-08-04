@@ -1,3 +1,22 @@
+; ?abort            ( f -- ) "abort text"
+; if true display message and halt
+qabort:
+    ENTER 0
+    _isZero 
+    jr z,qabort1
+    call rFrom
+    call count      ; adr+1 len
+    call type
+    _print "\r\n"
+    halt
+qabort1:
+    call rFrom
+    call count      ; adr+1 len
+    _plus           ; adr'
+    ex DE,HL		; 
+    _drop
+    jp (HL)
+
 ; doNext ( -- ) ( r: idx ) followed by address of loop start
 ; Run time CODE for the single index loop.
 doNext:                 ; ~274t

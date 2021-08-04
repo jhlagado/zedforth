@@ -8,32 +8,6 @@
     _store charPtr
 .endm
 
-.macro expect, expectVal, failTxt
-    _dup
-    call dot
-    _push expectVal
-    _dup
-    call dot
-    _minus
-    _isZero
-    jp z, tf_done%%M            
-    _print "\r\nFailed: "
-    _print failTxt
-    halt
-tf_done%%M:
-    _cr
-.endm
-
-.macro _printDepth
-    call depth
-    call dot
-    halt
-.endm
-
-.macro _init
-    call Tinit
-.endm
-
 .macro _test
     call Tbegin
 .endm
@@ -42,7 +16,31 @@ tf_done%%M:
     call Texpect
 .endm
 
-.macro _end, failTxt
+.macro _fail, reason
     call Tend
-    .pstr failTxt
+    call qabort
+    .pstr "\r\nFailed: ",reason
 .endm
+
+; .macro expect, expectVal, failTxt
+;     _dup
+;     call dot
+;     _push expectVal
+;     _dup
+;     call dot
+;     _minus
+;     _isZero
+;     jp z, tf_done%%M            
+;     _print "\r\nFailed: "
+;     _print failTxt
+;     halt
+; tf_done%%M:
+;     _cr
+; .endm
+
+; .macro _printDepth
+;     call depth
+;     call dot
+;     halt
+; .endm
+

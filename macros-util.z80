@@ -13,11 +13,6 @@
     ex DE,HL
 .endm
 
-.macro _cellPlus
-    inc DE
-    inc DE
-.endm
-
 .macro _onePlus
     inc DE              ; 6t
 .endm
@@ -34,6 +29,14 @@
 .macro _twoMinus
     _oneMinus
     _oneMinus
+.endm
+
+.macro _cellPlus
+    _twoPlus    
+.endm
+
+.macro _cellMinus
+    _twoMinus    
 .endm
 
 .macro _twoSlash                            ; n -- n/2
@@ -82,6 +85,11 @@
 .macro _cr
     _pushStr "\r\n"
     call type
+.endm    
+
+.macro _space
+    _pushc " "
+    call emit
 .endm    
 
 .macro _compile, label

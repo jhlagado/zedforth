@@ -1,10 +1,3 @@
-; T. (x -- )
-; report the test number to a numeric output device
-CODE "T.",2,TDot
-    ENTER 0
-    call dot
-    EXIT 0                      
-
 ; hasn ( x1 h0 -- h1 )
 ; compute h1 by hashing x1 and h0
 CODE "hash",4,THash
@@ -56,8 +49,7 @@ CODE "->",2,TExpect
     _store TDepth
     EXIT 0
 
-; }T ( "fail text" --) 
-; compare actual output with expected output
+
 CODE "}T",2,Tend 
     ENTER 0
     call depth
@@ -65,18 +57,5 @@ CODE "}T",2,Tend
     _minus
     call THashN
     call EQ
-    _isZero
-    jr z,TExpect1
-    _print "Failed! \r\n"
-    call rFrom
-    call count      ; adr+1 len
-    call type
-    _print "\r\n"
-    halt
-TExpect1:
-    call rFrom
-    call count      ; adr+1 len
-    _plus           ; adr'
-    ex DE,HL		; 
-    _drop
-    jp (HL)
+    EXIT 0
+    

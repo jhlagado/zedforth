@@ -61,14 +61,33 @@ litStr:
 
 ; depth of data stack
 ; destroys: HL
-CODE "depth", 0, depth                       ; -- n
+depth:              ; -- n
     ENTER 0
-    ld HL,0
-    add HL,SP
-    _dup
-    ex DE,HL
+    _spAt
     _push dStack
     _swap
     _minus    
     _twoSlash
+    EXIT 0
+    
+; .s    ( x... -- x... ) 
+; print stack (non-destructively)
+CODE ".s",2,dots                
+    ENTER 0
+    call depth          ; x... n 
+    _push dStack        ; x... n s0
+    _cellMinus
+    _cellMinus          ; x... @x0 n
+    _swap               
+dots1:
+    _swap
+    _dup
+    _at
+    call dot
+    _space
+    _cellMinus
+    _swap
+    _loopNext dots1     ; 12t
+    _drop
+    _drop
     EXIT 0
