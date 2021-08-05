@@ -70,24 +70,3 @@ depth:              ; -- n
     _twoSlash
     EXIT 0
     
-; .s    ( x... -- x... ) 
-; print stack (non-destructively)
-CODE ".s",2,dots                
-    ENTER 0
-    call depth          ; x... n 
-    _push dStack        ; x... n s0
-    _cellMinus
-    _cellMinus          ; x... @x0 n
-    _swap               
-dots1:
-    _swap
-    _dup
-    _at
-    call dot
-    _space
-    _cellMinus
-    _swap
-    _loopNext dots1     ; 12t
-    _drop
-    _drop
-    EXIT 0
