@@ -46,8 +46,7 @@ CODE "=",1,EQ
     ENTER 0
     call XORR
     _dup
-    _isZero
-    jr z,EQ1
+    _zeroBranch EQ1
     ld DE,TRUE 
 EQ1:           
     EXIT 0

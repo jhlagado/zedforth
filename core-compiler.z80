@@ -233,8 +233,7 @@ CODE "defer@",0,deferAt
 CODE "is",IMMED,is
     ENTER 0
     _fetch var_state 
-    _isZero
-    jr z,is1
+    _zeroBranch is1
     _compile bracTick
     _push deferStore
     call comma

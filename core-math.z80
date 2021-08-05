@@ -15,8 +15,7 @@ CODE "U<",2,uLT	        ; less than
     _twoDup
     call xorr
     call zeroLT
-    _isZero
-    jr z,uLT1
+    _zeroBranch uLT1
     _swap
     _drop
     call zeroLT
@@ -32,8 +31,7 @@ CODE "<",1,LT	        ; less than
 	ENTER 0
     _twoDup
 	call xorr 
-    _isZero
-    jr z,LT1
+    _zeroBranch LT1
     _drop
     call zeroLT
 	EXIT 0
@@ -53,8 +51,7 @@ CODE "max",3,max
 	ENTER 0
     _twoDup
 	call LT 
-    _isZero
-    jr z,max1
+    _zeroBranch max1
     _swap
 max1:		
     _drop

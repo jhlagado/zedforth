@@ -95,8 +95,7 @@ CODE "key",3,key
     ENTER 0
 key1:  
     call qkey
-    _isZero
-    jr z,key1 
+    _zeroBranch key1 
     EXIT 0
 
 ; ?key  ( -- c T | F )

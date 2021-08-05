@@ -1,119 +1,124 @@
 .engine mycomputer
 
-TESTMODE equ 1
-
-    ; .include "header.z80"
-
-;===============================================================================
-
-    .include "constants.z80"
-    .include "macros-control.z80"
-    .include "macros-device.z80"
-    .include "macros-dict.z80"
-    .include "macros-input.z80"
-    .include "macros-kernel.z80"
-    .include "macros-memory.z80"
-    .include "macros-stack.z80"
-    .include "macros-testing.z80"
-    .include "macros-util.z80"
-
-.org START_ROM
-RST00:                                      ; Reset
-    di                                          
-    jp start
-
-.org $0008
-RST08:                                      ; rst 38
-    ret
-
-.org $0038
-RST38:                                      ; rst 38
-    jp serialIn
-
-codePtr  .set $ 
-
-    .include "core-compiler.z80"
-    .include "core-control.z80"
-    .include "core-kernel.z80"
-    .include "core-logic.z80"
-    .include "core-math.z80"
-    .include "core-memory.z80"
-    .include "core-parse.z80"
-    .include "core-print.z80"
-    .include "core-tester.z80"
-    .include "core-serial.z80"
-    .include "core-stack.z80"
-    .include "core-util.z80"
-
-LASTN       EQU     vvNAME+4             ;last name address
-
-initialLatest:
-    dw backLink
-
-start:
-    call init
-
+    TESTMODE equ 1
     
-; end header  ============================================================  
+        ; .include "header.z80"
     
-
-    jp TESTS_START
+    ;===============================================================================
     
-org START_RAM
-    .include "variables.z80"
+        .include "constants.z80"
+        .include "macros-control.z80"
+        .include "macros-device.z80"
+        .include "macros-dict.z80"
+        .include "macros-input.z80"
+        .include "macros-kernel.z80"
+        .include "macros-memory.z80"
+        .include "macros-stack.z80"
+        .include "macros-testing.z80"
+        .include "macros-util.z80"
     
-    charPtr:    dw 0            ; mocking getc
-    TCount:   dw 0            ; core-tester
-    TDepth:   dw 0            ; core-tester
-
-TESTS_START:
-    _push 16
-    _store var_base
-
-    _push 1
-    _push 2
-    _push 3
-    call dots    
-
-
-    ; _test
-    ;     _push 1 
-    ;     call toR
-    ;     _push 2 
-    ;     call toR
-    ;     _push 3 
-    ;     call rFrom
-    ;     call rFrom
-    ; _expect
-    ;     _push 2
-    ;     _push 1
-    ;     _push 3
-    ; _fail "should have been 2 1 3"
-
-
-    ; ; _setInputText "xyz"
-    ; ; call key
-    ; ; call emit
-
-    ; ; .include "test-stack.z80" 
-
-    ; _test
-    ;     _push 1 
-    ;     _dup 
-    ; _expect
-    ;     _push 1 
-    ;     _push 1 
-    ; _fail "should be identical"
+    .org START_ROM
+    RST00:                                      ; Reset
+        di                                          
+        jp start
     
-    _print "\r\nDone! \r\n"
-    halt
+    .org $0008
+    RST08:                                      ; rst 38
+        ret
     
-START_USER:
-
-CPP:                    ; grows up
-                .ORG END_RAM - 2
-NPP:                    ; grows down
-
-vvCODE .set CPP
-vvNAME .set NPP
-
+    .org $0038
+    RST38:                                      ; rst 38
+        jp serialIn
+    
+    codePtr  .set $ 
+    
+        .include "core-compiler.z80"
+        .include "core-control.z80"
+        .include "core-kernel.z80"
+        .include "core-logic.z80"
+        .include "core-math.z80"
+        .include "core-memory.z80"
+        .include "core-parse.z80"
+        .include "core-print.z80"
+        .include "core-tester.z80"
+        .include "core-serial.z80"
+        .include "core-stack.z80"
+        .include "core-util.z80"
+    
+    LASTN       EQU     vvNAME+4             ;last name address
+    
+    initialLatest:
+        dw backLink
+    
+    start:
+        call init
+    
+        
+    ; end header  ============================================================  
+        
+    
+        jp TESTS_START
+        
+    org START_RAM
+        .include "variables.z80"
+        
+        charPtr:    dw 0            ; mocking getc
+        TCount:   dw 0            ; core-tester
+        TDepth:   dw 0            ; core-tester
+    
+    TESTS_START:
+        _push 16
+        _store var_base
+    
+        _test  
+            _push 1
+            _push 2
+            _push 3
+        _expect
+            _push 1
+            _push 2
+            _push 3
+        _fail "_push: expected 1 2 3"
+    
+        _test
+            _push 1 
+            call toR
+            _push 2 
+            call toR
+            _push 3 
+            call rFrom
+            call rFrom
+        _expect
+            _push 2
+            _push 1
+            _push 3
+        _fail ">R and R>: expected 2 1 3"
+    
+        _test
+            _push 1 
+            _dup 
+        _expect
+            _push 1 
+            _push 1 
+        _fail "dup: should be identical"
+    
+        ; ; _setInputText "xyz"
+        ; ; call key
+        ; ; call emit
+    
+        ; ; .include "test-stack.z80" 
+    
+        
+        _print "\r\nDone! \r\n"
+        halt
+        
+    START_USER:
+    
+    CPP:                    ; grows up
+                    .ORG END_RAM - 2
+    NPP:                    ; grows down
+    
+    vvCODE .set CPP
+    vvNAME .set NPP
+    
+    

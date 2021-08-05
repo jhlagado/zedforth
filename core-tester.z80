@@ -15,8 +15,7 @@ CODE "hash-n",6,THashN
     call toR
 THashN1:
     _dup
-    _isZero
-    jr z,THashN2
+    _zeroBranch THashN2
     _swap
     call rFrom
     call THash
