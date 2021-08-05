@@ -24,6 +24,3 @@ TRUE            equ     -1
 CALL_OPCODE     equ     $CD
 JP_OPCODE       equ     $C3
 RET_OPCODE      equ     $C9
-
-XYZ             equ     $100
-ABC             equ     $200
