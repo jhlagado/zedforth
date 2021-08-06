@@ -1,14 +1,14 @@
-toR:
-    pop HL
+toR:                ; 59t
+    pop HL          ; 11t
     _rpush D,E		; 34t		x		R: x 
 	_drop			; 10t				R: x
-    jp (HL)
+    jp (HL)         ; 4t
 
-rFrom:              ; 45t + 15t
-    pop HL
+rFrom:              ; 59t
+    pop HL          ; 10t
 	_dup			; 11t			
     _rpop	D,E		; 34t		x 		
-    jp (HL)
+    jp (HL)         ; 4t
 
 rAt:
     pop HL

@@ -39,6 +39,7 @@ codePtr  .set $
     .include "core-tester.z80"
     .include "core-serial.z80"
     .include "core-stack.z80"
+    .include "core-string.z80"
     .include "core-util.z80"
 
 lastHeader: EQU headerPtr+6             ;last name address
@@ -66,12 +67,9 @@ TESTS_START:
     _push 16
     _store var_base
 
-    ; .include "test-stack.z80" 
-    ; .include "test-input.z80" 
-
     _print "\r\nDone! \r\n"
     halt
-    
+
 START_USER:
 
 CPP:                    ; grows up

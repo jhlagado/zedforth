@@ -21,14 +21,14 @@
     ld BC,HL
 .endm
 
-.macro _shadowAt, rp  ;   28t
+.macro _shadowAt, rp    ; 28t
     exx                 ; 4t
-    push BC             ; 10t
+    push rp             ; 10t
     exx                 ; 4t
     _drop               ; 10t
 .endm
 
-.macro _shadowBang, rp    ; 40t
+.macro _shadowBang, rp  ; 40t
     _dup                ; 11t
     exx                 ; 4t
     pop rp              ; 11t
@@ -59,3 +59,4 @@
 .macro _zBang   ; 39t
     _shadowBang HL
 .endm
+
