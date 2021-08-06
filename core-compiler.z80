@@ -141,12 +141,11 @@ xdoes:                                      ; --
     _bang                                   ; rewrite with address of body after does>
     EXIT 1                                 ; return to caller of caller (terminate caller)
 
-;Z IMMED?    nfa -- f      fetch immediate flag
-;   1- C@ ;                     nonzero if ``immed''
+; IMMED?    nfa -- f      
+; fetch immediate flag
 CODE "immed?",6,IMMEDQ
     ENTER 1
-    _oneMinus
-    _at
+    _cat
     _push IMMED
     call andd
     EXIT 1

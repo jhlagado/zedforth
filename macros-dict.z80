@@ -1,6 +1,6 @@
 codePtr0 .set 0
 codePtr .set 0
-namePtr .set END_ROM
+headerPtr .set END_ROM
 backLink .set 0                             ;back link is null
 
 .macro CODE, nameStr, lenFlags, label
@@ -10,14 +10,14 @@ label:                                      ; assembly label
     codePtr .set $                          ; save code pointer
     
     .if backLink                            ; back patch code length
-        .org namePtr + 4
+        .org headerPtr + 4
         dw (codePtr - codePtr0)
     .endif
     
-    vvLEN  .set (lenFlags & 01FH)           ; length byte in 5 least sig bits
+    nameLen  .set (lenFlags & 01FH)         ; length byte in 5 least sig bits
     
-    .org namePtr - (vvLEN + 8)              ; header -= (link + token + codelen + len + len byte)                                     ; ? needed
-    namePtr .set $                          ; save start of header
+    .org headerPtr - (nameLen + 8)            ; header -= (link + token + codelen + len + len byte)                                     ; ? needed
+    headerPtr .set $                          ; save start of header
     
     dw backLink                             ; back link       
     dw codePtr                              ; execution token

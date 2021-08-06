@@ -1,0 +1,4 @@
+    _setInputText "xyz"
+    call key
+    call emit
+
