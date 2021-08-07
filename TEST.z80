@@ -14,7 +14,7 @@ TESTMODE equ 1
     .include "macros-kernel.z80"
     .include "macros-memory.z80"
     .include "macros-stack.z80"
-    .include "macros-testing.z80"
+    .include "macros-tester.z80"
     .include "macros-util.z80"
 
 .org START_ROM
@@ -24,7 +24,7 @@ RST00:                                      ; Reset
 
 .org $0038
 RST38:                                      ; rst 38
-    jp serialIn
+    jp serialInt
 
 codePtr  .set $ 
 
@@ -42,7 +42,7 @@ codePtr  .set $
     .include "core-string.z80"
     .include "core-util.z80"
 
-lastHeader: EQU headerPtr+6             ;last name address
+lastHeader equ headerPtr+6             ;last name address
 
 initialLatest:
     dw backLink
@@ -56,16 +56,15 @@ start:
 
     jp TESTS_START
     
-org START_RAM
+    .org START_RAM
     .include "variables.z80"
     
-    charPtr:    dw 0            ; mocking getc
-    TCount:   dw 0            ; core-tester
-    TDepth:   dw 0            ; core-tester
+charPtr:    dw 0            ; mocking getc
+tdepth:     dw 0            ; core-tester
 
 TESTS_START:
-    _push 16
-    _store var_base
+
+    .include "test-string.z80"
 
     _print "\r\nDone! \r\n"
     halt
@@ -73,7 +72,7 @@ TESTS_START:
 START_USER:
 
 CPP:                    ; grows up
-                .ORG END_RAM - 2
+    .org END_RAM - 2
 NPP:                    ; grows down
 
 codePtr .set CPP

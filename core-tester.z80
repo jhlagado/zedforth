@@ -33,7 +33,7 @@ CODE "T{",2,Tbegin
     ENTER 0
     _print "."
     call depth
-    _store TDepth
+    _store tdepth
     EXIT 0
 
 ; => ( y1 y2 ... yn -- hy )
@@ -41,18 +41,18 @@ CODE "T{",2,Tbegin
 CODE "->",2,TExpect 
     ENTER 0
     call depth
-    _fetch TDepth
+    _fetch tdepth
     _minus
     call THashN
     call depth
-    _store TDepth
+    _store tdepth
     EXIT 0
 
 
 CODE "}T",2,Tend 
     ENTER 0
     call depth
-    _fetch TDepth
+    _fetch tdepth
     _minus
     call THashN
     call EQ

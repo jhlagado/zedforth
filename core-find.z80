@@ -1,0 +1,34 @@
+; FIND   c-addr -- c-addr 0   if not found
+;                  xt     1   if immediate
+;                  xt    -1   if normal
+CODE "find",0,find
+    _fetch latest
+find1:
+    call LFAtoNFA   
+    _twoDup
+    _over
+    _cAt
+    _onePlus
+    _sameq
+    _dup
+    _zeroBranch find2
+    _drop
+    call NFAtoLFA
+    _at
+    _dup
+find2:
+    _zeroBranch find1
+    _dup
+    _isZero
+    ret z
+    _nip
+    _dup
+    call NFAtoBody
+    _swap
+    call immedq
+    _zeroBranch,find3
+    _push -1
+    ret
+find3:
+    _push 1
+    ret

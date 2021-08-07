@@ -115,11 +115,6 @@
     push HL			    ; 11t		x1 x2 x3 x4 x1 x2	
 .endm
 
-.macro _twonip      ; 24t			n1 n2 n3 -- n3 		
-    _nip				; 12t
-    _nip				; 12t
-.endm
-
 .macro _spAt
     ld HL,0
     add HL,SP
@@ -127,3 +122,8 @@
     ex DE,HL
 .endm
 
+.macro _qdup
+    _dup
+    _zeroBranch 2
+    _dup
+.endm

@@ -15,6 +15,7 @@ CODE ".",1,dot
 ; Output n characters from adr.
 CODE 'type',4,type
     ENTER 0
+    jr type2
 type1:          
     _swap               ; 25t
     _dup                ; 11t
@@ -22,6 +23,7 @@ type1:
     call emit           ; 
     _onePlus            ; 6t
     _swap
+type2:
     _loopNext TYPE1     ; 12t
     _drop               ; 10t
     _drop               ; 10t
@@ -31,13 +33,15 @@ type1:
 ; print stack (non-destructively)
 CODE ".s",2,dots                
     ENTER 0
+    _print "\r\n"
     call depth          ; x... n 
     _dup
-    _zeroBranch dots2
+    _zeroBranch dots3
     _push dStack        ; x... n s0
     _cellMinus
     _cellMinus          ; x... @x0 n
     _swap               
+    jr dots2
 dots1:
     _swap
     _dup
@@ -46,8 +50,10 @@ dots1:
     _space
     _cellMinus
     _swap
+dots2:
     _loopNext dots1     ; 12t
     _drop
-dots2:
+dots3:
     _drop
+    _print "\r\n"
     EXIT 0

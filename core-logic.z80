@@ -24,7 +24,7 @@ CODE "or",2,orr	        ; bitwise xor
 
 ; xor    x1 x2 -- x3            logical xor
 CODE "xor",3,xorr	        ; bitwise xor
-    ENTER 1
+    ENTER 0
     pop HL
     ld A,H
     xor D
@@ -32,7 +32,7 @@ CODE "xor",3,xorr	        ; bitwise xor
     ld A,L
     xor E
     ld E,A
-    EXIT 1
+    EXIT 0
 
 ; INVERT x1 -- x2               ; bitwise complement
 CODE "not",3,nott

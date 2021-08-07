@@ -10,57 +10,30 @@ CODE 'count',5,count
 
 ; non-standard word
 ; S= ( str1 str2 len -- -1|0|1 )
-CODE 'S=',0,stringEQ
-compareStr:                             ; str1 str2 len -- (-1|0|1)
-    ENTER 0
-    _dup
-    _isZero                         ; test for Count=0
-    jr z,compstr5
-    _swap                           ; str1 len str2
-    _pop HL                             ; str1 len      HL = str2 c = len 
-    ld A,C                              ; str1 len      HL = sr2 A = len
-    ex af,af'
-    ld A,B                              ; str1 len      HL = sr2 A:A' = len
-    _drop                           ; str1          HL = sr2 A = len 
-    push DE                             ; save DE       suspend forth
-    ld D,B                              
-    ld E,C                              ; str1          HL = sr2 DE = str1 B = len 
-    ld B,A
-    ex af,af'
-    ld C,A                              ; len
-compstr1:
-    ld A,(DE)
-    inc DE
-    cpi
-    jr z,compstr3                   ; char mismatch: exit
-    dec HL                      ; point at mismatch char
-    cp (HL)                     ; set carry if char1 < char2
-    jr nc,compstr2
-    ld BC, -1               ; -1 str1 < str2
-    jr compstr4
-compstr2:
-    ld BC, 1                ; 1 str1 > str2
-    jr compstr4
-compstr3:
-    jp pe,compstr1
-    ld BC,0                             ; 0 no mismatch found
-compstr4:
-    pop DE                              ; restore DE resume forth
-compstr5:
-    EXIT 0
 
-; type  ( adr n -- )
-; Output n characters from adr.
-CODE 's=',4,sequal
+; SAME? ( a a n -- a a f \ -0+ )
+; Compare n chars in two strings. Return 0 if identical.
+CODE 'same?',5,sameq
     ENTER 0
-sequal1:          
-    _swap               ; 25t
-    _dup                ; 11t
-    _cAt                ; 18t
-    call emit           ; 
-    _onePlus            ; 6t
-    _swap
-    _loopNext sequal1     ; 12t
-    _drop               ; 10t
-    _drop               ; 10t
-    EXIT 0
+    jr sameq3           ; a1 a2 n            
+sameq1:
+    call toR            ; a1 a2         R: n
+    _over               ; a1 a2 a1
+    call rAt            ; a1 a2 a1 n
+    _plus               ; a1 a2 a1+n
+    _cAt                 ; a1 a2 c1
+    _over               ; a1 a2 c1 a2
+    call rAt            ; a1 a2 c1 a2 n
+    _plus               ; a1 a2 c1 a2+n
+    _cAt                 ; a1 a2 c1 c2
+    _minus              ; a1 a2 diff
+    jr z,sameq2
+    call rFrom          ; a1 a2 -+ n
+    _drop               ; a1 a2 -+
+    EXIT 0              ; not equal
+sameq2:
+    _drop               ; a1 a2
+    call rFrom          ; a1 a2 n
+sameq3:
+    _loopNext sameq1    ; a1 a2 n    
+    EXIT 0              ; a1 a2 0   ; equal

@@ -1,0 +1,41 @@
+    _initKernel
+    _push 16
+    _store var_base
+
+    _test
+        _pushStr ""
+        _drop
+        _pushStr ""
+        call sameq
+        _nip
+        _nip
+    _expect
+        _push 0
+    _fail "Should be 0"  
+
+    _test
+        _pushStr "T"
+        _drop
+        _pushStr "Te"
+        call sameq
+        _nip
+        _nip
+        _dup
+        _zeroBranch x1
+        _drop
+        _push 1
+x1:
+    _expect
+        _push 1
+    _fail "Should be 1"  
+
+    _test
+        _pushStr "Test123"
+        _drop
+        _pushStr "Test123"
+        call sameq
+        _nip
+        _nip
+    _expect
+        _push 0
+    _fail "Should be 0"  

@@ -24,36 +24,36 @@ PORT_DATA       equ $03
     ei
 .endm
 
-serialIn:
+serialInt:
     push AF
     push HL
     in A,(IO_CTRL)
     and $01
-    jr z,serialIn1
+    jr z,serialInt1
     in A,(IO_DATA)
-    call serialIn2
-serialIn1:
+    call serialInt2
+serialInt1:
     pop HL
     pop AF
     ei
     ret
 
 ; destroys: HL
-serialIn2:
+serialInt2:
     push AF
     ld A,(serBufUsed)
     cp SER_BUFSIZE
-    jr nz,serialIn21
+    jr nz,serialInt21
     pop AF
     ret
-serialIn21:
+serialInt21:
     ld HL,(serInPtr)
     inc HL
     ld A,L             ; Only need to check low byte becasuse lineBuf<256 bytes
     cp (serBuf + SER_BUFSIZE) & $FF
-    jr nz,serialIn22
+    jr nz,serialInt22
         ld HL,serBuf
-serialIn22:
+serialInt22:
     ld (serInPtr),HL
     pop AF
     ld (HL),A
@@ -61,10 +61,10 @@ serialIn22:
     inc A
     ld (serBufUsed),A
     cp SER_FULLSIZE
-    jr c, serialIn23
+    jr c, serialInt23
     ld A,RTS_HIGH
     out (IO_CTRL),A
-serialIn23:
+serialInt23:
     ret
 
 ; emit  ( c -- )
