@@ -1,5 +1,5 @@
 ; c@ ( a -- n )
-CODE 'c@',IMMED+2,cAt
+CODE 'c@',2,cAt
 POP HL
 _cAt
 JP (HL)

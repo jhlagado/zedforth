@@ -17,6 +17,7 @@ RET_STACK       equ     END_RAM             ; return stack, grows down
 
 IMMED           equ     $40
 HIDE            equ     $80
+MASK            equ     $1F
 
 FALSE           equ     0
 TRUE            equ     -1

@@ -7,11 +7,13 @@ TESTMODE equ 1
 ;===============================================================================
 
     .include "constants.z80"
+    .include "macros-compiler.z80"
     .include "macros-control.z80"
     .include "macros-device.z80"
     .include "macros-dict.z80"
     .include "macros-input.z80"
     .include "macros-kernel.z80"
+    .include "macros-math.z80"
     .include "macros-memory.z80"
     .include "macros-stack.z80"
     .include "macros-tester.z80"
@@ -30,6 +32,7 @@ codePtr  .set $
 
     .include "core-compiler.z80"
     .include "core-control.z80"
+    .include "core-find.z80"
     .include "core-kernel.z80"
     .include "core-logic.z80"
     .include "core-math.z80"
@@ -41,8 +44,6 @@ codePtr  .set $
     .include "core-stack.z80"
     .include "core-string.z80"
     .include "core-util.z80"
-
-lastHeader equ headerPtr+6             ;last name address
 
 initialLatest:
     dw backLink
@@ -64,7 +65,10 @@ tdepth:     dw 0            ; core-tester
 
 TESTS_START:
 
-    .include "test-string.z80"
+
+
+    .include "test-find.z80"
+    ; .include "test-string.z80"
 
     _print "\r\nDone! \r\n"
     halt

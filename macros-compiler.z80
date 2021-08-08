@@ -1,0 +1,46 @@
+; Structure of a header
+; header:
+;    lfa:       2       header^ | null  
+;    cfa:       2       code^
+;    clen:      2       number
+;    nfa:       1+len   pstr
+
+; ; lfa -- cfa    
+; .macro _lfaToCfa
+;     _cellPlus
+; .endm
+
+; lfa -- nfa    
+.macro _lfaToNfa
+    _push 6
+    _plus
+.endm
+
+; nfa -- lfa    
+.macro _nfaToLfa
+    _push 6
+    _minus
+.endm
+
+; nfa -- cfa    
+.macro _nfaToCfa
+    _push 4
+    _minus
+.endm
+
+; nfa -- f      
+; fetch immediate flag
+.macro _immedq
+    _cat
+    _push IMMED
+    call andd
+.endm
+
+; nfa -- n      
+; fetch length of name
+.macro _nfaToLen
+    _cat
+    _push MASK
+    call andd
+.endm
+

@@ -8,9 +8,11 @@ CODE 'count',5,count
     _cat
     EXIT 1
 
-; non-standard word
-; S= ( str1 str2 len -- -1|0|1 )
+; TODO
+; COMPARE
+; ( c-addr1 u1 c-addr2 u2 -- n )
 
+; non-standard word
 ; SAME? ( a a n -- a a f \ -0+ )
 ; Compare n chars in two strings. Return 0 if identical.
 CODE 'same?',5,sameq

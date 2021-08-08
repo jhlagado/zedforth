@@ -4,9 +4,6 @@
 CODE "word",4,word
     ret
     
-CODE "find",4,find
-    ret    
-    
-CODE "abort",5,abort
-    ret
+; CODE "abort",5,abort
+;     ret
     

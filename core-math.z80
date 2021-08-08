@@ -63,3 +63,25 @@ CODE "min",3,MIN
 	_swap
 	call max
 	EXIT 0
+
+; =      x1 x2 -- flag         test x1=x2
+CODE "=",1,EQ
+    ENTER 0
+    call XORR
+    _dup
+    _zeroBranch EQ1
+    ld DE,TRUE 
+EQ1:           
+    EXIT 0
+
+; =      n -- flag         
+CODE "0=",2,zeroEQ
+    ENTER 0
+    _zeroBranch zeroEQ1
+    ld DE,FALSE
+    jr zeroEQ2
+zeroEQ1:           
+    _oneMinus               ; -1 true
+zeroEQ2:
+    EXIT 0
+    

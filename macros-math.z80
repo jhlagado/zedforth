@@ -1,0 +1,50 @@
+.macro _plus            ; 29t             
+    ex DE,HL	            ; 4t	
+    pop DE		            ; 10t
+    add HL,DE               ; 11t
+    ex DE,HL                ; 4t
+.endm
+
+.macro _minus                         
+    pop HL
+    or A    
+    sbc HL,DE
+    ex DE,HL
+.endm
+
+.macro _onePlus
+    inc DE              ; 6t
+.endm
+
+.macro _oneMinus
+    dec DE
+.endm
+
+.macro _twoPlus
+    _onePlus
+    _onePlus
+.endm
+
+.macro _twoMinus
+    _oneMinus
+    _oneMinus
+.endm
+
+.macro _cellPlus
+    _twoPlus    
+.endm
+
+.macro _cellMinus
+    _twoMinus    
+.endm
+
+.macro _twoSlash                            ; n -- n/2
+    srl D
+    rr E
+.endm
+
+.macro _isZero      ; 18t
+    ld A, E         ; 4t
+    or D            ; 4t
+    _drop           ; 10t
+.endm

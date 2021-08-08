@@ -1,34 +1,51 @@
-; FIND   c-addr -- c-addr 0   if not found
-;                  xt     1   if immediate
-;                  xt    -1   if normal
-CODE "find",0,find
-    _fetch latest
+; FIND   pstr --    pstr    0   if not found
+;                   xt      1   if immediate
+;                   xt      -1  if normal
+CODE "find",4,find
+    ENTER 0
+    _fetch var_latest       ; pstr1 pstr2           ; var_latest = latest nfa
 find1:
-    call LFAtoNFA   
-    _twoDup
-    _over
-    _cAt
-    _onePlus
-    _sameq
-    _dup
-    _zeroBranch find2
+    _over                   ; pstr1 pstr2 pstr1
+    _cat                    ; pstr1 pstr2 len1
+    _over                   ; pstr1 pstr2 len1 pstr2
+    _cat                    ; pstr1 pstr2 len1 len2
+    call xorr               ; pstr1 pstr2 diff
+    _push mask                   
+    call andd               ; pstr1 pstr2 diff'
+    jr nz,find2
     _drop
-    call NFAtoLFA
-    _at
-    _dup
+
+    _over                   ; pstr1 pstr2 pstr1
+    _onePlus                ; pstr1 pstr2 pstr1'
+    _over                   ; pstr1 pstr2 pstr1' pstr2
+    call count              ; pstr1 pstr2 pstr1' pstr2' lenx
+    _push MASK
+    call andd               ; pstr1 pstr2 pstr1' pstr2' len
+    call sameq              ; pstr1 pstr2 pstr1' pstr2' result    ; 0 = match
+    _nip                    ; pstr1 pstr2 result
+    _nip                    ; pstr1 pstr2 result
+    _dup                    ; pstr1 pstr2 result result
+    _zeroBranch find3       ; pstr1 pstr2 result
 find2:
-    _zeroBranch find1
-    _dup
-    _isZero
-    ret z
-    _nip
-    _dup
-    call NFAtoBody
-    _swap
-    call immedq
-    _zeroBranch,find3
+    _drop                   ; pstr1 pstr2
+    _nfaToLfa               ; pstr1 lfa2
+    _at                     ; pstr1 link2
+    _dup                    ; pstr1 link2 link2
+    _zeroBranch find5       ; pstr1 link2|0 
+    jr find1                ; pstr1 link2
+find3:                      ; pstr1 pstr2 result
+    _drop                   ; pstr1 pstr2
+    _nip                    ; pstr2 
+    _dup                    ; pstr2 pstr2
+    _nfaToCfa               ; pstr2 cfa
+    _at                     ; pstr2 xt
+    _swap                   ; xt pstr2
+    _immedq                 ; xt immed?
+    _zeroBranch find4       
+    _push 1                 ; xt -1
+    jr find5
+find4:
     _push -1
-    ret
-find3:
-    _push 1
-    ret
+    jr find5                ; xt 1
+find5:
+    EXIT 0

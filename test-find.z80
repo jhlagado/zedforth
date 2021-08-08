@@ -1,0 +1,47 @@
+    _test
+        _packStr "o"
+        call find
+        _nip
+    _expect
+        _push 0
+    _fail "'o' should not be found"
+
+    _test
+        _packStr "ok!"
+        call find
+        _nip
+    _expect
+        _push 0
+    _fail "'ok!' should not be found"
+
+    _test
+        _packStr "ok"
+        call find
+    _expect
+        _push ok
+        _push -1
+    _fail "'ok' not found or immediate"
+
+    _test
+        _packStr "find"
+        call find
+    _expect
+        _push find
+        _push -1
+    _fail "'find' not found or immediate"
+
+    _test
+        _packStr "while"
+        call find
+    _expect
+        _push while
+        _push 1
+    _fail "'while' not found or immediate"
+
+    _test
+        _packStr "literal"
+        call find
+    _expect
+        _push literal
+        _push 1
+    _fail "'literal' not found or not immediate"

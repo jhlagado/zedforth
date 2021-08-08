@@ -122,75 +122,26 @@ CODE ":noname",7,colonNoName
     call rbrac                                  ; go into compile mode.
     EXIT 1                                 
 
-CODE "does>", IMMED+5, does                  ; --
-    ENTER 1
-    _compile xdoes                          ; compile two calls 
-    _compile rfrom                          ; address of body of created word                            
-    EXIT 1                                 
+; CODE "does>", IMMED+5, does                  ; --
+;     ENTER 1
+;     _compile xdoes                          ; compile two calls 
+;     _compile rfrom                          ; address of body of created word                            
+;     EXIT 1                                 
 
-xdoes:                                      ; --
-    _drop                      ;call rfrom  ; TOS = ptr to body after does> word
-    ENTER 1                                  ; caller of caller?
+; xdoes:                                      ; --
+;     _drop                      ;call rfrom  ; TOS = ptr to body after does> word
+;     ENTER 1                                  ; caller of caller?
 
-    _fetch var_latest                           ; ptr to created word
-    call toBody                            
-    _push call_opcode
-    _over
-    _cBang
-    _onePlus
-    _bang                                   ; rewrite with address of body after does>
-    EXIT 1                                 ; return to caller of caller (terminate caller)
+;     _fetch var_latest                           ; ptr to created word
+;     call toBody                            
+;     _push call_opcode
+;     _over
+;     _cBang
+;     _onePlus
+;     _bang                                   ; rewrite with address of body after does>
+;     EXIT 1                                 ; return to caller of caller (terminate caller)
 
-; IMMED?    nfa -- f      
-; fetch immediate flag
-CODE "immed?",6,IMMEDQ
-    ENTER 1
-    _cat
-    _push IMMED
-    call andd
-    EXIT 1
-
-; NFA>LFA   nfa -- lfa    
-; name adr -> link field
-;   4 - ;
-CODE "LFA>NFA",7,LFAtoNFA
-    ENTER 0
-    _cellPlus
-    _onePlus
-    EXIT 0
-
-; NFA>LFA   nfa -- lfa    
-; name adr -> link field
-;   4 - ;
-CODE "NFA>LFA",0,NFAtoLFA
-    ENTER 0
-    _oneMinus
-    _twoMinus
-    EXIT 0
-
-; NFA>CFA   nfa -- cfa    name adr -> CODE field
-;   COUNT 7F AND + ;       mask off 'smudge' bit
-CODE "NFA>body",0,NFAtoBody
-    ENTER 0
-    _dup
-    _cat
-    _onePlus                               ; skip over len
-    _plus
-    EXIT 0
-
-; >body     ( ptr -- ptr' )
-CODE ">body",0,toBody
-    ENTER 0
-    _cellPlus                              ; skip over backlink
-    _onePlus                               ; skip over flags
-    ; TODO: replace rest with jump to NFATOCFA
-    _dup
-    _cat
-    _onePlus                               ; skip over len
-    _plus
-    EXIT 0
-
-CODE "'",0,tick
+CODE "'",1,tick
     ENTER 0
     _pushc " "
     call word
@@ -198,46 +149,46 @@ CODE "'",0,tick
     _drop
     EXIT 0
 
-CODE "[']",IMMED,bracTick
+CODE "[']",IMMED+3,bracTick
     ENTER 0
     call tick               ; get xt of 'xxx'
     call literal
     EXIT 0
 
-; ( "<spaces>name" -- )
-CODE "defer",0,defer
-    ENTER 0
-    call create
-    _compile abort
-    call does
-    _at
-    call execute
-    EXIT 0
+; ; ( "<spaces>name" -- )
+; CODE "defer",5,defer
+;     ENTER 0
+;     call create
+;     _compile abort
+;     call does
+;     _at
+;     call execute
+;     EXIT 0
 
-; ( xt2 xt1 -- )
-CODE "defer!",0,deferstore
-    ENTER 0
-    call toBody
-    _bang
-    EXIT 0
+; ; ( xt2 xt1 -- )
+; CODE "defer!",6,deferstore
+;     ENTER 0
+;     call toBody
+;     _bang
+;     EXIT 0
 
-; ( xt1 -- xt2 )
-CODE "defer@",0,deferAt
-    ENTER 0
-    call toBody
-    _at
-    EXIT 0
+; ; ( xt1 -- xt2 )
+; CODE "defer@",6,deferAt
+;     ENTER 0
+;     call toBody
+;     _at
+;     EXIT 0
 
-; ( xt "<spaces>name" -- )
-CODE "is",IMMED,is
-    ENTER 0
-    _fetch var_state 
-    _zeroBranch is1
-    _compile bracTick
-    _push deferStore
-    call comma
-    EXIT 0
-is1:
-    _push deferStore
-    EXIT 0
+; ; ( xt "<spaces>name" -- )
+; CODE "is",IMMED+2,is
+;     ENTER 0
+;     _fetch var_state 
+;     _zeroBranch is1
+;     _compile bracTick
+;     _push deferStore
+;     call comma
+;     EXIT 0
+; is1:
+;     _push deferStore
+;     EXIT 0
 
