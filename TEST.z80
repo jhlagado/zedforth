@@ -60,15 +60,12 @@ start:
     .org START_RAM
     .include "variables.z80"
     
-charPtr:    dw 0            ; mocking getc
-tdepth:     dw 0            ; core-tester
-
 TESTS_START:
 
 
 
     .include "test-find.z80"
-    ; .include "test-string.z80"
+    .include "test-string.z80"
 
     _print "\r\nDone! \r\n"
     halt
