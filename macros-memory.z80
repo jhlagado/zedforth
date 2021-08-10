@@ -1,21 +1,24 @@
 .macro _fetch, name
-    _push name
-    _at
+    _dup
+    ld DE,(name)
 .endm
 
 .macro _cfetch, name
-    _push name
-    _at
+    _dup
+    ld A,(name)
+    ld E,A
+    ld D,0
 .endm
 
 .macro _store, name
-    _push name
-    _bang
+    ld (name),DE
+    _drop
 .endm
 
 .macro _cstore, name
-    _push name
-    _cBang
+    ld A,E
+    ld (name),A
+    _drop
 .endm
 
 .macro _cAt     ; 18t			a -- c

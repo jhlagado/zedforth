@@ -1,17 +1,17 @@
 toR:                ; 59t
-    pop HL          ; 11t
+    ENTER 2         ; 11t
     _rpush D,E		; 34t		x		R: x 
 	_drop			; 10t				R: x
     jp (HL)         ; 4t
 
 rFrom:              ; 59t
-    pop HL          ; 10t
+    ENTER 2         ; 11t
 	_dup			; 11t			
     _rpop	D,E		; 34t		x 		
     jp (HL)         ; 4t
 
 rAt:
-    pop HL
+    ENTER 2         ; 11t
 	_dup			; 11
     _rpeek D,E		; 34t				R: x		TMP x
     jp (HL)
