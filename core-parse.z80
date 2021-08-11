@@ -2,8 +2,100 @@
 ; read a word from input stream
 ; Skip leading delimiters. Parse characters ccc delimited by char. 
 CODE "word",4,word
+    ENTER 0
+    call tor                                ; delim
+    _fetch here                             ; delim ptr
+    _onePlus                                ; delim ptr'    ; fill in length later
+    _swap                                   ; ptr' delim
+    _push $40                               ; ptr' delim maxlen
+    _swap                                   ; ptr' maxlen delim 
+    call parseWord                          ; ptr' len
+    _swap                                   ; len ptr'
+    oneMinus                                ; len ptr
+    _dup
+    ld HL,DE                                ; len ptr   HL: ptr
+    _cbang                                  ;           HL: ptr  ; store length
+    ld DE,HL                                ; ptr
+    EXIT 0                                     
+
+; ptr maxlen delim -- ptr len
+parseWord:                                  ; -- ptr len
+    ENTER 0
+    _dup                                    ; ptr maxlen delim delim
+    call skipDelims                         ; ptr maxlen delim char
+    call wordRead                           ; ptr len
+    EXIT 0                                     
+
+; delim -- char
+skipDelims:                                 
+    ENTER 0
+skipd1:
+    call key                                ; delim key
+    bit 7,E                                 ; delim key     ; EOF? used by tests
+    jr nz,skipd10
+    cp " "                                  ; delim key     ; < space?
+    jr nc,skipd10
+    cp $5C                                  ; delim key     ; \ start of a comment?
+    jr z,skip3
+    _over                                   ; delim key delim 
+    _over                                   ; delim key delim key
+    call equals                             ; delim key f
+    _zeroBranch skipd4                      ; delim key     ; if delim then loop
+    _nip                                    ; key           ; already in word
+    jr skipd8
+skipd3:                                     ; skip to end of line
+    _drop                                   ; delim
+    call key                                ; delim key2
+    ld A,"\n"
+    cp E
+    jr nz,skipd3
+skipd4:
+    _drop                                   ; delim
+    jr skipd1                               ; resume main loop
+skip9:
+    _drop                                   ; delim key
+skip10:
+    _drop                                   ; delim
+    ld DE,0                                 ; 0
+skipd8:
+    EXIT 0                                     
+
+; ptr maxlen delim char -- ptr len
+wordRead:                                   
+    ENTER 0
+    ld A,E                                  ; A = char
+    ex AF,AF'                               ; AA = char
+    call drop                               ; ptr maxlen delim  ; A' = char
+    ld A,E                                  ; ptr maxlen delim  ; A = delim A' = char
+    call drop                               ; ptr maxlen        ; A = delim A' = char
+    ld D,A                                  ; ptr delim:maxlen  ; A = delim A' = char
+    ex af,af'                               ; ptr del:max       ; A = char
+    or A                                    ; A = 0 ?
+    jr nz,wordRd1
+    ld DE,0                                 ; ptr len           ; where len = 0
     ret
-    
-; CODE "abort",5,abort
-;     ret
+wordRd1:
+    call over                               ; ptr del:max ptr   ; A = char
+    _pop HL                                 ; ptr del:max       ; HL = ptr A = char
+wordRd2:
+    ld (HL),A                               ; write char to lineBuf
+    inc HL                                  ; ptr del:max       ; HL = ptr'
+    push HL
+    call KEY                                ; ptr del:max key
+    pop HL
+    ld A,E                                  ; ptr del:max key   ; A = key    
+    call drop                               ; ptr del:max       ; A = key B = delim C = maxlen
+    cp D                                    ; key = delim?
+    jr z,wordRd3
+    cp " "                                  ; < space? i.e. control chars
+    jr c,wordRd3
+    dec E                                   ; maxlen--
+    jr nz, wordRd2                          ; jump loop
+wordRd3:
+    call drop                               ; ptr
+    or A
+    sbc HL, DE                              ; ptr' - ptr
+    _push  HL                               ; ptr len
+    EXIT 0                                     
+
     
