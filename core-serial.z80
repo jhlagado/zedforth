@@ -103,12 +103,12 @@ key1:
 CODE "?key",4,qkey
     ENTER 1
     .if TESTMODE
-        _fetch charPtr              ; adr
+        _fetch inptr                ; adr
         _dup                        ; adr adr
         _cat                        ; adr c
         _swap                       ; c adr
         _onePlus                    ; c adr+1
-        _store charPtr              ; c
+        _store inptr                ; c
         _push TRUE                  ; c true
     .else
         ld A,(serBufUsed)

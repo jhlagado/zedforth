@@ -4,14 +4,14 @@
 CODE "word",4,word
     ENTER 0
     call tor                                ; delim
-    _fetch here                             ; delim ptr
+    _fetch var_here                             ; delim ptr
     _onePlus                                ; delim ptr'    ; fill in length later
     _swap                                   ; ptr' delim
     _push $40                               ; ptr' delim maxlen
     _swap                                   ; ptr' maxlen delim 
     call parseWord                          ; ptr' len
     _swap                                   ; len ptr'
-    oneMinus                                ; len ptr
+    _oneMinus                                ; len ptr
     _dup
     ld HL,DE                                ; len ptr   HL: ptr
     _cbang                                  ;           HL: ptr  ; store length
@@ -36,10 +36,10 @@ skipd1:
     cp " "                                  ; delim key     ; < space?
     jr nc,skipd10
     cp $5C                                  ; delim key     ; \ start of a comment?
-    jr z,skip3
+    jr z,skipd3
     _over                                   ; delim key delim 
     _over                                   ; delim key delim key
-    call equals                             ; delim key f
+    call EQ                             ; delim key f
     _zeroBranch skipd4                      ; delim key     ; if delim then loop
     _nip                                    ; key           ; already in word
     jr skipd8
@@ -52,9 +52,9 @@ skipd3:                                     ; skip to end of line
 skipd4:
     _drop                                   ; delim
     jr skipd1                               ; resume main loop
-skip9:
+skipd9:
     _drop                                   ; delim key
-skip10:
+skipd10:
     _drop                                   ; delim
     ld DE,0                                 ; 0
 skipd8:
@@ -65,9 +65,9 @@ wordRead:
     ENTER 0
     ld A,E                                  ; A = char
     ex AF,AF'                               ; AA = char
-    call drop                               ; ptr maxlen delim  ; A' = char
+    _drop                               ; ptr maxlen delim  ; A' = char
     ld A,E                                  ; ptr maxlen delim  ; A = delim A' = char
-    call drop                               ; ptr maxlen        ; A = delim A' = char
+    _drop                               ; ptr maxlen        ; A = delim A' = char
     ld D,A                                  ; ptr delim:maxlen  ; A = delim A' = char
     ex af,af'                               ; ptr del:max       ; A = char
     or A                                    ; A = 0 ?
@@ -75,7 +75,7 @@ wordRead:
     ld DE,0                                 ; ptr len           ; where len = 0
     ret
 wordRd1:
-    call over                               ; ptr del:max ptr   ; A = char
+    _over                               ; ptr del:max ptr   ; A = char
     _pop HL                                 ; ptr del:max       ; HL = ptr A = char
 wordRd2:
     ld (HL),A                               ; write char to lineBuf
@@ -84,7 +84,7 @@ wordRd2:
     call KEY                                ; ptr del:max key
     pop HL
     ld A,E                                  ; ptr del:max key   ; A = key    
-    call drop                               ; ptr del:max       ; A = key B = delim C = maxlen
+    _drop                               ; ptr del:max       ; A = key B = delim C = maxlen
     cp D                                    ; key = delim?
     jr z,wordRd3
     cp " "                                  ; < space? i.e. control chars
@@ -92,7 +92,7 @@ wordRd2:
     dec E                                   ; maxlen--
     jr nz, wordRd2                          ; jump loop
 wordRd3:
-    call drop                               ; ptr
+    _drop                               ; ptr
     or A
     sbc HL, DE                              ; ptr' - ptr
     _push  HL                               ; ptr len

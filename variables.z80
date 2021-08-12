@@ -24,8 +24,9 @@ var_state:          dw FALSE
 
 .if TESTMODE
 
-    charPtr:    dw 0            ; mocking getc
     tdepth:     dw 0            ; core-tester
+    inbuf:      dw 0
+    inptr:      dw 0            ; mocking getc
     outbuf:     ds $100  
     outptr:     dw 0
 

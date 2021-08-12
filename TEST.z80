@@ -62,10 +62,9 @@ start:
     
 TESTS_START:
 
-
-
-    .include "test-find.z80"
-    .include "test-string.z80"
+    .include "test-parse.z80"
+    ; .include "test-find.z80"
+    ; .include "test-string.z80"
 
     _print "\r\nDone! \r\n"
     halt

@@ -1,11 +1,14 @@
 .macro _setInputText, s1
     _fetch lineBufStart
+    _dup
     _store lineBufTop
     _store currkey
     call litStr
     .pstr s1,"\r\n",-1,"\r\n"
     _drop
-    _store charPtr
+    _dup
+    _store inbuf
+    _store inptr
 .endm
 
 .macro _test
