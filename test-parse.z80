@@ -6,13 +6,15 @@
         _fetch inptr
         call dots
     _expect
-        _pushc "c1"
+        _pushc c1
         _fetch inbuf
         _push i1
         _plus
         call dots
-    _fail "expected c1 at i1"
+    _fail {s1," expected ",c1," at i1"}
 .endm
 
-; _testSkipDelims "Hello"," ",H,1
-; _testSkipDelims "   Hello"," ",H,4
+_testSkipDelims "Hello"," ","H",1
+_testSkipDelims "   Hello"," ","H",4
+_testSkipDelims "\t  Hello"," ","H",4
+_testSkipDelims "\\ comment \nHello"," ","H",12
