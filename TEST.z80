@@ -66,6 +66,9 @@ TESTS_START:
     ; .include "test-find.z80"
     ; .include "test-string.z80"
 
+_testSkipDelims "\t  Hello"," ",H,4
+
+
     _print "\r\nDone! \r\n"
     halt
 

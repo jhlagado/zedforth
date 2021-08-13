@@ -33,14 +33,17 @@ skipd1:
     call key                                ; delim key
     bit 7,E                                 ; delim key     ; EOF? used by tests
     jr nz,skipd10
-    cp " "                                  ; delim key     ; < space?
-    jr nc,skipd10
-    cp $5C                                  ; delim key     ; \ start of a comment?
+    _over                                   ; delim key delim    
+    ld A,E                                  ; delim key delim   ; A = delim
+    _drop                                   ; delim key
+    cp E
+    jr z,skipd2                             ; delim key     ; if delim then loop
+    ld A,$1F                                ; delim key     ; < space?
+    cp E
+    jr nc,skipd2
+    ld A,$5C
+    cp E                                    ; delim key     ; \ start of a comment?
     jr z,skipd3
-    _over                                   ; delim key delim 
-    _over                                   ; delim key delim key
-    call EQ                             ; delim key f
-    _zeroBranch skipd4                      ; delim key     ; if delim then loop
     _nip                                    ; key           ; already in word
     jr skipd8
 skipd3:                                     ; skip to end of line
@@ -49,11 +52,9 @@ skipd3:                                     ; skip to end of line
     ld A,"\n"
     cp E
     jr nz,skipd3
-skipd4:
-    _drop                                   ; delim
-    jr skipd1                               ; resume main loop
-skipd9:
-    _drop                                   ; delim key
+skipd2:
+    _drop
+    jr skipd1
 skipd10:
     _drop                                   ; delim
     ld DE,0                                 ; 0
