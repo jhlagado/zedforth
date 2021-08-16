@@ -1,4 +1,4 @@
-.engine mycomputer
+; .engine mycomputer
 
 TESTMODE equ 1
 
@@ -62,9 +62,27 @@ start:
     
 TESTS_START:
 
-    .include "test-parse.z80"
-    .include "test-find.z80"
-    .include "test-string.z80"
+    ; .include "test-parse.z80"
+    ; .include "test-find.z80"
+    ; .include "test-string.z80"
+
+.macro _testWordRead,char1,str1,max1,delim1,len1 
+    _test
+        _setInputText str1
+        _push outbuf                            ; delim ptr
+        _pushc delim1                           ; ptr' delim
+        _push max1                              ; ptr' delim maxlen
+        _pushc char1                            ; ptr' delim maxlen char
+        call wordRead                           ; ptr len
+        call dots
+    _expect
+        _push outbuf
+        _push 5
+        call dots
+    _fail {" expected length ",len1}
+.endm
+
+_testWordRead "H","ello",$40," ",5
 
     _print "\r\nDone! \r\n"
     halt

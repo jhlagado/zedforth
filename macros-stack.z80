@@ -61,23 +61,23 @@
 	EX DE,HL			        ; 4t
 .endm
 
-.macro _nip 	    ; 12t			x1 x2 -- x2  		
-    INC SP			    ; 6t
-    INC SP			    ; 6t
+.macro _rot	                ; 53t			( x1 x2 x3 -- x2 x3 x1 )
+    ex DE,HL	                ; 4t
+    pop DE		                ; 10t
+    EX DE,HL			        ; 4t		x1 x3 			T: x2
+    EX(SP),HL			        ; 20t		x2 x3 			T: x1
+	_dup			            ; 11t
+	EX DE,HL			        ; 4t
+.endm
+
+.macro _nip 	            ; 12t			x1 x2 -- x2  		
+    INC SP			            ; 6t
+    INC SP			            ; 6t
 .endm
 
 .macro _tuck				        ; x1 x2 -- x2 x1 x2
 	_swap				; 25t
     _over				; 35t
-.endm
-
-.macro _rot	        ; 53t			( x1 x2 x3 -- x2 x3 x1 )
-    ex DE,HL		
-    pop DE		
-    EX DE,HL			; 4t			x1 x3 			T: x2
-    EX(SP),HL			; 20t			x2 x3 			T: x1
-	_dup			    ; 11t
-	EX DE,HL			; 4t
 .endm
 
 .macro _twoDup      ; 43t         	; x1 x2 -- x1 x2 x1 x2
