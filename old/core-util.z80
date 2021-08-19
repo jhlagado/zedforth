@@ -1,4 +1,0 @@
-CODE 'ok',2,ok
-    ENTER 0
-    _println "ok"
-    EXIT 0
