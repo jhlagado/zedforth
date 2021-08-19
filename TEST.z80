@@ -1,4 +1,4 @@
-; .engine mycomputer
+.engine mycomputer
 
 TESTMODE equ 1
 
@@ -66,23 +66,25 @@ TESTS_START:
     ; .include "test-find.z80"
     ; .include "test-string.z80"
 
-.macro _testWordRead,char1,str1,max1,delim1,len1 
+.macro _testWordRead,char1,str1,delim1,len1 
     _test
         _setInputText str1
         _push outbuf                            ; delim ptr
         _pushc delim1                           ; ptr' delim
-        _push max1                              ; ptr' delim maxlen
+        _push $40                               ; ptr' delim maxlen
         _pushc char1                            ; ptr' delim maxlen char
+        call dots
         call wordRead                           ; ptr len
         call dots
     _expect
-        _push outbuf
-        _push 5
-        call dots
+        ; _push outbuf
+        ; _push len1
+        ; call dots
     _fail {" expected length ",len1}
 .endm
 
-_testWordRead "H","ello",$40," ",5
+; _testWordRead 0,""," ",0
+_testWordRead "H","ello"," ",5
 
     _print "\r\nDone! \r\n"
     halt

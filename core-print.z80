@@ -1,4 +1,4 @@
-CODE ".",1,dot
+CODE ".d",1,dotDigit
     ENTER 0
     ld  A,E
     and $0F
@@ -9,6 +9,39 @@ CODE ".",1,dot
     ld E,A
     ld D,0
     call emit
+    EXIT 0
+
+.macro _rotLeftBit
+    ADD HL,HL
+    RL E 
+.endm
+
+; n -- n1 n2
+; rotate most significant nibble into n2
+rotLeftDigit:
+    ENTER 0
+    EX DE,HL
+    LD DE,0 
+    _rotLeftBit 
+    _rotLeftBit 
+    _rotLeftBit 
+    _rotLeftBit 
+    EX DE,HL
+    _dup
+    EX DE,HL
+    EXIT 0
+
+CODE ".",1,dot
+    ENTER 0
+    call rotLeftDigit
+    call dotDigit
+    call rotLeftDigit
+    call dotDigit
+    call rotLeftDigit
+    call dotDigit
+    call rotLeftDigit
+    call dotDigit
+    _drop
     EXIT 0
     
 ; type  ( adr n -- )
