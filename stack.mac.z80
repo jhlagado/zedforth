@@ -1,0 +1,48 @@
+.macro _dup
+    push HL			        ; 11t
+.endm
+
+.macro _drop                ; 10t			x1 --  
+    pop HL			            
+.endm
+
+.macro _swap                ; 25t			x1 x2 -- x2 x1
+    ex (SP),HL		
+.endm
+
+.macro _over 	            ; 35t			x1 x2 -- x1 x2 x1
+    pop DE			            ; 10t		x2			T: x1
+    push DE			            ; 11t		x1 x2		T: x1
+	_dup			            ; 11t
+	EX DE,HL			        ; 4t
+.endm
+
+.macro _push, src                           ; put src (value or memory) location on top of param stack
+    _dup
+    ld HL, src
+.endm
+
+.macro _pushc, src                           ; put src (value or memory) location on top of param stack
+    _dup
+    ld L, src
+    ld H,0
+.endm
+
+.macro _rpush,hi,lo			; 34t		EX1
+    ex DE,HL
+    dec HL
+    ld (HL),lo
+    dec HL
+    ld (HL),hi
+	ex DE,HL
+.endm
+
+.macro _rpop,hi,lo				; 34t		EX1
+    ex DE,HL
+    ld hi,(HL)
+    inc HL
+    ld lo,(HL)
+    inc HL
+    ex DE,HL
+.endm
+

@@ -1,0 +1,22 @@
+.macro _fetch, name
+    _dup
+    ld HL,(name)
+.endm
+
+.macro _cfetch, name
+    _dup
+    ld A,(name)
+    ld L,A
+    ld H,0
+.endm
+
+.macro _store, name
+    ld (name),HL
+    _drop
+.endm
+
+.macro _cstore, name
+    ld A,L
+    ld (name),A
+    _drop
+.endm

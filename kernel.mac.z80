@@ -1,0 +1,58 @@
+; BC = IP
+; DE = RSP
+; HL = transient (used for jump)
+; DE' = transient (used for intermediate results)
+; HL' = TOS
+; BC',IX,IY = unused
+
+.macro _initKernel
+    ld SP,dStack
+    ld BC,startForth
+    ld DE,rStack 
+    _push FALSE
+    _store var_state
+    _push 10
+    _store var_base
+    _fetch initialLatest
+    _store var_latest
+    _push START_USER
+    _store var_here
+.endm
+
+.macro _next            ; 28t       EX1
+	ld H,1                  ; page $100
+    ld A,(BC)
+    ld L,A
+	inc BC
+	jp (HL)
+.endm
+
+.macro _enter           ; 73t       EX1
+    _rpush B,C			
+    pop BC			
+    _next			
+.endm
+
+.macro _exit            ; 62t       EX1
+    _rpop B,C
+    _next
+.endm
+
+.macro RPUSH			; 34t		EX1
+    ex DE,HL
+    dec HL
+    ld (HL),C
+    dec HL
+    ld (HL),B
+	ex DE,HL
+.endm
+
+.macro RPOP				; 34t		EX1
+    ex DE,HL
+    ld B,(HL)
+    inc HL
+    ld C,(HL)
+    inc HL
+    ex DE,HL
+.endm
+

@@ -1,0 +1,14 @@
+; .macro _call, adr
+;     db doCall
+;     dw litStr
+; .endm
+
+; .macro _pushStr, s1
+;     _call litStr
+;     .pstr s1
+; .endm    
+
+; .macro _print, s1
+;     _pushStr s1
+;     _call type
+; .endm    

@@ -1,4 +1,4 @@
-.engine mycomputer
+; .engine mycomputer
 
 TESTMODE equ 1
 
@@ -7,50 +7,69 @@ TESTMODE equ 1
 ;===============================================================================
 
     .include "constants.z80"
-    .include "macros-compiler.z80"
-    .include "macros-control.z80"
-    .include "macros-device.z80"
-    .include "macros-dict.z80"
-    .include "macros-input.z80"
-    .include "macros-kernel.z80"
-    .include "macros-math.z80"
-    .include "macros-memory.z80"
-    .include "macros-stack.z80"
-    .include "macros-tester.z80"
-    .include "macros-util.z80"
+    .include "dict.mac.z80"
+    .include "kernel.mac.z80"
+    .include "memory.mac.z80"
+    .include "print.mac.z80"
+    .include "stack.mac.z80"
+    ; .include "macros-compiler.z80"
+    ; .include "macros-control.z80"
+    ; .include "macros-device.z80"
+    ; .include "macros-dict.z80"
+    ; .include "macros-input.z80"
+    ; .include "macros-kernel.z80"
+    ; .include "macros-math.z80"
+    ; .include "macros-memory.z80"
+    ; .include "macros-stack.z80"
+    ; .include "macros-tester.z80"
+    ; .include "macros-util.z80"
 
 .org START_ROM
 RST00:                                      ; Reset
     di                                          
     jp start
 
+.org $0008
+RST08:                                      ; rst 08 ENTER
+    _enter
+
 .org $0038
-RST38:                                      ; rst 38
-    jp serialInt
+RST38:                                      ; rst 38 SEIAL INTERRUPT
+    ; jp serialInt
 
 codePtr  .set $ 
 
-    .include "core-compiler.z80"
-    .include "core-control.z80"
-    .include "core-find.z80"
-    .include "core-kernel.z80"
-    .include "core-logic.z80"
-    .include "core-math.z80"
-    .include "core-memory.z80"
-    .include "core-parse.z80"
-    .include "core-print.z80"
-    .include "core-tester.z80"
-    .include "core-serial.z80"
-    .include "core-stack.z80"
-    .include "core-string.z80"
-    .include "core-util.z80"
+    .org $100
+primPage:
+    .include "prim.z80"
+
+    .include "serial.z80"
+    ; .include "core-compiler.z80"
+    ; .include "core-control.z80"
+    ; .include "core-find.z80"
+    ; .include "core-kernel.z80"
+    ; .include "core-logic.z80"
+    ; .include "core-math.z80"
+    ; .include "core-memory.z80"
+    ; .include "core-parse.z80"
+    ; .include "core-print.z80"
+    ; .include "core-tester.z80"
+    ; .include "core-stack.z80"
+    ; .include "core-string.z80"
+    ; .include "core-util.z80"
 
 initialLatest:
     dw backLink
 
 start:
-    call init
-
+    _initKernel
+    ld BC,startForth
+    _next
+    
+startForth:    
+    db lit 
+    dw 3
+    db double, dot, quit
     
 ; end header  ============================================================  
     
@@ -62,31 +81,12 @@ start:
     
 TESTS_START:
 
+    .include "colon.test.z80"
     ; .include "test-parse.z80"
     ; .include "test-find.z80"
     ; .include "test-string.z80"
 
-.macro _testWordRead,char1,str1,delim1,len1 
-    _test
-        _setInputText str1
-        _push outbuf                            ; delim ptr
-        _pushc delim1                           ; ptr' delim
-        _push $40                               ; ptr' delim maxlen
-        _pushc char1                            ; ptr' delim maxlen char
-        call dots
-        call wordRead                           ; ptr len
-        call dots
-    _expect
-        ; _push outbuf
-        ; _push len1
-        ; call dots
-    _fail {" expected length ",len1}
-.endm
-
-; _testWordRead 0,""," ",0
-_testWordRead "H","ello"," ",5
-
-    _print "\r\nDone! \r\n"
+    ; _print "\r\nDone! \r\n"
     halt
 
 START_USER:
