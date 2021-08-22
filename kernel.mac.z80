@@ -6,25 +6,21 @@
 ; BC',IX,IY = unused
 
 .macro _initKernel
-    ld SP,dStack
     ld BC,startForth
     ld DE,rStack 
-    _push FALSE
-    _store var_state
-    _push 10
-    _store var_base
-    _fetch initialLatest
-    _store var_latest
-    _push START_USER
-    _store var_here
+    ld IY,next16
+    ld HL, FALSE
+    ld (var_state),HL
+    ld HL, 10
+    ld (var_base),HL
+    ld HL, (initialLatest)
+    ld (var_latest),HL
+    ld HL, START_USER
+    ld (var_here),HL
 .endm
 
 .macro _next            ; 28t       EX1
-	ld H,1                  ; page $100
-    ld A,(BC)
-    ld L,A
-	inc BC
-	jp (HL)
+	jp (IY)
 .endm
 
 .macro _enter           ; 73t       EX1
@@ -38,21 +34,16 @@
     _next
 .endm
 
-.macro RPUSH			; 34t		EX1
-    ex DE,HL
-    dec HL
-    ld (HL),C
-    dec HL
-    ld (HL),B
-	ex DE,HL
+.macro _mode8
+    ld IY,next8
+    _next
 .endm
 
-.macro RPOP				; 34t		EX1
-    ex DE,HL
-    ld B,(HL)
-    inc HL
-    ld C,(HL)
-    inc HL
-    ex DE,HL
+.macro _mode16
+    ld IY,next16
+    _next
 .endm
 
+.macro _quit
+    halt
+.endm

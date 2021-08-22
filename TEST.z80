@@ -9,6 +9,7 @@ TESTMODE equ 1
     .include "constants.z80"
     .include "dict.mac.z80"
     .include "kernel.mac.z80"
+    .include "math.mac.z80"
     .include "memory.mac.z80"
     .include "print.mac.z80"
     .include "stack.mac.z80"
@@ -26,12 +27,21 @@ TESTMODE equ 1
 
 .org START_ROM
 RST00:                                      ; Reset
-    di                                          
-    jp start
-
+    ld SP,dStack                            ; subroutine call to init so it can 
+    call init                               ; be easily skipped during debugging
+    _next                                   ; start Forth
+    
 .org $0008
 RST08:                                      ; rst 08 ENTER
     _enter
+
+.org $0018
+RST20:                                      
+    _mode8
+
+.org $0020
+RST18:                                      
+    _mode16
 
 .org $0038
 RST38:                                      ; rst 38 SEIAL INTERRUPT
@@ -41,13 +51,13 @@ codePtr  .set $
 
     .org $100
 primPage:
-    .include "prim.z80"
+    .include "bytecode.z80"
 
+    .include "kernel.z80"
     .include "serial.z80"
     ; .include "core-compiler.z80"
     ; .include "core-control.z80"
     ; .include "core-find.z80"
-    ; .include "core-kernel.z80"
     ; .include "core-logic.z80"
     ; .include "core-math.z80"
     ; .include "core-memory.z80"
@@ -61,25 +71,31 @@ primPage:
 initialLatest:
     dw backLink
 
-start:
-    _initKernel
-    ld BC,startForth
-    _next
-    
+next8:            ; 28t       EX1
+	ld H,1                  ; page $100
+    ld A,(BC)
+    ld L,A
+	inc BC
+	jp (HL)
+
+next16:            ; 38t       EX1
+    ld A,(BC)
+    ld L,A
+	inc BC
+    ld A,(BC)
+    ld H,A
+	inc BC
+	jp (HL)
+
 startForth:    
-    db lit 
-    dw 3
-    db double, dot, quit
-    
+    dw lit, 3, double, dot, quit
+ 
+.org START_RAM
+    .include "variables.z80"
+
 ; end header  ============================================================  
     
-
-    jp TESTS_START
-    
-    .org START_RAM
-    .include "variables.z80"
-    
-TESTS_START:
+testsStart:
 
     .include "colon.test.z80"
     ; .include "test-parse.z80"
