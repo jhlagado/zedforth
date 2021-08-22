@@ -1,0 +1,13 @@
+.macro _codeMacro, name1
+name1:
+    exx
+    _name1
+    exx
+    _next
+.endm
+
+.macro _const, name1
+    _dup
+    ld HL,name
+.endm
+

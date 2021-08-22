@@ -1,38 +1,16 @@
 ; byte code
 ; origin at $100
 
-.macro _bytecode, name1
-name1:
-    exx
-    _name1
-    exx
-    _next
-.endm
-
 .org $101                   ; opcode 1 page 1
-_bytecode mode16
-_bytecode dup
-_bytecode plus
-_bytecode dot
+; _codeMacro mode16
 
-exit: 
-    _exit
+; exit: 
+;     _exit
 
-quit:
-    _quit
+; quit:
+;     _quit
 
-lit:            ; 85t
-	ld H,0
-    ld A,(BC)
-    ld L,A
-	inc BC
-	ld A,(BC)
-    ld H,A
-	inc BC
-    push HL
-    exx
-    pop DE
-    push HL
-    ex DE,HL
-    exx
-    _next         ; return to adr2 + 2
+dot:
+    _dot
+    _next
+

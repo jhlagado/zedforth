@@ -28,22 +28,3 @@
     pop BC			
     _next			
 .endm
-
-.macro _exit            ; 62t       EX1
-    _rpop B,C
-    _next
-.endm
-
-.macro _mode8
-    ld IY,next8
-    _next
-.endm
-
-.macro _mode16
-    ld IY,next16
-    _next
-.endm
-
-.macro _quit
-    halt
-.endm

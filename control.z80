@@ -1,0 +1,15 @@
+qbranch_:           
+    exx
+    _isZero
+    _drop
+    exx
+    jr z,qbranch1
+branch_:
+    _litParam
+    jp (HL)
+qbranch1:
+    _next
+
+execute_:            ; 41t
+    _exPop
+    jp (HL)

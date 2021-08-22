@@ -1,3 +1,46 @@
+; reads next cell into HL
+; advances IP by 2
+.macro _litParam:           ; 34t
+    ld A,(BC)
+    ld L,A
+	inc BC
+	ld A,(BC)
+    ld H,A
+	inc BC
+.endm
+
+; transfers HL to TOS (HL')
+.macro _exPush              ; 38t
+    push HL             
+    exx
+    _swap
+    exx
+.endm
+
+; transfers TOS (HL') to HL
+.macro _exPop               ; 38t
+    exx
+    _swap
+    exx
+    pop HL             
+.endm
+
+
+.macro _lit:                ; 72t
+    _litParam
+    _exPush
+.endm
+
+.macro _unnip			    ; 12t		; x y -- z x y   N: z --
+	dec SP	
+    dec SP	
+.endm
+
+.macro _twoUnnip			; 24t		; x y -- z x y   N: z --
+	_unnip	
+    _unnip	
+.endm
+
 .macro _dup
     push HL			        ; 11t
 .endm
@@ -6,15 +49,71 @@
     pop HL			            
 .endm
 
-.macro _swap                ; 25t			x1 x2 -- x2 x1
+.macro _swap                ; 19t			x1 x2 -- x2 x1
     ex (SP),HL		
 .endm
 
-.macro _over 	            ; 35t			x1 x2 -- x1 x2 x1
+.macro _over 	            ; 36t			x1 x2 -- x1 x2 x1
     pop DE			            ; 10t		x2			T: x1
     push DE			            ; 11t		x1 x2		T: x1
 	_dup			            ; 11t
-	EX DE,HL			        ; 4t
+	ex DE,HL			        ; 4t
+.endm
+
+.macro _rot	                ; 45t			( x1 x2 x3 -- x2 x3 x1 )
+    pop DE		                ; 10t
+    ex DE,HL			        ; 4t		x1 x3 			T: x2
+    ex (SP),HL			        ; 20t		x2 x3 			T: x1
+	_dup			            ; 11t
+.endm
+
+.macro _nip 	            ; 14t			x1 x2 -- x2  		
+	inc SP	
+    inc SP	
+.endm
+
+.macro _tuck				        ; x1 x2 -- x2 x1 x2
+	_swap				; 25t
+    _over				; 35t
+.endm
+
+.macro _twoDup      ; 43t         	; x1 x2 -- x1 x2 x1 x2
+    pop DE			    ; 10t		; x2				T: x1
+    push DE			    ; 11t		; x1 x2				T: x1
+	_dup				; 11t		; x1 x2 x2			T: x1
+	push DE			    ; 11t		; x1 x2 x1 x2
+.endm
+
+.macro _twoDrop     ; 20t       	; x x --     
+    _drop				; 10t
+	_drop				; 10t
+.endm
+
+.macro _twoswap	    ; 99t 			x1 x2 x3 x4 -- x3 x4 x1 x2 	
+    pop DE              ; 10		x1 x2 x4            T x3
+    ex (SP),HL			; 19		x1 x4 x2			T x3
+    ex DE,HL            ; 4         x1 x4 x3            T x2
+    _nip			    ; 12		x1 x3		N x4   	T x2
+    ex (SP),HL			; 19		x3 x1				T x2
+    _unnip			    ; 12		x3 x4 x1			T x2
+	_dup			    ; 11t
+    ex DE,HL
+.endm
+
+.macro _twoOver	    ; 114t			x1 x2 x3 x4 -- x1 x2 x3 x4 x1 x2	       
+    _dup				; 11t		x1 x2 x3 x4 x4
+	_twoNip				; 24t		x1 x2 x4	    N: x3 x4
+	_drop				; 10t		x1 x2	        N: x2 x3 x4
+	pop DE			    ; 10t		x2		        N: x1 x2 x3 x4      T = x1
+    _twoUnnip			; 24t		x1 x2 x2   	    N: x3 x4            T = x1
+	_twoUnnip			; 24t		x1 x2 x3 x4 x2                      T = x1
+    push DE			    ; 11t		x1 x2 x3 x4 x1 x2	
+.endm
+
+.macro _spAt
+    ld HL,0
+    add HL,SP
+    _dup
 .endm
 
 .macro _push, src                           ; put src (value or memory) location on top of param stack
@@ -28,7 +127,7 @@
     ld H,0
 .endm
 
-.macro _rpush,hi,lo			; 34t		EX1
+.macro _rpush,hi,lo			    ; 34t		
     ex DE,HL
     dec HL
     ld (HL),lo
@@ -37,7 +136,7 @@
 	ex DE,HL
 .endm
 
-.macro _rpop,hi,lo				; 34t		EX1
+.macro _rpop,hi,lo				; 34t		
     ex DE,HL
     ld hi,(HL)
     inc HL

@@ -1,3 +1,19 @@
 init:
     _initKernel
     ret
+
+exit:
+    _rpop B,C
+    _next
+
+mode8:
+    ld IY,next8
+    _next
+
+mode16:
+    ld IY,next16
+    _next
+
+quit:
+    halt
+

@@ -7,6 +7,7 @@ TESTMODE equ 1
 ;===============================================================================
 
     .include "constants.z80"
+    .include "code.mac.z80"
     .include "dict.mac.z80"
     .include "kernel.mac.z80"
     .include "math.mac.z80"
@@ -35,14 +36,6 @@ RST00:                                      ; Reset
 RST08:                                      ; rst 08 ENTER
     _enter
 
-.org $0018
-RST20:                                      
-    _mode8
-
-.org $0020
-RST18:                                      
-    _mode16
-
 .org $0038
 RST38:                                      ; rst 38 SEIAL INTERRUPT
     ; jp serialInt
@@ -54,17 +47,17 @@ primPage:
     .include "bytecode.z80"
 
     .include "kernel.z80"
+    .include "math.z80"
+    .include "memory.z80"
     .include "serial.z80"
+    .include "stack.z80"
     ; .include "core-compiler.z80"
     ; .include "core-control.z80"
     ; .include "core-find.z80"
     ; .include "core-logic.z80"
-    ; .include "core-math.z80"
-    ; .include "core-memory.z80"
     ; .include "core-parse.z80"
     ; .include "core-print.z80"
     ; .include "core-tester.z80"
-    ; .include "core-stack.z80"
     ; .include "core-string.z80"
     ; .include "core-util.z80"
 

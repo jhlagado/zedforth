@@ -20,3 +20,56 @@
     ld (name),A
     _drop
 .endm
+
+.macro _cAt         ; 14t			a -- c
+    ld L,(HL)		    ; 7t
+    ld H,0			    ; 7t
+.endm
+
+.macro _cBang       ; 27t			c a --
+    pop DE              ; 10t		
+    ld (HL),E		    ; 7t
+	_drop			    ; 10t
+.endm
+
+.macro _at          ; 32t 			a -- n 
+    ld A,(HL)		    ; 7t
+	inc HL			    ; 6t
+    ld H,(HL)		    ; 7t
+    ld L,A              ; 4t
+.endm
+
+.macro _bang        ; 30t			n a --
+    pop DE              ; 10t		
+    ld (HL),E			; 7
+	inc HL			    ; 6
+    ld (HL),D			; 7
+    _drop
+.endm
+
+.macro _twoAt	    ; 81t			a -- x y
+	_dup				; 11t
+	_cellPlus			; 11t
+	_at				    ; 20t
+	_swap				; 19t
+	_at				    ; 20t
+.endm
+
+.macro _twoBang	    ; 124t			x y a --
+	_swap				; 19t		x a y
+	_over				; 16t		x a y a
+	_bang			    ; 46t		x a
+	_cellPlus			; 12t		x a+1
+	_bang			    ; 46t
+.endm
+
+; +! ( n a -- )
+; Add n to the contents at address a.
+.macro _plusBang
+    _swap                                   ; a n
+    _over                                   ; a n a
+    _at                                     ; a n d
+    _plus                                   ; a n+d
+    _swap                                   ; n+d a
+    _bang
+.endm

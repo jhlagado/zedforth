@@ -1,3 +1,70 @@
+rFrom:
+    _rpop H,L
+    _exPush
+    _next
+
+toR:
+    _exPop
+    _rpush H,L
+    _next
+
+lit:                ; 72t
+    _litParam
+    _exPush
+    _next
+
+_codeMacro unnip
+_codeMacro twoUnnip			; 24t		; x y -- z x y   N: z --
+_codeMacro dup
+_codeMacro drop                ; 10t			x1 --  
+_codeMacro swap                ; 19t			x1 x2 -- x2 x1
+_codeMacro over 	            ; 36t			x1 x2 -- x1 x2 x1
+_codeMacro rot	                ; 45t			( x1 x2 x3 -- x2 x3 x1 )
+_codeMacro nip 	            ; 14t			x1 x2 -- x2  		
+_codeMacro tuck				        ; x1 x2 -- x2 x1 x2
+_codeMacro twoDup      ; 43t         	; x1 x2 -- x1 x2 x1 x2
+_codeMacro twoDrop     ; 20t       	; x x --     
+
+twoSwap:	    ; 99t 			x1 x2 x3 x4 -- x3 x4 x1 x2 	
+    exx
+    pop DE              ; 10		x1 x2 x4            T x3
+    ex (SP),HL			; 19		x1 x4 x2			T x3
+    ex DE,HL            ; 4         x1 x4 x3            T x2
+    _nip			    ; 12		x1 x3		N x4   	T x2
+    ex (SP),HL			; 19		x3 x1				T x2
+    _unnip			    ; 12		x3 x4 x1			T x2
+	_dup			    ; 11t
+    ex DE,HL
+    exx
+    _next
+
+twoOver:	    ; 114t			x1 x2 x3 x4 -- x1 x2 x3 x4 x1 x2	       
+    exx
+    _dup				; 11t		x1 x2 x3 x4 x4
+	_nip				; 24t		x1 x2 x3 x4	    N: x4
+	_nip				; 24t		x1 x2 x4	    N: x3 x4
+	_drop				; 10t		x1 x2	        N: x2 x3 x4
+	pop DE			    ; 10t		x2		        N: x1 x2 x3 x4      T = x1
+    _twoUnnip			; 24t		x1 x2 x2   	    N: x3 x4            T = x1
+	_twoUnnip			; 24t		x1 x2 x3 x4 x2                      T = x1
+    push DE			    ; 11t		x1 x2 x3 x4 x1 x2	
+    exx
+    _next
+
+spAt:
+    exx
+    ld HL,0
+    add HL,SP
+    _dup
+    exx
+    _next
+
+
+
+
+
+
+
 
 ; ; -- p n   
 ; ; is followed by a literal Packed (Pascal) string
