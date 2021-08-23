@@ -34,7 +34,14 @@ RST00:                                      ; Reset
     
 .org $0008
 RST08:                                      ; rst 08 ENTER
-    _enter
+    _rpush B,C                              
+    pop BC
+    _next
+
+.org $0018
+RST18:                                      ; rst $18 REENTER
+    pop BC
+    _next
 
 .org $0038
 RST38:                                      ; rst 38 SEIAL INTERRUPT
@@ -80,9 +87,15 @@ next16:            ; 38t       EX1
 	inc BC
 	jp (HL)
 
-startForth:    
-    dw lit, 3, double, dot, quit
- 
+startForth:
+    dw lit, 3
+    dw double, escape
+    exx
+    dec HL
+    exx
+    _reenter
+    dw dot, quit
+
 .org START_RAM
     .include "variables.z80"
 

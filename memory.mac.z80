@@ -73,3 +73,79 @@
     _swap                                   ; n+d a
     _bang
 .endm
+
+; address register
+
+; >a ( -- n)
+.macro _toA
+    _dup
+    ld HL,BC
+.end
+
+; a> ( n -- )
+.macro _AFrom
+    ld BC,HL
+    _drop
+.end
+
+; a+ ( -- )
+.macro _APlus
+    ld BC,HL
+    _drop
+.end
+
+; a@ ( -- n )
+.macro _aAt
+    ld L,(BC)
+    inc BC
+    ld H,(BC)
+    dec BC
+.end
+
+; a! ( n -- )
+.macro _aBang
+    ld (BC),L
+    inc BC
+    ld (BC),H
+    dec BC
+.end
+
+; a@+ ( -- n )
+.macro _aAtPlus
+    _atA
+    inc BC
+.end
+
+; a!+ ( n -- )
+.macro _aBangPlus
+    _bangA
+    inc BC
+.end
+
+; ac@ ( -- n )
+.macro _aCAt
+    ld L,(BC)
+    ld H,0
+.end
+
+; ac! ( n -- )
+.macro _aCBang
+    ld (BC),L
+.end
+
+; ac@+ ( -- n )
+.macro _aCAtPlus
+    _cAtA
+    inc BC
+.end
+
+; ac!+ ( n -- )
+.macro _aCBangPlus
+    _cBangA
+    inc BC
+.end
+
+
+
+
+

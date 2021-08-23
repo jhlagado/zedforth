@@ -6,6 +6,10 @@ exit:
     _rpop B,C
     _next
 
+escape:
+    ld HL,BC
+    jp (HL)
+
 mode8:
     ld IY,next8
     _next

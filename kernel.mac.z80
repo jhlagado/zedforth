@@ -19,12 +19,21 @@
     ld (var_here),HL
 .endm
 
-.macro _next            ; 28t       EX1
+.macro _next            
 	jp (IY)
 .endm
 
-.macro _enter           ; 73t       EX1
+.macro _doColon         
     _rpush B,C			
     pop BC			
     _next			
 .endm
+
+.macro _enter           
+    rst $08
+.endm
+
+.macro _reenter           
+    rst $18
+.endm
+
