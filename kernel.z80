@@ -3,11 +3,11 @@ init:
     ret
 
 exit:
-    _rpop B,C
+    _rpop D,E
     _next
 
 escape:
-    ld HL,BC
+    ex DE,HL
     jp (HL)
 
 mode8:

@@ -34,13 +34,13 @@ RST00:                                      ; Reset
     
 .org $0008
 RST08:                                      ; rst 08 ENTER
-    _rpush B,C                              
-    pop BC
+    _rpush D,E                              
+    pop DE
     _next
 
 .org $0018
 RST18:                                      ; rst $18 REENTER
-    pop BC
+    pop DE
     _next
 
 .org $0038
@@ -73,18 +73,13 @@ initialLatest:
 
 next8:            ; 28t       EX1
 	ld H,1                  ; page $100
-    ld A,(BC)
+    ld A,(DE)
     ld L,A
-	inc BC
+	inc DE
 	jp (HL)
 
 next16:            ; 38t       EX1
-    ld A,(BC)
-    ld L,A
-	inc BC
-    ld A,(BC)
-    ld H,A
-	inc BC
+    _litParam
 	jp (HL)
 
 startForth:

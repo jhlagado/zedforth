@@ -1,13 +1,13 @@
-; BC = IP
-; DE = RSP
+; BC = RSP
+; DE = IP
 ; HL = transient (used for jump)
 ; DE' = transient (used for intermediate results)
 ; HL' = TOS
 ; BC',IX,IY = unused
 
 .macro _initKernel
-    ld BC,startForth
-    ld DE,rStack 
+    ld BC,rStack 
+    ld DE,startForth
     ld IY,next16
     ld HL, FALSE
     ld (var_state),HL
@@ -24,7 +24,7 @@
 .endm
 
 .macro _doColon         
-    _rpush B,C			
+    _rpush D,E			
     pop BC			
     _next			
 .endm

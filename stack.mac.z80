@@ -1,12 +1,12 @@
 ; reads next cell into HL
 ; advances IP by 2
 .macro _litParam:           ; 34t
-    ld A,(BC)
-    ld L,A
-	inc BC
-	ld A,(BC)
-    ld H,A
-	inc BC
+    ex DE,HL
+    ld E,(HL)
+	inc HL
+	ld D,(HL)
+	inc HL
+    ex DE,HL
 .endm
 
 ; transfers HL to TOS (HL')
@@ -126,21 +126,21 @@
     ld H,0
 .endm
 
-.macro _rpush,hi,lo			    ; 34t		
-    ex DE,HL
-    dec HL
-    ld (HL),lo
-    dec HL
-    ld (HL),hi
-	ex DE,HL
+.macro _rpush,hi,lo			    ; 38t		
+    dec BC
+    ld A,lo
+    ld (BC),A
+    dec BC
+    ld A,hi
+    ld (BC),A
 .endm
 
-.macro _rpop,hi,lo				; 34t		
-    ex DE,HL
-    ld hi,(HL)
-    inc HL
-    ld lo,(HL)
-    inc HL
-    ex DE,HL
+.macro _rpop,hi,lo				; 38t		
+    ld A,(BC)
+    ld hi,A
+    inc BC
+    ld A,(BC)
+    ld lo,A
+    inc BC
 .endm
 
