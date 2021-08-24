@@ -1,6 +1,6 @@
 rFrom:
     ex DE,HL
-    _rpop D,E
+    _rpop
     ex DE,HL
     _exPush
     _next
@@ -8,7 +8,7 @@ rFrom:
 toR:
     _exPop
     ex DE,HL
-    _rpush D,E
+    _rpush
     ex DE,HL
     _next
 

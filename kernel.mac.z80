@@ -24,7 +24,7 @@
 .endm
 
 .macro _doColon         
-    _rpush D,E			
+    _rpush		
     pop BC			
     _next			
 .endm

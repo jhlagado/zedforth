@@ -34,7 +34,7 @@ RST00:                                      ; Reset
     
 .org $0008
 RST08:                                      ; rst 08 ENTER
-    _rpush D,E                              
+    _rpush                              
     pop DE
     _next
 

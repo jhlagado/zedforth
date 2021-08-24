@@ -3,7 +3,7 @@ init:
     ret
 
 exit:
-    _rpop D,E
+    _rpop
     _next
 
 escape:
