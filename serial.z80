@@ -68,17 +68,8 @@ serialInt23:
     ret
 
 ; emit  ( c -- )
-CODE "emit",4,emit
-emit1:
-    in A,(IO_CTRL)      ; Status byte
-    bit 1,A             ; Set Zero flag if still transmitting character
-    jr z,emit1
-    exx
-    ld A,E
-    _drop
-    exx
-    out (IO_DATA),A         ; Output the character
-    _next
+_codeMacro emit
+
 
 ; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; ; serReady - check if there is input waiting to be read

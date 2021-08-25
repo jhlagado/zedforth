@@ -1,0 +1,65 @@
+; type  ( adr n -- )
+; Output n characters from adr.
+type:
+    exx
+    jr type2
+type1:          
+    _swap               ; 25t
+    _dup                ; 11t
+    _cAt                ; 18t
+    _emit
+    _onePlus            ; 6t
+    _swap
+type2:
+    _loopNext TYPE1     ; 12t
+    _drop               ; 10t
+    _drop               ; 10t
+    exx
+    _next
+
+; n -- n
+digitAscii:
+    exx
+    ld  A,L
+    and $0F
+    add a,$90
+    daa
+    adc a,$40
+    daa
+    ld L,A
+    ld H,0
+    exx
+    _next
+
+; n -- n1 n2
+; rotate most significant nibble into n2
+rotLeftDigit:
+    exx
+    LD DE,0 
+    ADD HL,HL
+    RL E
+    ADD HL,HL
+    RL E
+    ADD HL,HL
+    RL E
+    ADD HL,HL
+    RL E
+    _dup
+    EX DE,HL
+    exx
+    _next
+
+; n --
+dotDigit:
+    _enter
+    dw digitAscii, emit, exit
+
+; n --
+dot:
+    _enter
+    dw rotLeftDigit, dotDigit
+    dw rotLeftDigit, dotDigit
+    dw rotLeftDigit, dotDigit
+    dw rotLeftDigit, dotDigit
+    dw drop, exit
+    

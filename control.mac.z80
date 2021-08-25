@@ -1,0 +1,12 @@
+.macro _loopNext,label     ; 97t
+    _dup                    ; 11t   ; ret idx idx
+    _zeroBranch loopNext%%M ; 12t
+    _oneMinus               ; 6t
+    jr label 
+loopNext%%M:
+.endm
+
+.macro _zeroBranch,label    ; 97t
+    _isZero                 ; 18t
+    jr z,label             ; 12t
+.endm

@@ -64,22 +64,14 @@ spAt:
     _next
 
 
+; ; depth of data stack
+; ; destroys: HL
+; depth:              ; -- n
+;     ENTER 0
+;     _spAt
+;     _push dStack
+;     _swap
+;     _minus    
+;     _twoSlash
+;     EXIT 0
 
-
-
-
-
-
-; ; -- p n   
-; ; is followed by a literal Packed (Pascal) string
-; litStr:                         
-;     ENTER 
-;     _rFrom
-;     _xchg           ; swaps IP and TOS
-;     _call count     ; adr+1 len
-;     db twoDup       ; adr+1 len adr+1 len
-;     db plus         ; adr+1 len adr'
-;     ld BC,DE        ; 
-;     ex DE,HL		; adr+1 len ?           HL: adr'
-;     pop DE		    ; adr+1 len             HL: adr'
-;     EXIT

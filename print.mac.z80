@@ -7,6 +7,3 @@
 ;     _pushStr s1
 ;     _call type
 ; .endm    
-
-.macro _dot
-.endm

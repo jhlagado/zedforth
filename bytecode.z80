@@ -10,7 +10,3 @@
 ; quit:
 ;     _quit
 
-dot:
-    _dot
-    _next
-

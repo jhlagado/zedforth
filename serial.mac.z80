@@ -1,0 +1,10 @@
+.macro _emit
+emit1%%M:
+    in A,(IO_CTRL)      ; Status byte
+    bit 1,A             ; Set Zero flag if still transmitting character
+    jr z,emit1%%M
+    ld A,L
+    _drop
+    out (IO_DATA),A         ; Output the character
+.endm
+

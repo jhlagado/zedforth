@@ -21,3 +21,14 @@ mode16:
 quit:
     halt
 
+next8:            ; 28t       EX1
+	ld H,1                  ; page $100
+    ld A,(DE)
+    ld L,A
+	inc DE
+	jp (HL)
+
+next16:            ; 38t       EX1
+    _litParam
+	jp (HL)
+

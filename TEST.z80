@@ -1,21 +1,22 @@
-; .engine mycomputer
+.engine mycomputer
 
 TESTMODE equ 1
 
     ; .include "header.z80"
 
-;===============================================================================
+;======================================================================
 
     .include "constants.z80"
     .include "code.mac.z80"
+    .include "control.mac.z80"
     .include "dict.mac.z80"
     .include "kernel.mac.z80"
     .include "math.mac.z80"
     .include "memory.mac.z80"
     .include "print.mac.z80"
     .include "stack.mac.z80"
+    .include "serial.mac.z80"
     ; .include "macros-compiler.z80"
-    ; .include "macros-control.z80"
     ; .include "macros-device.z80"
     ; .include "macros-dict.z80"
     ; .include "macros-input.z80"
@@ -28,10 +29,8 @@ TESTMODE equ 1
 
 .org START_ROM
 RST00:                                      ; Reset
-    ld SP,dStack                            ; subroutine call to init so it can 
-    call init                               ; be easily skipped during debugging
-    _next                                   ; start Forth
-    
+    jp startForth
+
 .org $0008
 RST08:                                      ; rst 08 ENTER
     _rpush                              
@@ -58,50 +57,56 @@ primPage:
     .include "memory.z80"
     .include "serial.z80"
     .include "stack.z80"
+    .include "string.z80"
+    .include "print.z80"
     ; .include "core-compiler.z80"
     ; .include "core-control.z80"
     ; .include "core-find.z80"
     ; .include "core-logic.z80"
     ; .include "core-parse.z80"
-    ; .include "core-print.z80"
     ; .include "core-tester.z80"
-    ; .include "core-string.z80"
     ; .include "core-util.z80"
 
 initialLatest:
     dw backLink
 
-next8:            ; 28t       EX1
-	ld H,1                  ; page $100
-    ld A,(DE)
-    ld L,A
-	inc DE
-	jp (HL)
-
-next16:            ; 38t       EX1
-    _litParam
-	jp (HL)
-
 startForth:
-    dw lit, 3
-    dw double, escape
-    exx
-    dec HL
-    exx
-    _reenter
-    dw dot, quit
-
+    ld SP,dStack                            ; subroutine call to init so it can 
+    call init                               ; be easily skipped during debugging
+    jp startTests
+    
 .org START_RAM
     .include "variables.z80"
 
 ; end header  ============================================================  
     
-testsStart:
 
     .include "colon.test.z80"
     ; .include "test-parse.z80"
     ; .include "test-find.z80"
     ; .include "test-string.z80"
+
+startTests:
+    _reenter
+    dw lit
+    db 'X',0
+    dw emit
+    dw lit
+    dw $0123
+    dw dot
+    dw litStr
+    .pstr "Hello!"
+    dw type
+    
+    dw quit    
+
+    ; dw lit, 3
+    ; dw double, escape
+    ; exx
+    ; dec HL
+    ; exx
+    ; _reenter
+    ; dw dot, quit
 
     ; _print "\r\nDone! \r\n"
     halt
