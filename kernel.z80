@@ -6,7 +6,7 @@ exit:
     _rpop
     _next
 
-escape:
+unjoin:
     ex DE,HL
     jp (HL)
 

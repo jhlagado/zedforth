@@ -3,9 +3,6 @@
     .pstr s1
 .endm    
 
-
-
-
 .macro _push, src                           ; put src (value or memory) location on top of param stack
     _dup
     ld HL, src
@@ -41,4 +38,4 @@
 .macro _compile, label
     _push label
     call callc
-.endm    
+.endm  

@@ -1,3 +1,4 @@
 double:
     _enter
-    dw dup,plus,exit
+    dw dup,plus
+    _exit

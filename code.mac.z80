@@ -1,4 +1,4 @@
-.macro _codeMacro, name1
+.macro _code, name1
 name1:
     exx
     _name1

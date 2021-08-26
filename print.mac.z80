@@ -7,3 +7,47 @@
 ;     _pushStr s1
 ;     _call type
 ; .endm    
+
+.macro _type
+    jr type2%%M
+type1%%M:          
+    _swap               ; 25t
+    _dup                ; 11t
+    _cAt                ; 18t
+    _emit
+    _onePlus            ; 6t
+    _swap
+type2%%M:
+    _loopNext TYPE1%%M  ; 12t
+    _drop               ; 10t
+    _drop               ; 10t
+.endm
+
+; n -- n1 n2
+; rotate most significant nibble into n2
+.macro _rotLeftDigit:
+    LD DE,0 
+    ADD HL,HL
+    RL E
+    ADD HL,HL
+    RL E
+    ADD HL,HL
+    RL E
+    ADD HL,HL
+    RL E
+    _dup
+    EX DE,HL
+.endm
+
+; n -- n
+.macro _digitAscii
+    ld  A,L
+    and $0F
+    add a,$90
+    daa
+    adc a,$40
+    daa
+    ld L,A
+    ld H,0
+.endm
+

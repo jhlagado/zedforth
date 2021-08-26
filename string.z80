@@ -1,6 +1,6 @@
 ; count ( ptr -- ptr+1 len )
 ; Return count byte of a string and add 1 to byte address.
-_codeMacro count                   
+_code count                   
 
 ; -- p n   
 ; is followed by a literal Packed (Pascal) string

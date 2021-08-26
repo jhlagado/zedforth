@@ -33,7 +33,22 @@
     rst $08
 .endm
 
-.macro _reenter           
+.macro _exit           
+    dw exit
+.endm
+
+.macro _join           
     rst $18
 .endm
+
+.macro _rejoin           
+    exx
+    _join
+.endm
+
+.macro _unjoin           
+    dw unjoin
+    exx
+.endm
+
 

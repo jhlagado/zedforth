@@ -17,17 +17,17 @@ lit:                ; 72t
     _exPush
     _next
 
-_codeMacro unnip
-_codeMacro twoUnnip			; 24t		; x y -- z x y   N: z --
-_codeMacro dup
-_codeMacro drop                ; 10t			x1 --  
-_codeMacro swap                ; 19t			x1 x2 -- x2 x1
-_codeMacro over 	            ; 36t			x1 x2 -- x1 x2 x1
-_codeMacro rot	                ; 45t			( x1 x2 x3 -- x2 x3 x1 )
-_codeMacro nip 	            ; 14t			x1 x2 -- x2  		
-_codeMacro tuck				        ; x1 x2 -- x2 x1 x2
-_codeMacro twoDup      ; 43t         	; x1 x2 -- x1 x2 x1 x2
-_codeMacro twoDrop     ; 20t       	; x x --     
+_code unnip
+_code twoUnnip			; 24t		; x y -- z x y   N: z --
+_code dup
+_code drop                ; 10t			x1 --  
+_code swap                ; 19t			x1 x2 -- x2 x1
+_code over 	            ; 36t			x1 x2 -- x1 x2 x1
+_code rot	                ; 45t			( x1 x2 x3 -- x2 x3 x1 )
+_code nip 	            ; 14t			x1 x2 -- x2  		
+_code tuck				        ; x1 x2 -- x2 x1 x2
+_code twoDup      ; 43t         	; x1 x2 -- x1 x2 x1 x2
+_code twoDrop     ; 20t       	; x x --     
 
 twoSwap:	    ; 99t 			x1 x2 x3 x4 -- x3 x4 x1 x2 	
     exx

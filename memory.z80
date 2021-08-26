@@ -1,7 +1,7 @@
-_codeMacro cAt        
-_codeMacro cBang
-_codeMacro at 
-_codeMacro bang
-_codeMacro twoAt	
-_codeMacro twoBang	
-_codeMacro plusBang
+_code cAt        
+_code cBang
+_code at 
+_code bang
+_code twoAt	
+_code twoBang	
+_code plusBang
