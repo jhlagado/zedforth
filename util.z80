@@ -1,48 +1,19 @@
-.macro _push, src                           ; put src (value or memory) location on top of param stack
-    _dup
-    ld HL, src
-.endm
+; subroutine to be called from inlined code
+; followed immediated by a packed string
+; eg. 
+; call pushString
+; .pstr "Hello!"
+; returns ptr len 
 
-.macro _pushc, src                           ; put src (value or memory) location on top of param stack
-    _dup
-    ld L, src
-    ld H,0
-.endm
+pushString:
+    _swap       ; cstr          ; ret address = cstr
+    _count      ; adr+1 len    
+    _twoDup     ; adr+1 len adr+1 len
+    _plus       ; adr+1 len adr'
+    _swap
+    ret         ; ret consumes adr'
 
-.macro _pushStr, s1
-    call litStr
-    .pstr s1
-.endm    
+    
+    
 
-.macro _packStr, s1
-    call litStr
-    .pstr s1
-    _drop
-    _oneMinus
-.endm    
 
-.macro _print, s1
-    _pushStr s1
-    call type
-.endm    
-
-.macro _println, s1
-    _pushStr s1
-    call type
-    _cr
-.endm    
-
-.macro _cr
-    _pushStr "\r\n"
-    call type
-.endm    
-
-.macro _space
-    _pushc " "
-    call emit
-.endm    
-
-.macro _compile, label
-    _push label
-    call callc
-.endm    

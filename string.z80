@@ -1,23 +1,14 @@
 ; count ( ptr -- ptr+1 len )
 ; Return count byte of a string and add 1 to byte address.
-count:
-    exx
-    _dup 
-    _onePlus 
-    _swap 
-    _cAt
-    exx
-    _next
+_codeMacro count                   
 
 ; -- p n   
 ; is followed by a literal Packed (Pascal) string
 litStr: 
     ex DE,HL
     _exPush
-    _enter    
-    dw count            ; adr+1 len
-    dw escape
     exx
+    _count    
     _twoDup           ; adr+1 len adr+1 len
     _plus             ; adr+1 len adr'
     exx

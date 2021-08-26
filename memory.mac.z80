@@ -76,26 +76,26 @@
 
 ; address register
 
-; >a ( -- n)
-.macro _toA
+; a> ( -- n )
+.macro _AFrom
     _dup
     ld HL,BC
 .endm
 
-; a> ( n -- )
-.macro _AFrom
+; >a ( n -- )
+.macro _toA
     ld BC,HL
     _drop
 .endm
 
 ; a+ ( -- )
 .macro _APlus
-    ld BC,HL
-    _drop
+    inc BC
 .endm
 
 ; a@ ( -- n )
 .macro _aAt
+    _dup
     ld L,(BC)
     inc BC
     ld H,(BC)
@@ -108,44 +108,18 @@
     inc BC
     ld (BC),H
     dec BC
+    _drop
 .endm
 
-; a@+ ( -- n )
-.macro _aAtPlus
-    _atA
-    inc BC
-.endm
-
-; a!+ ( n -- )
-.macro _aBangPlus
-    _bangA
-    inc BC
-.endm
-
-; ac@ ( -- n )
-.macro _aCAt
+; ca@ ( -- n )
+.macro _cAAt
+    _dup
     ld L,(BC)
     ld H,0
 .endm
 
-; ac! ( n -- )
-.macro _aCBang
+; ca! ( n -- )
+.macro _cABang
     ld (BC),L
+    _drop
 .endm
-
-; ac@+ ( -- n )
-.macro _aCAtPlus
-    _cAtA
-    inc BC
-.endm
-
-; ac!+ ( n -- )
-.macro _aCBangPlus
-    _cBangA
-    inc BC
-.endm
-
-
-
-
-

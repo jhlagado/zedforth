@@ -88,33 +88,6 @@
 	_drop				; 10t
 .endm
 
-; .macro _twoswap	    ; 99t 			x1 x2 x3 x4 -- x3 x4 x1 x2 	
-;     pop DE              ; 10		x1 x2 x4            T x3
-;     ex (SP),HL			; 19		x1 x4 x2			T x3
-;     ex DE,HL            ; 4         x1 x4 x3            T x2
-;     _nip			    ; 12		x1 x3		N x4   	T x2
-;     ex (SP),HL			; 19		x3 x1				T x2
-;     _unnip			    ; 12		x3 x4 x1			T x2
-; 	_dup			    ; 11t
-;     ex DE,HL
-; .endm
-
-; .macro _twoOver	    ; 114t			x1 x2 x3 x4 -- x1 x2 x3 x4 x1 x2	       
-;     _dup				; 11t		x1 x2 x3 x4 x4
-; 	_twoNip				; 24t		x1 x2 x4	    N: x3 x4
-; 	_drop				; 10t		x1 x2	        N: x2 x3 x4
-; 	pop DE			    ; 10t		x2		        N: x1 x2 x3 x4      T = x1
-;     _twoUnnip			; 24t		x1 x2 x2   	    N: x3 x4            T = x1
-; 	_twoUnnip			; 24t		x1 x2 x3 x4 x2                      T = x1
-;     push DE			    ; 11t		x1 x2 x3 x4 x1 x2	
-; .endm
-
-; .macro _spAt
-;     ld HL,0
-;     add HL,SP
-;     _dup
-; .endm
-
 .macro _push, src                           ; put src (value or memory) location on top of param stack
     _dup
     ld HL, src
@@ -143,4 +116,3 @@
     ld E,A
     inc BC
 .endm
-

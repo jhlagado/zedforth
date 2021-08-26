@@ -1,0 +1,7 @@
+.macro _count
+    _dup 
+    _onePlus 
+    _swap 
+    _cAt
+.endm
+

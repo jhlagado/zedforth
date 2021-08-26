@@ -14,8 +14,10 @@ TESTMODE equ 1
     .include "math.mac.z80"
     .include "memory.mac.z80"
     .include "print.mac.z80"
-    .include "stack.mac.z80"
     .include "serial.mac.z80"
+    .include "stack.mac.z80"
+    .include "string.mac.z80"
+    .include "util.mac.z80"
     ; .include "macros-compiler.z80"
     ; .include "macros-device.z80"
     ; .include "macros-dict.z80"
@@ -59,13 +61,13 @@ primPage:
     .include "stack.z80"
     .include "string.z80"
     .include "print.z80"
+    .include "util.z80"
     ; .include "core-compiler.z80"
     ; .include "core-control.z80"
     ; .include "core-find.z80"
     ; .include "core-logic.z80"
     ; .include "core-parse.z80"
     ; .include "core-tester.z80"
-    ; .include "core-util.z80"
 
 initialLatest:
     dw backLink
@@ -86,11 +88,20 @@ startForth:
     ; .include "test-find.z80"
     ; .include "test-string.z80"
 
+; string:
+;     .pstr "HHHHH!!!!"
 startTests:
+    exx
+    _pushString "HHHHHHello!"
+        ; _dup
+        ; ld HL,string
+        ; _count
+    exx
     _reenter
-    dw lit
-    db 'X',0
-    dw emit
+    dw type
+    ; dw lit
+    ; db 'X',0
+    ; dw emit
     dw lit
     dw $0123
     dw dot

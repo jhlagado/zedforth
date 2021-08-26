@@ -8,3 +8,9 @@ emit1%%M:
     out (IO_DATA),A         ; Output the character
 .endm
 
+; serReady - check if there is input waiting to be read
+; flags: NZ if input ready
+.macro _serReady
+    ld A,(serBufUsed)
+    cp $0
+.endm
