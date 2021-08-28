@@ -7,3 +7,4 @@ _code twoMinus
 _code cellPlus
 _code cellMinus
 _code twoSlash                           
+_code eq                           

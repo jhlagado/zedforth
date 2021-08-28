@@ -1,0 +1,21 @@
+testPrint1:
+    _enter
+    _unjoin
+    
+    _pushString "Hello!"
+    _call type
+    _cr
+    _pushString "There!"
+    _call type
+    _cr
+    _pushc 'X'
+    _call emit
+    _push $0123
+    _call dot
+    
+    _rejoin
+    dw litStr
+    .pstr "Again!\r\n"
+    dw type
+    dw lit, 3, double, oneMinus, dot
+    _exit

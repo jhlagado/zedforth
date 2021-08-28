@@ -1,0 +1,30 @@
+.macro _logicalOp,op1	        
+    pop DE
+    ld A,H
+    op1 D
+    ld H,A
+    ld A,L
+    op1 E
+    ld L,A
+.endm
+
+; and    x1 x2 -- x3            
+.macro _andd	        
+    _logicalOp and
+.endm
+
+; or    x1 x2 -- x3            
+.macro _orr	        
+    _logicalOp or
+.endm
+
+; xor    x1 x2 -- x3            
+.macro _xorr	        
+    _logicalOp xor
+.endm
+
+; not x1 -- x2               
+.macro _nott
+    _push -1 
+    _xorr 
+.endm

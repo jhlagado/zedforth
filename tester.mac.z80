@@ -1,0 +1,90 @@
+.macro _setInputText, s1
+    _fetch lineBufStart
+    _dup
+    _store lineBufTop
+    _store currkey
+    _pushString {s1,"\r\n",-1,"\r\n"}
+    _drop
+    _dup
+    _store inbuf
+    _store inptr
+.endm
+
+; asserts that TRUE is on stack
+.macro _assert
+    _nott
+    _zeroBranch assert1%%M
+    _print {"\r\nFailed: ",reason}
+    _call quit
+assert1%%M:
+.endm
+
+; _test ... _expect .... _fail reason
+.macro _test
+    _print "."
+    _call depth
+    _store tdepth
+.endm
+
+.macro _expect
+    _call depth
+    _fetch tdepth
+    _minus
+    _call hashItems
+    _call depth
+    _store tdepth
+.endm
+
+.macro _fail, reason
+    _call depth
+    _fetch tdepth
+    _minus
+    _call hashItems
+    _call eq
+    _assert reason
+.endm
+
+; .macro _outReset
+;     _push 0
+;     _store outptr
+; .endm
+
+; .macro _outEmit
+;     _fetch outptr
+;     _push outbuf
+;     _plus
+;     _cbang
+;     _fetch outptr
+;     _onePlus
+;     _store outptr
+; .endm
+
+; .macro _outPrint
+;     _push outbuf
+;     _dup
+;     _fetch outptr
+;     _swap
+;     _minus
+;     jr outPrint2
+
+; outPrint1:          
+;     _swap               ; 25t
+;     _dup                ; 11t
+;     _cAt                ; 18t
+;     ld A,E
+;     call putc           ; 
+;     _drop
+;     _onePlus            ; 6t
+;     _swap
+
+; outPrint2:
+;     _loopNext outPrint1 ; 12t
+;     _drop               ; 10t
+;     _drop               ; 10t
+
+; .endm
+
+; .macro _expectOutput s1, reason
+;     _print s1
+;     _print reason
+; .endm

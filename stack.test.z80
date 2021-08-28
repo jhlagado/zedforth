@@ -1,0 +1,9 @@
+_initKernel
+
+_push $100
+_pushc "A"
+_call depth
+
+_push 2
+_eq
+_assert "depth should have been 2"

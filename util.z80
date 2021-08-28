@@ -13,6 +13,9 @@ pushString:
     _swap
     ret         ; ret consumes adr'
 
+; x1 x2 ... xn n -- h 
+; hash n items from the stack and return the hash code
+_code hashItems 
     
     
 

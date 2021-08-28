@@ -5,6 +5,7 @@
 
 .macro _minus                         
     pop DE
+    ex DE,HL
     or A    
     sbc HL,DE
 .endm
@@ -45,3 +46,15 @@
     or H            ; 4t
     _drop           ; 10t
 .endm
+
+; =      x1 x2 -- flag         test x1=x2
+.macro _eq
+    _xorr
+    _dup
+    _zeroBranch eq1%%M
+    jr eq2%%M
+eq1%%M:           
+    ld HL,TRUE 
+eq2%%M:           
+.endm
+
