@@ -66,24 +66,3 @@ name1:
     _pushc " "
     _emit
 .endm    
-
-; x1 x2 ... xn n -- h 
-; hash n items from the stack and return the hash code
-.macro _hashItems 
-    _push 0
-    _call toR
-hashNItems1%%M:
-    _dup
-    _zeroBranch hashNItems2%%M
-    _swap
-    _call rFrom
-    _swap
-    _onePlus
-    _call xorr
-    _call toR
-    _oneMinus
-    jr hashNItems1%%M
-hashNItems2%%M:
-    _drop
-    _call rFrom
-.endm

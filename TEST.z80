@@ -85,6 +85,7 @@ startForth:
 startTests:
     .include "stack.test.z80"
     ; _call testPrint1
+
     _cr
     _print "Done!"
     _call quit    

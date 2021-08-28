@@ -13,10 +13,29 @@ pushString:
     _swap
     ret         ; ret consumes adr'
 
+; colon definition
 ; x1 x2 ... xn n -- h 
 ; hash n items from the stack and return the hash code
-_code hashItems 
-    
-    
+hashItems:
+    _enter
+    _unjoin
+
+    _push 0             ; x1..xn n          R: h=0
+    _call toR
+    jr hashn2
+hashn1:          
+    _swap               ; x1..xn-1 n xn     R: h   
+    _call rFrom         ; x1..xn-1 n xn h
+    _swap               ; x1..xn-1 n h xn
+    _onePlus            ; x1..xn-1 n h xn+1
+    _call xorr          ; x1..xn-1 n h'
+    _call toR           ; x1..xn-1 n        R: h'
+hashn2:
+    _loopNext hashn1 
+    _drop               ;                   R: h'
+    _call rFrom         ; h'
+
+    _rejoin
+    _exit
 
 

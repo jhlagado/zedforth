@@ -19,14 +19,14 @@
 assert1%%M:
 .endm
 
-; _test ... _expect .... _fail reason
+; _test ... _end .... _expect reason
 .macro _test
     _print "."
     _call depth
     _store tdepth
 .endm
 
-.macro _expect
+.macro _end
     _call depth
     _fetch tdepth
     _minus
@@ -35,7 +35,7 @@ assert1%%M:
     _store tdepth
 .endm
 
-.macro _fail, reason
+.macro _expect, reason
     _call depth
     _fetch tdepth
     _minus
