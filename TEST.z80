@@ -9,7 +9,6 @@ TESTMODE equ 1
     .include "constants.z80"
     .include "code.mac.z80"
     .include "control.mac.z80"
-    .include "dict.mac.z80"
     .include "kernel.mac.z80"
     .include "math.mac.z80"
     .include "memory.mac.z80"
@@ -34,18 +33,17 @@ RST00:                                      ; Reset
     jp startForth
 
 .org $0008
-RST08:                                      ; rst 08 ENTER
-    _rpush                              
+RST08:                                      ; rst 08 enter
     pop DE
     _next
 
-.org $0018
-RST18:                                      ; rst $18 REENTER
-    pop DE
-    _next
+; .org $0018
+; RST18:                                      ; rst $18 rejoin
+;     pop DE
+;     _next
 
 .org $0038
-RST38:                                      ; rst 38 SEIAL INTERRUPT
+RST38:                                      ; rst 38 SERIAL INTERRUPT
     ; jp serialInt
 
 codePtr  .set $ 
@@ -75,6 +73,7 @@ initialLatest:
 startForth:
     ld SP,dStack                            ; subroutine call to init so it can 
     call init                               ; be easily skipped during debugging
+    exx
     jp startTests
     
 .org START_RAM
@@ -88,45 +87,31 @@ startForth:
     ; .include "test-find.z80"
     ; .include "test-string.z80"
 
-test1:
-    exx
-    _pushString "HHHHHHello!"
-    exx
+testPrint1:
     _enter
-    dw type
     _unjoin
-    _pushString "TTTThere!"
+    _pushString "Hello!"
+    _call type
+    _cr
+    _pushString "There!"
+    _call type
+    _cr
+    _pushc 'X'
+    _call emit
+    _push $0123
+    _call dot
     _rejoin
+    dw litStr
+    .pstr "Again!\r\n"
     dw type
-    _unjoin
-    _rejoin
+    dw lit, 3, double, oneMinus, dot
     _exit
 
 startTests:
-    _join
-    dw test1
-    dw lit
-    db 'X',0
-    dw emit
-    dw lit
-    dw $0123
-    dw dot
-    dw litStr
-    .pstr "Hello!"
-    dw type
-    
-    dw quit    
-
-    ; dw lit, 3
-    ; dw double, escape
-    ; exx
-    ; dec HL
-    ; exx
-    ; _reenter
-    ; dw dot, quit
-
-    ; _print "\r\nDone! \r\n"
-    halt
+    _call testPrint1
+    _cr
+    _print "Done!"
+    _call quit    
 
 START_USER:
 

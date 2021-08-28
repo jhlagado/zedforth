@@ -1,41 +1,69 @@
-.macro _pushString, s1
-    call pushString
-    .pstr s1
-.endm    
+; convert an inline macro name1 (without leading underscore)
+.macro _code, name1
+name1:
+    exx
+    _name1
+    exx
+    _next
+.endm
 
-.macro _push, src                           ; put src (value or memory) location on top of param stack
+; put src (value or memory) location on top of param stack
+.macro _push, src           
     _dup
     ld HL, src
 .endm
 
-.macro _pushc, src                           ; put src (value or memory) location on top of param stack
+; put src (value or memory) location on top of param stack
+.macro _pushc, src          
     _dup
     ld L, src
     ld H,0
 .endm
 
-.macro _print, s1
-    _pushStr s1
-    call type
+.macro _fetch, name
+    _dup
+    ld HL,(name)
+.endm
+
+.macro _cfetch, name
+    _dup
+    ld A,(name)
+    ld L,A
+    ld H,0
+.endm
+
+.macro _store, name
+    ld (name),HL
+    _drop
+.endm
+
+.macro _cstore, name
+    ld A,L
+    ld (name),A
+    _drop
+.endm
+
+.macro _compile, label
+    _push label
+    _callc
+.endm  
+
+.macro _pushString, s1
+    call pushString
+    .pstr s1
 .endm    
 
-.macro _println, s1
-    _pushStr s1
-    call type
-    _cr
+.macro _print, s1
+    _pushString s1
+    _type
 .endm    
 
 .macro _cr
-    _pushStr "\r\n"
-    call type
+    _print "\r\n"
 .endm    
 
 .macro _space
     _pushc " "
-    call emit
+    _emit
 .endm    
 
-.macro _compile, label
-    _push label
-    call callc
-.endm  

@@ -1,33 +1,11 @@
-; reads next cell into HL
-; advances IP by 2
-.macro _litParam:           ; 34t
-    ex DE,HL
-    ld E,(HL)
-	inc HL
-	ld D,(HL)
-	inc HL
-    ex DE,HL
-.endm
-
-; transfers HL to TOS (HL')
-.macro _exPush              ; 38t
-    push HL             
-    exx
+; -- n
+; depth of data stack
+.macro _depth              
+    _spAt
+    _push dStack
     _swap
-    exx
-.endm
-
-; transfers TOS (HL') to HL
-.macro _exPop               ; 38t
-    exx
-    _swap
-    exx
-    pop HL             
-.endm
-
-.macro _lit:                ; 72t
-    _litParam
-    _exPush
+    _minus    
+    _twoSlash
 .endm
 
 .macro _unnip			    ; 12t		; x y -- z x y   N: z --
@@ -88,31 +66,30 @@
 	_drop				; 10t
 .endm
 
-.macro _push, src                           ; put src (value or memory) location on top of param stack
+.macro _twoSwap	    ; 99t 			x1 x2 x3 x4 -- x3 x4 x1 x2 	
+    pop DE              ; 10		x1 x2 x4            T x3
+    ex (SP),HL			; 19		x1 x4 x2			T x3
+    ex DE,HL            ; 4         x1 x4 x3            T x2
+    _nip			    ; 12		x1 x3		N x4   	T x2
+    ex (SP),HL			; 19		x3 x1				T x2
+    _unnip			    ; 12		x3 x4 x1			T x2
+	_dup			    ; 11t
+    ex DE,HL
+.endm
+
+.macro _twoOver	    ; 114t			x1 x2 x3 x4 -- x1 x2 x3 x4 x1 x2	       
+    _dup				; 11t		x1 x2 x3 x4 x4
+	_nip				; 24t		x1 x2 x3 x4	    N: x4
+	_nip				; 24t		x1 x2 x4	    N: x3 x4
+	_drop				; 10t		x1 x2	        N: x2 x3 x4
+	pop DE			    ; 10t		x2		        N: x1 x2 x3 x4      T = x1
+    _twoUnnip			; 24t		x1 x2 x2   	    N: x3 x4            T = x1
+	_twoUnnip			; 24t		x1 x2 x3 x4 x2                      T = x1
+    push DE			    ; 11t		x1 x2 x3 x4 x1 x2	
+.endm
+
+.macro _spAt
+    ld HL,0
+    add HL,SP
     _dup
-    ld HL, src
-.endm
-
-.macro _pushc, src                           ; put src (value or memory) location on top of param stack
-    _dup
-    ld L, src
-    ld H,0
-.endm
-
-.macro _rpush			    ; 38t		
-    dec BC
-    ld A,E
-    ld (BC),A
-    dec BC
-    ld A,D
-    ld (BC),A
-.endm
-
-.macro _rpop				; 38t		
-    ld A,(BC)
-    ld D,A
-    inc BC
-    ld A,(BC)
-    ld E,A
-    inc BC
 .endm

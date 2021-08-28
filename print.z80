@@ -1,15 +1,11 @@
-; type  ( adr n -- )
-; Output n characters from adr.
+; NOTE: a "digit" is 4 bits (a nibble)
+
 _code type
-
-; n -- n
 _code digitAscii
-
-; n -- n1 n2
-; rotate most significant nibble into n2
-_code rotLeftDigit
+_code shiftLeftDigit
 
 ; n --
+; prints a digit
 dotDigit:
     _enter
     dw digitAscii, emit 
@@ -18,10 +14,10 @@ dotDigit:
 ; n --
 dot:
     _enter
-    dw rotLeftDigit, dotDigit
-    dw rotLeftDigit, dotDigit
-    dw rotLeftDigit, dotDigit
-    dw rotLeftDigit, dotDigit
+    dw shiftLeftDigit, dotDigit
+    dw shiftLeftDigit, dotDigit
+    dw shiftLeftDigit, dotDigit
+    dw shiftLeftDigit, dotDigit
     dw drop
     _exit
     

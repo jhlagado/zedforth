@@ -1,26 +1,3 @@
-.macro _fetch, name
-    _dup
-    ld HL,(name)
-.endm
-
-.macro _cfetch, name
-    _dup
-    ld A,(name)
-    ld L,A
-    ld H,0
-.endm
-
-.macro _store, name
-    ld (name),HL
-    _drop
-.endm
-
-.macro _cstore, name
-    ld A,L
-    ld (name),A
-    _drop
-.endm
-
 .macro _cAt         ; 14t			a -- c
     ld L,(HL)		    ; 7t
     ld H,0			    ; 7t

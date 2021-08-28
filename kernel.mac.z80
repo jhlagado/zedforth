@@ -19,17 +19,30 @@
     ld (var_here),HL
 .endm
 
+.macro _rpush			    ; 38t		
+    dec BC
+    ld A,E
+    ld (BC),A
+    dec BC
+    ld A,D
+    ld (BC),A
+.endm
+
+.macro _rpop				; 38t		
+    ld A,(BC)
+    ld D,A
+    inc BC
+    ld A,(BC)
+    ld E,A
+    inc BC
+.endm
+
 .macro _next            
 	jp (IY)
 .endm
 
-.macro _doColon         
-    _rpush		
-    pop BC			
-    _next			
-.endm
-
 .macro _enter           
+    _rpush                              
     rst $08
 .endm
 
@@ -38,7 +51,7 @@
 .endm
 
 .macro _join           
-    rst $18
+    rst $08
 .endm
 
 .macro _rejoin           
@@ -51,4 +64,36 @@
     exx
 .endm
 
+.macro _call, label1           
+    _rejoin
+    dw label1
+    _unjoin
+.endm
+
+; reads next cell into HL
+; advances IP by 2
+.macro _litParam:           ; 34t
+    ex DE,HL
+    ld E,(HL)
+	inc HL
+	ld D,(HL)
+	inc HL
+    ex DE,HL
+.endm
+
+; transfers HL to TOS (HL')
+.macro _exPush              ; 38t
+    push HL             
+    exx
+    _swap
+    exx
+.endm
+
+; transfers TOS (HL') to HL
+.macro _exPop               ; 38t
+    exx
+    _swap
+    exx
+    pop HL             
+.endm
 

@@ -1,13 +1,7 @@
-; .macro _pushStr, s1
-;     _call litStr
-;     .pstr s1
-; .endm    
+; NOTE: a "digit" is 4 bits (a nibble)
 
-; .macro _print, s1
-;     _pushStr s1
-;     _call type
-; .endm    
-
+; type  ( adr n -- )
+; Output n characters from adr.
 .macro _type
     jr type2%%M
 type1%%M:          
@@ -24,17 +18,20 @@ type2%%M:
 .endm
 
 ; n -- n1 n2
-; rotate most significant nibble into n2
-.macro _rotLeftDigit:
+; rotate most significant bit into n2
+.macro _shiftLeftBit
+    ADD HL,HL
+    RL E
+.endm
+
+; n -- n1 n2
+; rotate most significant digit into n2
+.macro _shiftLeftDigit:
     LD DE,0 
-    ADD HL,HL
-    RL E
-    ADD HL,HL
-    RL E
-    ADD HL,HL
-    RL E
-    ADD HL,HL
-    RL E
+    _shiftLeftBit
+    _shiftLeftBit
+    _shiftLeftBit
+    _shiftLeftBit
     _dup
     EX DE,HL
 .endm

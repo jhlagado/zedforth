@@ -1,77 +1,43 @@
-rFrom:
-    ex DE,HL
-    _rpop
-    ex DE,HL
-    _exPush
-    _next
-
-toR:
-    _exPop
-    ex DE,HL
-    _rpush
-    ex DE,HL
-    _next
-
-lit:                ; 72t
-    _litParam
-    _exPush
-    _next
-
 _code unnip
-_code twoUnnip			; 24t		; x y -- z x y   N: z --
+
+; x y -- z x y   N: z --
+_code twoUnnip		
+
 _code dup
-_code drop                ; 10t			x1 --  
-_code swap                ; 19t			x1 x2 -- x2 x1
-_code over 	            ; 36t			x1 x2 -- x1 x2 x1
-_code rot	                ; 45t			( x1 x2 x3 -- x2 x3 x1 )
-_code nip 	            ; 14t			x1 x2 -- x2  		
-_code tuck				        ; x1 x2 -- x2 x1 x2
-_code twoDup      ; 43t         	; x1 x2 -- x1 x2 x1 x2
-_code twoDrop     ; 20t       	; x x --     
+; x1 --  
 
-twoSwap:	    ; 99t 			x1 x2 x3 x4 -- x3 x4 x1 x2 	
-    exx
-    pop DE              ; 10		x1 x2 x4            T x3
-    ex (SP),HL			; 19		x1 x4 x2			T x3
-    ex DE,HL            ; 4         x1 x4 x3            T x2
-    _nip			    ; 12		x1 x3		N x4   	T x2
-    ex (SP),HL			; 19		x3 x1				T x2
-    _unnip			    ; 12		x3 x4 x1			T x2
-	_dup			    ; 11t
-    ex DE,HL
-    exx
-    _next
+_code drop                
+; x1 x2 -- x2 x1
 
-twoOver:	    ; 114t			x1 x2 x3 x4 -- x1 x2 x3 x4 x1 x2	       
-    exx
-    _dup				; 11t		x1 x2 x3 x4 x4
-	_nip				; 24t		x1 x2 x3 x4	    N: x4
-	_nip				; 24t		x1 x2 x4	    N: x3 x4
-	_drop				; 10t		x1 x2	        N: x2 x3 x4
-	pop DE			    ; 10t		x2		        N: x1 x2 x3 x4      T = x1
-    _twoUnnip			; 24t		x1 x2 x2   	    N: x3 x4            T = x1
-	_twoUnnip			; 24t		x1 x2 x3 x4 x2                      T = x1
-    push DE			    ; 11t		x1 x2 x3 x4 x1 x2	
-    exx
-    _next
+_code swap                
 
-spAt:
-    exx
-    ld HL,0
-    add HL,SP
-    _dup
-    exx
-    _next
+; x1 x2 -- x1 x2 x1
+_code over 	            
 
+; x1 x2 x3 -- x2 x3 x1 
+_code rot	                
 
-; ; depth of data stack
-; ; destroys: HL
-; depth:              ; -- n
-;     ENTER 0
-;     _spAt
-;     _push dStack
-;     _swap
-;     _minus    
-;     _twoSlash
-;     EXIT 0
+; x1 x2 -- x2  		
+_code nip 	            
+
+; x1 x2 -- x2 x1 x2
+_code tuck				        
+
+; x1 x2 -- x1 x2 x1 x2
+_code twoDup      
+
+; x x --     
+_code twoDrop   
+
+; -- x
+_code depth     
+
+; x1 x2 x3 x4 -- x3 x4 x1 x2 	
+_code twoSwap	    
+
+; x1 x2 x3 x4 -- x1 x2 x3 x4 x1 x2	       
+_code twoOver	    
+
+; -- x1
+_code spAt
 

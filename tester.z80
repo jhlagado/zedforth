@@ -1,0 +1,65 @@
+; hasn ( x1 h0 -- h1 )
+; compute h1 by hashing x1 and h0
+tHash:
+    exx
+    _swap
+    _onePlus
+    _rejoin
+    _call xorr
+    exx
+    _next
+
+; hash-n ( x1 x2 ... xn n -- h )
+; hash n items from the stack and return the hash code
+tHashN: 
+    exx
+    _push 0
+    _call toR
+tHashN1:
+    _dup
+    _zeroBranch tHashN2
+    _swap
+    _call rFrom
+    _call tHash
+    _call toR
+    _oneMinus
+    jr tHashN1
+tHashN2:
+    _drop
+    _call rFrom
+    exx
+    _next                     
+
+; T{ ( -- )
+; begin test
+tBegin: 
+    exx
+    _print "."
+    _call depth
+    _store tdepth
+    exx
+    _next
+
+; => ( y1 y2 ... yn -- hy )
+; finish a unit test,
+tExpect: 
+    exx
+    _call depth
+    _fetch tdepth
+    _minus
+    _call tHashN
+    _call depth
+    _store tdepth
+    exx
+    _next
+
+
+tEnd: 
+    exx
+    _call depth
+    _fetch tdepth
+    _minus
+    _call tHashN
+    _call EQ
+    exx
+    _next
