@@ -1,0 +1,12 @@
+    _setInputText "Hello!"
+    jr serialLoop2
+serialLoop1:
+    _call emit
+serialLoop2:
+    _call key
+    _dup
+    _pushc "!"
+    _call eq
+    _zeroBranch serialLoop1
+    _drop
+

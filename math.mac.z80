@@ -52,9 +52,10 @@
     _xorr
     _dup
     _zeroBranch eq1%%M
+    ld HL,FALSE 
     jr eq2%%M
 eq1%%M:           
-    ld HL,TRUE 
+    ld HL,TRUE
 eq2%%M:           
 .endm
 

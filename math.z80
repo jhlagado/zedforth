@@ -8,3 +8,65 @@ _code cellPlus
 _code cellMinus
 _code twoSlash                           
 _code eq                           
+
+;   0<          ( n -- t )
+;               Return true if n is negative.
+zeroLT:
+	SLA H	; sign bit -> cy flag
+	SBC	A,A	; propagate cy through A
+	LD	H,A	; put 0000 or FFFF in TOS
+	LD	L,A
+	_next
+
+;   <           ( n1 n2 -- t )
+;               is less than
+LT:	            ; less than
+	_enter
+	_unjoin
+LT0:		
+    _twoDup
+	_call xorr 
+    _zeroBranch LT1
+    _drop
+    _call zeroLT
+	jr LT2
+LT1:		
+    _minus 
+    _call zeroLT
+LT2:
+	_rejoin
+	_exit
+
+; >      n1 n2 -- flag          test n1 > n2
+GT:
+	_enter
+	_unjoin
+
+    _swap
+    jr LT0
+
+; max   n1 n2 -- u                      maximum
+max:
+	_enter
+	_unjoin
+
+    _twoDup
+	_call LT 
+    _zeroBranch max1
+    _swap
+max1:		
+    _drop
+
+	_rejoin
+	_exit
+
+; min   n1 n2 -- u                      minimum
+min:
+	_enter
+	_unjoin
+
+	_swap
+	_call max
+
+	_rejoin
+	_exit

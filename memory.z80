@@ -5,3 +5,6 @@ _code bang
 _code twoAt	
 _code twoBang	
 _code plusBang
+
+; cmove (psrc pdest len -- )
+_code cmove

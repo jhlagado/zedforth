@@ -51,6 +51,17 @@
     _bang
 .endm
 
+; cmove ( psrc pdest len -- )
+; move len bytes from src to dest
+.macro _cmove
+    ld BC,HL
+    _drop
+    ex DE,HL                   
+    _drop                   ; BC = len DE = psrc HL = pdest
+    ldir
+    _drop
+.endm
+
 ; address register
 
 ; a> ( -- n )

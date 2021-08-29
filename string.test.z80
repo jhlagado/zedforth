@@ -1,0 +1,12 @@
+_initKernel
+
+_test
+    _pushString "string"
+    _drop
+    _pushString "string"
+    _call sameq
+    _nip 
+    _nip
+_end
+    _push 0
+_expect "should have been equal"

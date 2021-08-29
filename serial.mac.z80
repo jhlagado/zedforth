@@ -1,3 +1,15 @@
+.macro _initSerial
+    ld HL,0
+    ld (serBufUsed),HL
+    ld HL,serBuf
+    ld (serInPtr),HL
+    ld (serRdPtr),HL
+    ld A,RTS_LOW
+    out (IO_CTRL),A
+    im 1
+    ei
+.endm
+
 .macro _emit
 emit1%%M:
     in A,(IO_CTRL)      ; Status byte

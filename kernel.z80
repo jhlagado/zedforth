@@ -1,4 +1,5 @@
 init:
+    _initSerial
     _initKernel
     ret
 

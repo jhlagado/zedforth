@@ -9,21 +9,6 @@ RTS_LOW         equ $96                ; 10010110
 PORT_STATUS     equ $04
 PORT_DATA       equ $03
 
-.macro _initSerial
-    ld HL,0
-    ld (serbufused),HL
-
-    ld HL,serbuf
-    ld (serinptr),HL
-    ld (serrdptr),HL
-
-    ld A,RTS_LOW
-    out (IO_CTRL),A
-
-    im 1
-    ei
-.endm
-
 serialInt:
     push AF
     push HL
@@ -52,7 +37,7 @@ serialInt21:
     ld A,L             ; Only need to check low byte becasuse lineBuf<256 bytes
     cp (serBuf + SER_BUFSIZE) & $FF
     jr nz,serialInt22
-        ld HL,serBuf
+    ld HL,serBuf
 serialInt22:
     ld (serInPtr),HL
     pop AF
@@ -78,7 +63,6 @@ CODE "key",3,key
 key1:  
     _call qkey
     _zeroBranch key1 
-
     _rejoin
     _exit
 
@@ -88,43 +72,35 @@ CODE "?key",4,qkey
     _enter
     _unjoin
     
-    .if TESTMODE
-        _fetch inptr                ; adr
-        _dup                        ; adr adr
-        _cat                        ; adr c
-        _swap                       ; c adr
-        _onePlus                    ; c adr+1
-        _store inptr                ; c
-        _push TRUE                  ; c true
-    .else
-        _serReady
-        jr nz, qkey1
-        _push FALSE
-        jr qkey4
+    _serReady
+    jr nz, qkey1
+    _push FALSE
+    jr qkey4
 qkey1:
-        ld DE,(serRdPtr)
-        inc DE
-        ld A,E                      
-        cp (serBuf + SER_BUFSIZE) & $FF         ; Only need to check low byte
-        jr nz,qkey2
-        ld DE,serBuf
+    ld DE,(serRdPtr)
+    inc DE
+    ld A,E                      
+    cp (serBuf + SER_BUFSIZE) & $FF         ; Only need to check low byte
+    jr nz,qkey2
+    ld DE,serBuf
 qkey2:
-        di
-        ld (serRdPtr),DE
-        ld A,(serBufUsed)
-        dec A
-        ld (serBufUsed),A
-        cp SER_EMPTYSIZE
-        jr nc,qkey3
-        ld A,RTS_LOW
-        out (IO_CTRL),A
+    di
+    ld (serRdPtr),DE
+    ld A,(serBufUsed)
+    dec A
+    ld (serBufUsed),A
+    cp SER_EMPTYSIZE
+    jr nc,qkey3
+    ld A,RTS_LOW
+    out (IO_CTRL),A
 qkey3:
-        ld A,(DE)
-        _push TRUE
-        ei
+    ld A,(DE)
+    _dup
+    ld L,A
+    ld H,0
+    _push TRUE
+    ei
 qkey4:
-    .endif
-    
+
     _rejoin
     _exit
-

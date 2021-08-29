@@ -80,14 +80,10 @@ startForth:
 ; end header  ============================================================  
 
 startTests:
-    ; dw lit
-    ; db 'A',0
-    ; dw key
-    ; dw emit
-
-    
     ; .include "stack.test.z80"
-    .include "print.test.z80"
+    ; .include "print.test.z80"
+
+    .include "string.test.z80"
 
     _cr
     _print "Done!"
