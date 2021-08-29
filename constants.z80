@@ -6,7 +6,7 @@ RSTACK_SIZE     equ     $80                 ; return stack
 DSTACK_SIZE     equ     $80                 ; parameter stack
 PAD_SIZE        equ     $80                 ; user scratch pad
 
-SER_BUFSIZE     equ     $3F
+SER_BUFSIZE     equ     $80
 LINE_BUFSIZE    equ     $80
 
 START_ROM       equ     $0

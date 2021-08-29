@@ -11,7 +11,7 @@ dotDigit:
     dw digitAscii, emit 
     _exit
 
-; n --
+; . ( n -- )
 dot:
     _enter
     dw shiftLeftDigit, dotDigit
@@ -19,5 +19,35 @@ dot:
     dw shiftLeftDigit, dotDigit
     dw shiftLeftDigit, dotDigit
     dw drop
+    _exit
+    
+; .s    ( x... -- x... ) 
+; print stack (non-destructively)
+dots:                
+    _enter
+    _unjoin 
+    
+    _print "\r\n"
+    _push dStack            ; x... s0
+    _cellMinus
+    _cellMinus              ; x... @x 
+    _call depth             ; x... @x n 
+    _oneMinus
+    jr dots2
+dots1:
+    _swap                   ; x... n @x
+    _dup                    ; x... n @x @x
+    _at                     ; x... n @x x
+    _call dot               ; x... n @x
+    _space
+    _cellMinus              ; x... n @x'
+    _swap                   ; x... @x' n
+dots2:
+    _loopNext dots1         
+    _drop                   ; x... @x
+    _drop                   ; x...
+    _print "\r\n"
+    
+    _rejoin
     _exit
     

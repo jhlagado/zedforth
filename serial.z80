@@ -70,54 +70,61 @@ serialInt23:
 ; emit  ( c -- )
 _code emit
 
-; ; key   ( -- c )
-; ; Wait for and return an input character.
-; CODE "key",3,key
-;     _enter
-; key1:  
-;     dw qkey
-;     _zeroBranch key1 
-;     _exit
+; key   ( -- c )
+; Wait for and return an input character.
+CODE "key",3,key
+    _enter
+    _unjoin
+key1:  
+    _call qkey
+    _zeroBranch key1 
 
-; ; ?key  ( -- c T | F )
-; ; Return input character and true, or a false if no input.
-; CODE "?key",4,qkey
-;     ENTER 1
-;     .if TESTMODE
-;         _fetch inptr                ; adr
-;         _dup                        ; adr adr
-;         _cat                        ; adr c
-;         _swap                       ; c adr
-;         _onePlus                    ; c adr+1
-;         _store inptr                ; c
-;         _push TRUE                  ; c true
-;     .else
-;         _serReady
-;         jr nz, qkey1
-;         _push FALSE
-;         jr qkey4
-; qkey1:
-;         ld DE,(serRdPtr)
-;         inc DE
-;         ld A,L             ; Only need to check low byte because lineBuf<256 bytes
-;         cp (serBuf + SER_BUFSIZE) & $FF
-;         jr nz,qkey2
-;         ld DE,serBuf
-; qkey2:
-;         di
-;         ld (serRdPtr),DE
-;         ld A,(serBufUsed)
-;         dec A
-;         ld (serBufUsed),A
-;         cp SER_EMPTYSIZE
-;         jr nc,qkey3
-;         ld A,RTS_LOW
-;         out (IO_CTRL),A
-; qkey3:
-;         ld A,(DE)
-;         _push TRUE
-;         ei
-; qkey4:
-;     .endif
-;     EXIT 1
+    _rejoin
+    _exit
+
+; ?key  ( -- c T | F )
+; Return input character and true, or a false if no input.
+CODE "?key",4,qkey
+    _enter
+    _unjoin
+    
+    .if TESTMODE
+        _fetch inptr                ; adr
+        _dup                        ; adr adr
+        _cat                        ; adr c
+        _swap                       ; c adr
+        _onePlus                    ; c adr+1
+        _store inptr                ; c
+        _push TRUE                  ; c true
+    .else
+        _serReady
+        jr nz, qkey1
+        _push FALSE
+        jr qkey4
+qkey1:
+        ld DE,(serRdPtr)
+        inc DE
+        ld A,E                      
+        cp (serBuf + SER_BUFSIZE) & $FF         ; Only need to check low byte
+        jr nz,qkey2
+        ld DE,serBuf
+qkey2:
+        di
+        ld (serRdPtr),DE
+        ld A,(serBufUsed)
+        dec A
+        ld (serBufUsed),A
+        cp SER_EMPTYSIZE
+        jr nc,qkey3
+        ld A,RTS_LOW
+        out (IO_CTRL),A
+qkey3:
+        ld A,(DE)
+        _push TRUE
+        ei
+qkey4:
+    .endif
+    
+    _rejoin
+    _exit
 

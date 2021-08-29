@@ -1,12 +1,16 @@
-                    ds DSTACK_SIZE
-dStack:                                      ; grows down          
-                    ds RSTACK_SIZE
-rStack:                                      ; grows down          
+serBuf:             ds SER_BUFSIZE          ; must be aligned on a $100 page boundary
 
+                    ds DSTACK_SIZE
+dStack:                                     ; grows down          
+                    ds RSTACK_SIZE
+rStack:                                     ; grows down          
+
+var_serInPtr:
 serInPtr:           dw 0
+var_serRdPtr:
 serRdPtr:           dw 0
+var_serBufUsed: 
 serBufUsed:         dw 0
-serBuf:             ds SER_BUFSIZE
 
 lineBufStart        dw 0
 lineBufSize         dw 0

@@ -13,6 +13,13 @@ next16:            ; 38t       EX1
     _litParam
 	jp (HL)
 
+toR:
+    _exPop
+    ex DE,HL
+    _rpush
+    ex DE,HL
+    _next
+
 rFrom:
     ex DE,HL
     _rpop
@@ -20,11 +27,11 @@ rFrom:
     _exPush
     _next
 
-toR:
-    _exPop
+rAt:
     ex DE,HL
-    _rpush
+    _rpeek
     ex DE,HL
+    _exPush
     _next
 
 lit:                ; 72t

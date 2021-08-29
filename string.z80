@@ -16,3 +16,34 @@ litStr:
     ex DE,HL
     _next
 
+; non-standard word
+; SAME? ( a a n -- a a f \ -0+ )
+; Compare n chars in two strings. Return 0 if identical.
+sameq:
+    _enter
+    _unjoin
+
+    jr sameq3           ; a1 a2 n            
+sameq1:
+    call toR            ; a1 a2         R: n
+    _over               ; a1 a2 a1
+    call rAt            ; a1 a2 a1 n
+    _plus               ; a1 a2 a1+n
+    _cAt                ; a1 a2 c1
+    _over               ; a1 a2 c1 a2
+    call rAt            ; a1 a2 c1 a2 n
+    _plus               ; a1 a2 c1 a2+n
+    _cAt                ; a1 a2 c1 c2
+    _minus              ; a1 a2 diff
+    jr z,sameq2
+    call rFrom          ; a1 a2 -+ n
+    _drop               ; a1 a2 -+
+    jr sameq4           ; not equal
+sameq2:
+    _drop               ; a1 a2
+    call rFrom          ; a1 a2 n
+sameq3:
+    _loopNext sameq1    ; a1 a2 n    
+sameq4:
+    _rejoin
+    _exit               ; a1 a2 0   ; equal

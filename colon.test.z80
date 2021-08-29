@@ -1,4 +1,0 @@
-double:
-    _enter
-    dw dup,plus
-    _exit

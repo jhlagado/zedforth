@@ -37,6 +37,15 @@
     inc BC
 .endm
 
+.macro _rpeek						
+    ld A,(BC)
+    ld D,A
+    inc BC
+    ld A,(BC)
+    ld E,A
+    dec BC
+.endm
+
 .macro _next            
 	jp (IY)
 .endm

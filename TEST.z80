@@ -41,7 +41,7 @@ RST08:                                      ; rst 08 enter
 
 .org $0038
 RST38:                                      ; rst 38 SERIAL INTERRUPT
-    ; jp serialInt
+    jp serialInt
 
 codePtr  .set $ 
 
@@ -79,12 +79,15 @@ startForth:
 
 ; end header  ============================================================  
 
-    ; .include "colon.test.z80"
-    ; .include "print.test.z80"
-
 startTests:
-    .include "stack.test.z80"
-    ; _call testPrint1
+    ; dw lit
+    ; db 'A',0
+    ; dw key
+    ; dw emit
+
+    
+    ; .include "stack.test.z80"
+    .include "print.test.z80"
 
     _cr
     _print "Done!"
