@@ -50,6 +50,16 @@
 	jp (IY)
 .endm
 
+.macro _enter0           
+    _rpush                              
+    exx
+.endm
+
+.macro _exit0           
+    exx
+    _rpop                              
+.endm
+
 .macro _enter           
     _rpush                              
     rst $08

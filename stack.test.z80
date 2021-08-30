@@ -1,14 +1,155 @@
 _initKernel
 
 _test
-    _push $100
-    _pushc "A"
-    _call depth
+    _push 1
+    _push 2
+    _push 3
+    _depth
 _end
+    _push 1
+    _push 2
+    _push 3
+    _push 3
+_expect "should have pushed depth of 3"
 
-_push $100
-_pushc "A"
-_push 2
+_test
+    _push 1
+    _push 2
+    _push 3
+    _nip
+    _nip
+    _unnip
+_end
+    _push 1
+    _push 3
+_expect "unnip should have exposed 1"
 
-_expect "depth should have been 2"
+_test
+    _push 1
+    _push 2
+    _push 3
+    _nip
+    _unnip
+_end
+    _push 1
+    _push 2
+    _push 3
+_expect "should have restored stack"
 
+_test
+    _push 1
+    _push 2
+    _dup
+_end
+    _push 1
+    _push 2
+    _push 2
+_expect "should have dupped top item"
+
+_test
+    _push 1
+    _push 2
+    _drop
+_end
+    _push 1
+_expect "should have dropped top item"
+
+_test
+    _push 1
+    _push 2
+    _push 3
+    _swap                
+_end
+    _push 1
+    _push 3
+    _push 2
+_expect "should have swapped top two items"
+
+_test
+    _push 1
+    _push 2
+    _over
+_end
+    _push 1
+    _push 2
+    _push 1
+_expect "should have pushed copy of NOS"
+
+_test
+    _push 1
+    _push 2
+    _push 3
+    _rot
+_end
+    _push 2
+    _push 3
+    _push 1
+_expect "should have rotated top three items"
+
+_test
+    _push 1
+    _push 2
+    _push 3
+    _nip
+_end
+    _push 1
+    _push 3
+_expect "should have nipped NOS"
+
+_test
+    _push 1
+    _push 2
+    _tuck
+_end
+    _push 2
+    _push 1
+    _push 2
+_expect "should have tucked TOS"
+
+_test
+    _push 1
+    _push 2
+    _twoDup      
+_end
+    _push 1
+    _push 2
+    _push 1
+    _push 2
+_expect "should have duped top 2 items"
+
+_test
+    _push 1
+    _push 2
+    _push 3
+    _twoDrop   
+_end
+    _push 1
+_expect "should have dropped top 2 items"
+
+_test
+    _push 1
+    _push 2
+    _push 3
+    _push 4
+    _twoSwap	    
+_end
+    _push 3
+    _push 4
+    _push 1
+    _push 2
+_expect "should have swapped top 2 items with next 2 items"
+
+_test
+    _push 1
+    _push 2
+    _push 3
+    _push 4
+    _twoOver	    
+_end
+    _push 1
+    _push 2
+    _push 3
+    _push 4
+    _push 1
+    _push 2
+_expect "should have copied 3rd and 4th items"

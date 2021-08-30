@@ -44,10 +44,10 @@
 
 ; ( x1 x2 x3 -- x2 x3 x1 )
 .macro _rot	                ; 45t			
-    pop DE		                ; 10t
-    ex DE,HL			        ; 4t		x1 x3 			T: x2
-    ex (SP),HL			        ; 20t		x2 x3 			T: x1
-	_dup			            ; 11t
+    pop DE		                ; 10t       x1 x3           T: x2
+    ex DE,HL			        ; 4t		x1 x2 			T: x3
+    ex (SP),HL			        ; 20t		x2 x1 			T: x3
+    push DE		    	        ; 4t		x2 x3 x1 
 .endm
 
 ; x1 x2 -- x2  		

@@ -1,0 +1,101 @@
+_initKernel
+
+_test
+    _push 2
+    _push 3
+    _plus
+_end
+    _push 5
+_expect "should add 2 + 3"
+
+_test
+    _push 3
+    _push 2
+    _minus
+_end
+    _push 1
+_expect "should subtract 2 from 3"
+
+_test
+    _push 2
+    _onePlus
+_end
+    _push 3
+_expect "should add 1 to 2"
+
+_test
+    _push 2
+    _oneMinus
+_end
+    _push 1
+_expect "should subtract 1 to 2"
+
+_test
+    _push 2
+    _twoPlus
+_end
+    _push 2
+    _push 2
+    _plus
+_expect "should add 2 to 2"
+
+_test
+    _push 2
+    _twoMinus
+_end
+    _push 2
+    _push 2
+    _minus
+_expect "should subtract 2 to 2"
+
+_test
+    _push 4
+    _twoSlash
+_end
+    _push 2
+_expect "should divide 4 by 2"
+
+_test
+    _push 0
+    _zeroEq
+_end
+    _push TRUE
+_expect "should be zero"
+
+_test
+    _push 1
+    _zeroEq
+_end
+    _push FALSE
+_expect "should not be zero"
+
+_test
+    _push -1
+    _zeroLT
+_end
+    _push TRUE
+_expect "should be less than zero"
+
+_test
+    _push 1
+    _zeroLT
+_end
+    _push FALSE
+_expect "should not be less than zero"
+
+_test
+    _push 1
+    _push 1
+    _eq
+_end
+    _push TRUE
+_expect "should be equal"
+
+_test
+    _push 1
+    _push 2
+    _eq
+_end
+    _push FALSE
+_expect "should not be equal"
+

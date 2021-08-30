@@ -8,15 +8,8 @@ _code cellPlus
 _code cellMinus
 _code twoSlash                           
 _code eq                           
-
-;   0<          ( n -- t )
-;               Return true if n is negative.
-zeroLT:
-	SLA H	; sign bit -> cy flag
-	SBC	A,A	; propagate cy through A
-	LD	H,A	; put 0000 or FFFF in TOS
-	LD	L,A
-	_next
+_code zeroLT
+_code zeroEq
 
 ;   <           ( n1 n2 -- t )
 ;               is less than

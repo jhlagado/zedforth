@@ -1,0 +1,12 @@
+_initKernel
+
+_test
+    _push $100
+    _pushc "A"
+    _call depth
+_end
+    _push $100
+    _pushc "A"
+    _push 2
+_expect "depth should have been 2"
+

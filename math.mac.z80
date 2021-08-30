@@ -41,21 +41,38 @@
     rr L
 .endm
 
+; 0= ( n -- t )
+; Returns true if n is zero
+.macro _zeroEQ      
+    ld A, L         ; 4t
+    or H            ; 4t
+    jr z,zeroEQ1%%M
+    ld HL,1
+zeroEQ1%%M:
+    dec HL      
+.endm
+
+; 0< ( n -- t )
+; Returns true if n is negative
+.macro _zeroLT      
+	SLA H	; sign bit -> cy flag
+	SBC	A,A	; propagate cy through A
+	LD	H,A	; put 0000 or FFFF in TOS
+	LD	L,A
+.endm
+
+; = ( x1 x2 -- flag )  
+; Returns true if x1 = x2
+.macro _eq
+    _xorr
+    _zeroEQ
+.endm
+
+; set zero flag if TOS is zero
+; consumes TOS
 .macro _isZero      ; 18t
     ld A, L         ; 4t
     or H            ; 4t
     _drop           ; 10t
-.endm
-
-; =      x1 x2 -- flag         test x1=x2
-.macro _eq
-    _xorr
-    _dup
-    _zeroBranch eq1%%M
-    ld HL,FALSE 
-    jr eq2%%M
-eq1%%M:           
-    ld HL,TRUE
-eq2%%M:           
 .endm
 

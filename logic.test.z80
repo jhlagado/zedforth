@@ -1,0 +1,33 @@
+_initKernel
+
+_test
+    _push $AA
+    _push $0F
+    _andd
+_end
+    _push $0A
+_expect "should mask upper 4 bit"
+
+_test
+    _push $AA
+    _push $0F
+    _orr
+_end
+    _push $AF
+_expect "should set lower 4 bits"
+
+_test
+    _push $AA
+    _push $55
+    _xorr
+_end
+    _push $FF
+_expect "should set all bits"
+
+_test
+    _push $AAAA
+    _nott
+_end
+    _push $5555
+_expect "invert all bits"
+

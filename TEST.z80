@@ -23,12 +23,6 @@ TESTMODE equ 1
     ; .include "macros-device.z80"
     ; .include "macros-dict.z80"
     ; .include "macros-input.z80"
-    ; .include "macros-kernel.z80"
-    ; .include "macros-math.z80"
-    ; .include "macros-memory.z80"
-    ; .include "macros-stack.z80"
-    ; .include "macros-tester.z80"
-    ; .include "macros-util.z80"
 
 .org START_ROM
 RST00:                                      ; Reset
@@ -61,9 +55,7 @@ primPage:
     ; .include "core-compiler.z80"
     ; .include "core-control.z80"
     ; .include "core-find.z80"
-    ; .include "core-logic.z80"
     ; .include "core-parse.z80"
-    ; .include "core-tester.z80"
 
 initialLatest:
     dw backLink
@@ -80,10 +72,15 @@ startForth:
 ; end header  ============================================================  
 
 startTests:
-    ; .include "stack.test.z80"
-    ; .include "print.test.z80"
-
+    .include "control.test.z80"
+    .include "kernel.test.z80"
+    .include "logic.test.z80"
+    .include "math.test.z80"
+    .include "memory.test.z80"
+    .include "print.test.z80"
+    .include "stack.test.z80"
     .include "string.test.z80"
+    .include "util.test.z80"
 
     _cr
     _print "Done!"

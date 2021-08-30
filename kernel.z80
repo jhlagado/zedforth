@@ -14,6 +14,25 @@ next16:            ; 38t       EX1
     _litParam
 	jp (HL)
 
+exit:
+    _rpop
+    _next
+
+unjoin:
+    ex DE,HL
+    jp (HL)
+
+mode8:
+    ld IY,next8
+    _next
+
+mode16:
+    ld IY,next16
+    _next
+
+quit:
+    halt
+
 toR:
     _exPop
     ex DE,HL
@@ -40,23 +59,5 @@ lit:                ; 72t
     _exPush
     _next
 
-exit:
-    _rpop
-    _next
-
-unjoin:
-    ex DE,HL
-    jp (HL)
-
-mode8:
-    ld IY,next8
-    _next
-
-mode16:
-    ld IY,next16
-    _next
-
-quit:
-    halt
 
 

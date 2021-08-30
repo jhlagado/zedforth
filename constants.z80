@@ -1,19 +1,17 @@
 ROM_SIZE        equ     $2000
 RAM_SIZE        equ     $10000 - ROM_SIZE
-
-
-RSTACK_SIZE     equ     $80                 ; return stack
-DSTACK_SIZE     equ     $80                 ; parameter stack
-PAD_SIZE        equ     $80                 ; user scratch pad
-
 SER_BUFSIZE     equ     $80
+PAD_BUFSIZE     equ     $80
+DSTACK_SIZE     equ     $80                 ; parameter stack
+RSTACK_SIZE     equ     $80                 ; return stack
+
 LINE_BUFSIZE    equ     $80
 
 START_ROM       equ     $0
 END_ROM         equ     START_ROM + ROM_SIZE
 START_RAM       equ     START_ROM + ROM_SIZE
 END_RAM         equ     START_RAM + RAM_SIZE
-RET_STACK       equ     END_RAM             ; return stack, grows down
+; RET_STACK       equ     END_RAM             ; return stack, grows down
 
 IMMED           equ     $40
 HIDE            equ     $80

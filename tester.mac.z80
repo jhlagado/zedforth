@@ -23,10 +23,12 @@
 .endm
 
 ; asserts that TRUE is on stack
-.macro _assert
+.macro _assert, reason
     _nott
     _zeroBranch assert1%%M
-    _print {"\r\nFailed: ",reason}
+    _cr
+    ; _print "\r\nFailed: "
+    _print reason
     _call quit
 assert1%%M:
 .endm
@@ -54,6 +56,7 @@ assert1%%M:
     _call hashItems
     _call eq
     _assert reason
+expect1%%M:
 .endm
 
 ; .macro _outReset

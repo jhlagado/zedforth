@@ -1,0 +1,25 @@
+_test
+    _push 1
+    _push 2
+    _push 3             ; 1 2 3
+    _swap               ; 1 3 2
+    _call toR           ; 1 3       R: 2
+    _swap               ; 3 1
+    _call rFrom         ; 3 1 2
+    _swap               ; 3 2 1
+_end
+    _push 3             
+    _push 2
+    _push 1
+_expect "should have reversed the stack"
+
+_test
+    _push 1
+    _call toR           ;           R: 1
+    _call rAt           ; 1         R: 1
+    _call rFrom         ; 1 1
+_end
+    _push 1             
+    _push 1
+_expect "should have duped TOS"
+

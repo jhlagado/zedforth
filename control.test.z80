@@ -1,0 +1,14 @@
+_test
+    _push 0
+    _push 10
+    jr testControl2
+testControl1:
+    _swap
+    _onePlus
+    _swap
+testControl2:
+    _loopNext testControl1
+    _drop
+_end
+    _push 10
+_expect "should count to 10"
