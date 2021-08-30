@@ -1,15 +1,3 @@
-; .macro _setInputText, s1
-;     _fetch lineBufStart
-;     _dup
-;     _store lineBufTop
-;     _store currkey
-;     _pushString {s1,"\r\n",-1,"\r\n"}
-;     _drop
-;     _dup
-;     _store inbuf
-;     _store inptr
-; .endm
-
 .macro _setInputText, s1
     _pushString {s1,"\r\n",-1,"\r\n"}       ; psrc len
     _dup                                    ; psrc len len

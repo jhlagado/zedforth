@@ -77,7 +77,7 @@ startTests:
     .include "logic.test.z80"
     .include "math.test.z80"
     .include "memory.test.z80"
-    .include "print.test.z80"
+    ; .include "print.test.z80"
     .include "stack.test.z80"
     .include "string.test.z80"
     .include "util.test.z80"

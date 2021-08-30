@@ -20,8 +20,7 @@ litStr:
 ; SAME? ( a a n -- a a f \ -0+ )
 ; Compare n chars in two strings. Return 0 if identical.
 sameq:
-    _enter
-    _unjoin
+    _enter0
 
     jr sameq3           ; a1 a2 n            
 sameq1:
@@ -49,25 +48,3 @@ sameq4:
     _rejoin
     _exit               ; a1 a2 0   ; equal
     
-; compare ( p1 n1 p2 n2 – n )     
-    _enter
-    _unjoin
-    
-    _call toR           ; p1 n1 p2              R: n2
-    _swap               ; p1 p2 n1
-    _dup                ; p1 p2 n1 n1
-    _call rAt           ; p1 p2 n1 n1 n2        R: n2
-    _minus              ; p1 p2 n1 diff
-    _call rFrom         ; p1 p2 n1 diff n2
-    _swap               ; p1 p2 n1 n2 diff
-    _zeroBranch compare1
-    _minus              ; p1 p2 diff
-    jr compare2
-compare1:
-    _call min                ; p1 p2 nmin
-    _call sameq              ; p1 p2 diff
-compare2:
-    _nip                ; p1 diff
-    _nip                ; diff
-    _rejoin
-    _exit               

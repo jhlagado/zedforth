@@ -17,8 +17,7 @@ pushString:
 ; x1 x2 ... xn n -- h 
 ; hash n items from the stack and return the hash code
 hashItems:
-    _enter
-    _unjoin
+    _enter0
 
     _push 0             ; x1..xn n          R: h=0
     _call toR

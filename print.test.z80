@@ -20,9 +20,8 @@ double:
     _exit
 
 testPrint1:
-    _enter
-    _unjoin
-    
+    _enter0
+
     _pushString "Hello!"
     _call type
     _cr

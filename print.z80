@@ -24,9 +24,8 @@ dot:
 ; .s    ( x... -- x... ) 
 ; print stack (non-destructively)
 dots:                
-    _enter
-    _unjoin 
-    
+    _enter0
+
     _print "\r\n"
     _push dStack            ; x... s0
     _cellMinus
