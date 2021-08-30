@@ -43,7 +43,8 @@ sameq2:
     _drop               ; a1 a2
     _call rFrom         ; a1 a2 n
 sameq3:
-    _loopNext sameq1    ; a1 a2 n    
+    _loopNext sameq1    ; a1 a2 n
+    _push 0    
 sameq4:
     _rejoin
     _exit               ; a1 a2 0   ; equal

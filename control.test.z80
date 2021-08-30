@@ -8,7 +8,6 @@ testControl1:
     _swap
 testControl2:
     _loopNext testControl1
-    _drop
 _end
     _push 10
 _expect "should count to 10"

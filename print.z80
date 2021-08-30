@@ -44,7 +44,6 @@ dots1:
     _swap                   ; x... @x' n
 dots2:
     _loopNext dots1         
-    _drop                   ; x... @x
     _drop                   ; x...
     _print "\r\n"
     

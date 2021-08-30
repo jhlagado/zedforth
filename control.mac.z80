@@ -4,6 +4,7 @@
     _oneMinus               ; 6t
     jr label 
 loopNext%%M:
+    _drop
 .endm
 
 .macro _zeroBranch,label    ; 97t

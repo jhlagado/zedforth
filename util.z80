@@ -32,7 +32,6 @@ hashn1:
     _call toR           ; x1..xn-1 n        R: h'
 hashn2:
     _loopNext hashn1 
-    _drop               ;                   R: h'
     _call rFrom         ; h'
 
     _rejoin

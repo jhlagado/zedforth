@@ -95,7 +95,6 @@ expect1%%M:
 ; outPrint2:
 ;     _loopNext outPrint1 ; 12t
 ;     _drop               ; 10t
-;     _drop               ; 10t
 
 ; .endm
 
