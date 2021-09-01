@@ -21,72 +21,44 @@
 assert1%%M:
 .endm
 
+; ; _test ... _end .... _expect reason
+; .macro _test
+;     _print "."
+;     _call depth
+;     _store tdepth
+; .endm
+
+; .macro _end
+;     _call depth
+;     _fetch tdepth
+;     _minus
+;     _call hashItems
+;     _call depth
+;     _store tdepth
+; .endm
+
+; .macro _expect, reason
+;     _call depth
+;     _fetch tdepth
+;     _minus
+;     _call hashItems
+;     _call eq
+;     _assert reason
+; expect1%%M:
+; .endm
+
+
 ; _test ... _end .... _expect reason
 .macro _test
-    _print "."
-    _call depth
-    _store tdepth
+    _call test
 .endm
 
 .macro _end
-    _call depth
-    _fetch tdepth
-    _minus
-    _call hashItems
-    _call depth
-    _store tdepth
+    _call tend
 .endm
 
 .macro _expect, reason
-    _call depth
-    _fetch tdepth
-    _minus
-    _call hashItems
-    _call eq
-    _assert reason
-expect1%%M:
+    _pushString reason
+    _call expect 
 .endm
 
-; .macro _outReset
-;     _push 0
-;     _store outptr
-; .endm
-
-; .macro _outEmit
-;     _fetch outptr
-;     _push outbuf
-;     _plus
-;     _cbang
-;     _fetch outptr
-;     _onePlus
-;     _store outptr
-; .endm
-
-; .macro _outPrint
-;     _push outbuf
-;     _dup
-;     _fetch outptr
-;     _swap
-;     _minus
-;     jr outPrint2
-
-; outPrint1:          
-;     _swap               ; 25t
-;     _dup                ; 11t
-;     _cAt                ; 18t
-;     ld A,E
-;     call putc           ; 
-;     _drop
-;     _onePlus            ; 6t
-;     _swap
-
-; outPrint2:
-;     _loopNext outPrint1 ; 12t
-;     _drop               ; 10t
-
-; .endm
-
-; .macro _expectOutput s1, reason
-;     _print s1
-;     _print reason
-; .endm

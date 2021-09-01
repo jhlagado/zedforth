@@ -53,11 +53,13 @@ serialInt23:
     ret
 
 ; emit  ( c -- )
+_head "emit",4
 _code emit
 
 ; key   ( -- c )
 ; Wait for and return an input character.
-CODE "key",3,key
+_head "key",3
+key:
     _enter
     _unjoin
 key1:  
@@ -68,7 +70,8 @@ key1:
 
 ; ?key  ( -- c T | F )
 ; Return input character and true, or a false if no input.
-CODE "?key",4,qkey
+_head "?key",4,
+qkey:
     _enter
     _unjoin
     

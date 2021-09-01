@@ -7,8 +7,8 @@ TESTMODE equ 1
 ;======================================================================
 
     .include "constants.z80"
-    .include "code.mac.z80"
     .include "control.mac.z80"
+    .include "head.mac.z80"
     .include "kernel.mac.z80"
     .include "logic.mac.z80"
     .include "math.mac.z80"
@@ -43,11 +43,13 @@ codePtr  .set $
 primPage:
     .include "bytecode.z80"
 
+    .include "control.z80"
     .include "kernel.z80"
     .include "logic.z80"
     .include "math.z80"
     .include "memory.z80"
     .include "print.z80"
+    .include "tester.z80"
     .include "serial.z80"
     .include "stack.z80"
     .include "string.z80"
@@ -72,15 +74,22 @@ startForth:
 ; end header  ============================================================  
 
 startTests:
-    .include "control.test.z80"
-    .include "kernel.test.z80"
-    .include "logic.test.z80"
-    .include "math.test.z80"
-    .include "memory.test.z80"
-    ; .include "print.test.z80"
-    .include "stack.test.z80"
-    .include "string.test.z80"
-    .include "util.test.z80"
+    ; .include "control.test.z80"
+    ; .include "kernel.test.z80"
+    ; .include "logic.test.z80"
+    ; .include "math.test.z80"
+    ; .include "memory.test.z80"
+    ; ; .include "print.test.z80"
+    ; .include "stack.test.z80"
+    ; .include "string.test.z80"
+    ; .include "util.test.z80"
+
+_test
+    ; _push 1
+    _push 2
+_end
+    _push 2
+_expect "should have had 1 item on stack"
 
     _cr
     _print "Done!"

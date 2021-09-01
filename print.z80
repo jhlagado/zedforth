@@ -3,6 +3,7 @@
 _code type
 _code digitAscii
 _code shiftLeftDigit
+_code cr
 
 ; n --
 ; prints a digit
@@ -12,6 +13,7 @@ dotDigit:
     _exit
 
 ; . ( n -- )
+_head ".",1
 dot:
     _enter
     dw shiftLeftDigit, dotDigit
@@ -23,6 +25,7 @@ dot:
     
 ; .s    ( x... -- x... ) 
 ; print stack (non-destructively)
+_head ".s",2
 dots:                
     _enter0
 
@@ -48,4 +51,4 @@ dots2:
     
     _rejoin
     _exit
-    
+

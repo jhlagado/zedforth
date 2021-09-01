@@ -1,0 +1,46 @@
+; assert ( ptr len flag -- )
+; prints error and halts if false
+assert:
+    _enter
+    ; dw nott
+    dw qbranch,assert1
+    dw cr
+    dw litStr
+    .pstr "\r\nFailed: "
+    dw type           
+    dw type
+    dw quit
+assert1:
+    dw twoDrop
+    _exit
+
+; test ... tend .... expect
+test:
+    _enter
+    dw lit 
+    db ".",0
+    dw emit
+    dw depth, lit, tdepth, bang
+    _exit
+
+tend:
+    _enter
+    dw depth
+    dw lit, tdepth, at
+    dw minus
+    dw hashItems
+    dw depth, lit, tdepth, bang
+    _exit
+
+expect:
+    _enter
+    dw tor, tor
+    dw depth
+    dw lit, tdepth, at
+    dw minus
+    dw hashItems
+    dw eq
+    dw rFrom, rFrom, rot
+    dw assert 
+    _exit
+    

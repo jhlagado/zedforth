@@ -1,15 +1,17 @@
-qbranch_:           
+qbranch:           
     exx
     _isZero
-    _drop
     exx
-    jr z,qbranch1
-branch_:
-    _litParam
-    jp (HL)
-qbranch1:
+    jr nz,branch
+    inc DE
+    inc DE
     _next
 
-execute_:            ; 41t
+branch:
+    _litParam
+    ex DE,HL
+    _next
+
+execute:            ; 41t
     _exPop
     jp (HL)
