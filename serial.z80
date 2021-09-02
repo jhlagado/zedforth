@@ -70,40 +70,54 @@ key1:
 
 ; ?key  ( -- c T | F )
 ; Return input character and true, or a false if no input.
+; ?key  ( -- c T | F )
+; Return input character and true, or a false if no input.
 _head "?key",4,
 qkey:
-    _enter
-    _unjoin
-    
-    _serReady
-    jr nz, qkey1
-    _push FALSE
+    exx
+    _fetchc serBufUsed              ; used      
+    _isZero
+    jr nz,qkey1
+    _push FALSE                     ; FALSE
     jr qkey4
 qkey1:
-    ld DE,(serRdPtr)
-    inc DE
-    ld A,E                      
-    cp (serBuf + SER_BUFSIZE) & $FF         ; Only need to check low byte
-    jr nz,qkey2
-    ld DE,serBuf
-qkey2:
+    _fetch serRdPtr                 ; ptr
+    ld A,L
+    inc A                           ; ptr+1
+    and SER_BUFSIZE-1               ; Only mask low byte
+    ld L,A
+    _dup                            ; ptr+1 ptr+1
+    _store serRdPtr                 ; ptr+1
     di
-    ld (serRdPtr),DE
-    ld A,(serBufUsed)
-    dec A
-    ld (serBufUsed),A
+    _fetch serBufUsed
+    _oneMinus
+    _store serBufUsed
+    ld A,L
     cp SER_EMPTYSIZE
     jr nc,qkey3
     ld A,RTS_LOW
     out (IO_CTRL),A
-qkey3:
-    ld A,(DE)
-    _dup
-    ld L,A
-    ld H,0
-    _push TRUE
+qkey3:                              ; ptr+1
     ei
+    _cAt                            ; char
+    _push TRUE                      ; TRUE
 qkey4:
+    exx
+    _next
 
-    _rejoin
-    _exit
+unkey:
+    exx
+    _fetch serRdPtr                 ; ptr
+    ld A,L
+    dec A
+    and SER_BUFSIZE-1               ; Only mask low byte
+    ld L,A
+    _store serRdPtr                 ; ptr+1
+    di
+    _fetch serBufUsed
+    _onePlus
+    _store serBufUsed
+    ei
+    exx
+    _next
+    

@@ -1,0 +1,101 @@
+; word ( delim "<chars>ccc<char>" -- c-addr ) 
+; read a word from input stream
+; Skip leading delimiters. Parse characters ccc delimited by char. 
+word:
+    _enter0
+    _fetch var_here                         ; delim ptr
+    _onePlus                                ; delim ptr'    ; fill in length later
+    _swap                                   ; ptr' delim
+    _push $40                               ; ptr' delim maxlen
+    _swap                                   ; ptr' maxlen delim 
+    _call parseWord                         ; ptr' len
+    _swap                                   ; len ptr'
+    _oneMinus                               ; len ptr
+    _dup
+    ld HL,DE                                ; len ptr   HL: ptr
+    _cbang                                  ;           HL: ptr  ; store length
+    ld DE,HL                                ; ptr
+    _exit0                                     
+
+; ptr maxlen delim -- ptr len
+parseWord:                                  ; -- ptr len
+    ENTER 0
+    _dup                                    ; ptr maxlen delim delim
+    call skipDelims                         ; ptr maxlen delim char
+    call wordRead                           ; ptr len
+    EXIT 0                                     
+
+; delim -- char
+skipDelims:                                 
+    ENTER 0
+skipd1:
+    call key                                ; delim key
+    bit 7,E                                 ; delim key     ; EOF? used by tests
+    jr nz,skipd10
+    _over                                   ; delim key delim    
+    ld A,E                                  ; delim key delim   ; A = delim
+    _drop                                   ; delim key
+    cp E
+    jr z,skipd2                             ; delim key     ; if delim then loop
+    ld A,$1F                                ; delim key     ; < space?
+    cp E
+    jr nc,skipd2
+    ld A,$5C
+    cp E                                    ; delim key     ; \ start of a comment?
+    jr z,skipd3
+    _nip                                    ; key           ; already in word
+    jr skipd8
+skipd3:                                     ; skip to end of line
+    _drop                                   ; delim
+    call key                                ; delim key2
+    ld A,"\n"
+    cp E
+    jr nz,skipd3
+skipd2:
+    _drop
+    jr skipd1
+skipd10:
+    _drop                                   ; delim
+    ld DE,0                                 ; 0
+skipd8:
+    EXIT 0                                     
+
+; ptr maxlen delim char -- ptr len
+wordRead:                                   
+    ENTER 0
+    _dup
+    _zeroBranch wordRead9
+    _swap                                   ; ptr maxlen char delim
+    ld IYH,E
+    _drop                                   ; ptr maxlen char        IYH:delim
+    _swap
+    ld IYL,E                                ; ptr char maxlen        IYH:delim IYL:maxlen
+    _drop                                   ; ptr char               IYH:delim IYL:maxlen
+    _dup                                    ; ptr ptr 
+    _dup
+    ld E,A
+    ld D,0                                  ; ptr ptr char
+wordRead1:
+    _over                                   ; ptr ptr char ptr
+    _cbang                                  ; ptr ptr
+    _onePlus                                ; ptr ptr'
+    call KEY                                ; ptr ptr' key
+    ld A,E
+    cp IYH                                  ; ptr ptr' key      ; key = delim?
+    jr z,wordRead3
+    cp " "                                  ;                   ; < space? i.e. control chars
+    jr c,wordRead3
+    dec IYL                                 ;                   ; maxlen--
+    jr nz,wordRead1                         ; ptr ptr' key
+wordRead3:
+    _drop
+    _over                                   ; ptr ptr' ptr
+    _minus                                  ; ptr len
+    jr wordRead10
+wordRead9:
+    _nip                                    ; ptr maxlen 0
+    _nip                                    ; ptr 0
+wordRead10:
+    EXIT 0
+    
+ 

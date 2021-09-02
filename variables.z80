@@ -1,4 +1,4 @@
-serBuf:             ds SER_BUFSIZE          ; must be aligned on a $100 page boundary
+serBuf:             ds SER_BUFSIZE          ; must be aligned on a page boundary
 padBuf:             ds PAD_BUFSIZE          
 
                     ds DSTACK_SIZE
