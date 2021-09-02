@@ -1,46 +1,49 @@
-; assert ( ptr len flag -- )
-; prints error and halts if false
-assert:
-    _enter
-    ; dw nott
-    dw qbranch,assert1
-    dw cr
-    dw litStr
-    .pstr "\r\nFailed: "
-    dw type           
-    dw type
-    dw quit
-assert1:
-    dw twoDrop
-    _exit
-
 ; test ... tend .... expect
+
+; test ( -- )
+; start of test, stores depth of stack as a baseline
 test:
     _enter
-    dw lit 
+    dw lit                      ; prints a "."
     db ".",0
     dw emit
-    dw depth, lit, tdepth, bang
+    dw depth, lit, tdepth, bang ; stores depth of stack in tdepth
     _exit
 
+; tend ( -- hash )
+; end of test, stores depth of stack used by test
+; stores a hash of the stack items
 tend:
     _enter
-    dw depth
-    dw lit, tdepth, at
-    dw minus
-    dw hashItems
-    dw depth, lit, tdepth, bang
+    dw depth                    ; x1...xn depth
+    dw lit, tdepth, at          ; x1...xn depth tdepth
+    dw minus                    ; x1...xn len
+    dw hashItems                ; hash1
+    dw depth, lit, tdepth, bang ; stores depth of stack in tdepth
     _exit
 
+; expect ( hash1 x1...xn -- bool )
+; compares hash of stack with the one stored on stack
+; returns TRUE if they match
 expect:
     _enter
-    dw tor, tor
-    dw depth
-    dw lit, tdepth, at
-    dw minus
-    dw hashItems
-    dw eq
-    dw rFrom, rFrom, rot
-    dw assert 
+    dw depth                    ; hash1 x1...xn depth2
+    dw lit, tdepth, at          ; hash1 x1...xn depth2 depth1
+    dw minus                    ; hash1 x1...xn len    
+    dw hashItems                ; hash1 hash2 
+    dw eq                       ; bool
     _exit
-    
+
+; assert <reason> ( bool -- )
+; if bool is false displays string literal immediately following
+assert:
+    _enter
+    dw rFrom                    ; bool adr
+    dw count,twoDup,plus        ; bool adr+1 len adr'
+    dw toR,rot                  ; adr+1 len bool
+    dw qbranch, assert1
+    dw type                  
+    dw quit
+assert1:
+    dw twoDrop              
+    _exit

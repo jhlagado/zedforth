@@ -89,7 +89,7 @@ _test
     _push 2
 _end
     _push 2
-_expect "should have had 1 item on stack"
+_expect "should have just had 2 on stack"
 
     _cr
     _print "Done!"

@@ -21,33 +21,6 @@
 assert1%%M:
 .endm
 
-; ; _test ... _end .... _expect reason
-; .macro _test
-;     _print "."
-;     _call depth
-;     _store tdepth
-; .endm
-
-; .macro _end
-;     _call depth
-;     _fetch tdepth
-;     _minus
-;     _call hashItems
-;     _call depth
-;     _store tdepth
-; .endm
-
-; .macro _expect, reason
-;     _call depth
-;     _fetch tdepth
-;     _minus
-;     _call hashItems
-;     _call eq
-;     _assert reason
-; expect1%%M:
-; .endm
-
-
 ; _test ... _end .... _expect reason
 .macro _test
     _call test
@@ -58,7 +31,10 @@ assert1%%M:
 .endm
 
 .macro _expect, reason
-    _pushString reason
-    _call expect 
+    _rejoin
+    dw expect
+    dw assert
+    .pstr reason
+    _unjoin
 .endm
 
