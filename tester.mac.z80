@@ -1,3 +1,4 @@
+; copy s1 into input stream
 .macro _setInputText, s1
     _pushString {s1,"\r\n",-1,"\r\n"}       ; psrc len
     _dup                                    ; psrc len len
@@ -10,29 +11,36 @@
     _cmove                                  ; 
 .endm
 
-; asserts that TRUE is on stack
-.macro _assert, reason
-    _nott
-    _zeroBranch assert1%%M
-    _cr
-    ; _print "\r\nFailed: "
-    _print reason
-    _call quit
-assert1%%M:
-.endm
-
 ; _test ... _end .... _expect reason
+
+; test ( -- )
+; start of test, stores depth of stack as a baseline
 .macro _test
     _call test
 .endm
 
+; tend ( -- hash )
+; end of test, stores depth of stack used by test
+; stores a hash of the stack items
 .macro _end
     _call tend
 .endm
 
+; expect ( hash1 x1...xn -- bool )
+; compares hash of stack with the one stored on stack
+; if no match then display reason and abort
 .macro _expect, reason
     _rejoin
     dw expect
+    dw assert
+    .pstr reason
+    _unjoin
+.endm
+
+; assert ( bool -- )
+; if bool is false then display reason and abort
+.macro _assert, reason
+    _rejoin
     dw assert
     .pstr reason
     _unjoin
