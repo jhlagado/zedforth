@@ -48,6 +48,7 @@ primPage:
     .include "logic.z80"
     .include "math.z80"
     .include "memory.z80"
+    .include "parse.z80"
     .include "print.z80"
     .include "serial.z80"
     .include "stack.z80"
@@ -80,18 +81,11 @@ startTests:
     .include "logic.test.z80"
     .include "math.test.z80"
     .include "memory.test.z80"
+    .include "parse.test.z80"
     .include "string.test.z80"
     .include "util.test.z80"
     .include "print.test.z80"
 
-;     _setInputText "Hello!"
-;     jr serialLoop2
-; serialLoop1:
-;     _call emit
-; serialLoop2:
-;     _call key
-;     jr serialLoop1
-    
     _cr
     _print "Done!"
     _call quit    

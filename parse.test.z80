@@ -1,0 +1,23 @@
+.macro _testSkipDelims,s1,d1,i1
+    _test
+        _setInputText s1
+        _pushc d1
+        _call skipDelims
+        _fetch serRdPtr
+        _onePlus
+        _push $FF00 + SER_BUFSIZE-1
+        _andd
+    _end
+        _pushc d1
+        _push serBuf
+        _push i1
+        _plus
+        _push $FF00 + SER_BUFSIZE-1
+        _andd
+    _expect {s1," expected at i1"}
+.endm
+
+_testSkipDelims "Hello"," ",0
+_testSkipDelims "   Hello"," ",3
+_testSkipDelims "\t  Hello"," ",3
+_testSkipDelims "\\ comment \nHello"," ",11

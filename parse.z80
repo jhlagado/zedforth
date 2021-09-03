@@ -31,9 +31,9 @@ skipd1:
     ld A,L                                  ; delim key    
     _drop                                   ; delim
     cp L                                    ; delim             ; compare with delim
-    jr nz,skipd1                            ; delim             ; if delim then loop
+    jr z,skipd1                            ; delim             ; if delim then loop
     cp $1F                                  ; delim             ; whitespace
-    jr nc,skipd1
+    jr c,skipd1
     cp $5C                                  ; delim             ; \ start of a comment?
     jr z,skipd2
     bit 7,A                                 ; delim             ; EOF? used by tests
