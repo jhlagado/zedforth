@@ -74,24 +74,23 @@ startForth:
 ; end header  ============================================================  
 
 startTests:
-    ; .include "stack.test.z80"
-    ; .include "control.test.z80"
-    ; .include "kernel.test.z80"
-    ; .include "logic.test.z80"
-    ; .include "math.test.z80"
-    ; .include "memory.test.z80"
-    ; .include "print.test.z80"
-    ; .include "string.test.z80"
-    ; .include "util.test.z80"
+    .include "stack.test.z80"
+    .include "control.test.z80"
+    .include "kernel.test.z80"
+    .include "logic.test.z80"
+    .include "math.test.z80"
+    .include "memory.test.z80"
+    .include "string.test.z80"
+    .include "util.test.z80"
+    .include "print.test.z80"
 
-    ; _setInputText "Hello!"
-    ; _setInputText "Hi"
-    jr serialLoop2
-serialLoop1:
-    _call emit
-serialLoop2:
-    _call key
-    jr serialLoop1
+;     _setInputText "Hello!"
+;     jr serialLoop2
+; serialLoop1:
+;     _call emit
+; serialLoop2:
+;     _call key
+;     jr serialLoop1
     
     _cr
     _print "Done!"
