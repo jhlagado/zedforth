@@ -79,7 +79,10 @@ wordRead1:
     _swap                                   ; ptr delim len
 wordRead2:
     _loopNext wordRead1                     ; ptr delim
+    jr wordRead4
 wordRead3:
+    _drop                                   ; ptr len
+wordRead4:
     _drop                                   ; ptr
     _dup
     ld HL,BC                                ; ptr ptr'

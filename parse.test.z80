@@ -21,3 +21,21 @@ _testSkipDelims "Hello"," ",0
 _testSkipDelims "   Hello"," ",3
 _testSkipDelims "\t  Hello"," ",3
 _testSkipDelims "\\ comment \nHello"," ",11
+
+.macro _testWordRead,str1,delim1,len1
+    _test
+        _setInputText str1
+        _pushc delim1
+        _fetch var_here
+        _push $40
+        _call wordRead
+    _end
+        _fetch var_here
+        _push len1
+    _expect {"should be len1 long"}
+.endm
+
+_testWordRead "Hello"," ",5
+_testWordRead "Hello "," ",5
+_testWordRead "Hello\n"," ",5
+
