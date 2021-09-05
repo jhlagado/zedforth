@@ -45,6 +45,7 @@ primPage:
 
     .include "control.z80"
     .include "find.z80"
+    .include "interp.z80"
     .include "kernel.z80"
     .include "logic.z80"
     .include "math.z80"
