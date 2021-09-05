@@ -4,6 +4,7 @@ headerPtr .set END_ROM                      ; declare headers backwards from end
 backLink .set 0                             ; backLink is null
 
 .macro _head, nameStr, lenFlags
+                                            
     codePtr0 .set codePtr                   ; save code pointer
     codePtr .set $                          ; save code pointer
     
@@ -23,7 +24,29 @@ backLink .set 0                             ; backLink is null
 
     backLink .set $                         ; link points to a name string (NFA)
     db lenFlags, nameStr                    ; name string
-    
-    .org codePtr                            ; restore code pointer
+                                            
+    .org codePtr                            ; restore code pointer -----------------------
+                                            
 .endm
+
+; nfa -- lfa    
+.macro _nfaToLfa
+    _push 6
+    _minus
+.endm
+
+; nfa -- cfa    
+.macro _nfaToCfa
+    _push 4
+    _minus
+.endm
+
+; nfa -- f      
+; fetch immediate flag
+.macro _immedq
+    _cat
+    _push IMMED
+    _call andd
+.endm
+
 

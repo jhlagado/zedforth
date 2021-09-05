@@ -1,10 +1,9 @@
 ; subroutine to be called from inlined code
-; followed immediated by a packed string
+; followed immediated by a counted string
 ; eg. 
 ; call pushString
 ; .pstr "Hello!"
 ; returns ptr len 
-
 pushString:
     _swap       ; cstr          ; ret address = cstr
     _count      ; adr+1 len    
@@ -35,5 +34,4 @@ hashn2:
 
     _rejoin
     _exit
-
 

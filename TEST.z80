@@ -44,6 +44,7 @@ primPage:
     .include "bytecode.z80"
 
     .include "control.z80"
+    .include "find.z80"
     .include "kernel.z80"
     .include "logic.z80"
     .include "math.z80"
@@ -55,10 +56,16 @@ primPage:
     .include "string.z80"
     .include "tester.z80"
     .include "util.z80"
+
     ; .include "core-compiler.z80"
     ; .include "core-control.z80"
     ; .include "core-find.z80"
     ; .include "core-parse.z80"
+
+_head 'ok',2
+    _enter
+    _print "ok\r\n"
+    _exit
 
 initialLatest:
     dw backLink
@@ -77,6 +84,7 @@ startForth:
 startTests:
     .include "stack.test.z80"
     .include "control.test.z80"
+    .include "find.test.z80"
     .include "kernel.test.z80"
     .include "logic.test.z80"
     .include "math.test.z80"
@@ -86,6 +94,11 @@ startTests:
     .include "util.test.z80"
     
     .include "print.test.z80"
+
+; inline tests ============================================================  
+
+
+; inline tests ============================================================  
 
     _cr
     _print "Done!"

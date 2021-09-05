@@ -53,6 +53,13 @@ name1:
     .pstr s1
 .endm    
 
+.macro _pushCStr, s1
+    call pushString
+    .pstr s1
+    _drop
+    _oneMinus
+.endm    
+
 .macro _print, s1
     _pushString s1
     _type

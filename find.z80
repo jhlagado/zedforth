@@ -1,0 +1,48 @@
+; FIND   pstr --    pstr    0   if not found
+;                   xt      1   if immediate
+;                   xt      -1  if normal
+_head "find",4
+find:
+    _enter
+    _unjoin
+    _fetch var_latest       ; pstr1 pstr2           ; var_latest = latest nfa
+find1:
+    _over                   ; pstr1 pstr2 pstr1
+    _cat                    ; pstr1 pstr2 len1
+    ld A,L
+    _drop                   ; pstr1 pstr2           ; A: len1
+    xor (HL)
+    and mask
+    jr nz,find3
+find2:
+    _over                   ; pstr1 pstr2 pstr1
+    _onePlus                ; pstr1 pstr2 pstr1'
+    _over                   ; pstr1 pstr2 pstr1' pstr2
+    _call count             ; pstr1 pstr2 pstr1' pstr2' len+flags
+    _push MASK
+    _call andd              ; pstr1 pstr2 pstr1' pstr2' len
+    _call sameq             ; pstr1 pstr2 pstr1' pstr2' result    ; 0 = match
+    _nip                    ; pstr1 pstr2 pstr1' result
+    _nip                    ; pstr1 pstr2 result
+    _zeroBranch find4       
+find3:
+    _nfaToLfa               ; pstr1 lfa2
+    _at                     ; pstr1 link2
+    _dup                    ; pstr1 link2 link2
+    _zeroBranch find6      
+    jr find1                ; pstr1 link2
+find4:                      
+    _nip                    ; pstr2 
+    _dup                    ; pstr2 pstr2
+    _nfaToCfa               ; pstr2 cfa
+    _at                     ; pstr2 xt
+    _swap                   ; xt pstr2
+    _immedq                 ; xt immed?
+    _dup                    ; xt immed? immed?
+    _zeroBranch find5       
+    ld HL,2                 ; xt 2
+find5:
+    _oneMinus               ; xt -1|1
+find6:
+    _rejoin
+    _exit
