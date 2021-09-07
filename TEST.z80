@@ -50,6 +50,7 @@ primPage:
     .include "logic.z80"
     .include "math.z80"
     .include "memory.z80"
+    .include "number.z80"
     .include "parse.z80"
     .include "print.z80"
     .include "serial.z80"

@@ -6,86 +6,77 @@ repl:
 interpret:
     _enter
     _unjoin
+interpret0:
     _push $20                       ; str maxlen delim
     _call word                      ; c-addr                 
     _dup                            ; c-addr c-addr
     _cat                            ; c-addr len
-    _isZero                         ; c-addr
-    jr z,interpret2                 
-    _fetch var_state
-    _isZero
-    jr z,interpret1                 ; c-addr
-    _call compileWord      
-    jr interpret
+    _zeroBranch interpret2          ; is it zero length?          
+    ; _fetch var_state
+    ; _zeroBranch interpret1          ; are we interpreting or compiling?
+    ; _call compileWord      
+    ; jr interpret0
 interpret1:
     _call interpWord                 
-    jr interpret
+    jr interpret0
 interpret2:
     _drop  
     _rejoin
     _exit
 
-interpWord:                         
+interpWord:                         ; ( c-addr -- )
     _enter
     _unjoin
-    _dup                        ; c-addr c-addr
-    _call find                       ; c-addr xt result
-    _isZero                     ; c-addr xt
-    jr z,interpNum
-    _nip                        ; xt
-executeWord:
-    _call execute                    ; ?
+    _dup                            ; c-addr c-addr
+    _call find                      ; c-addr xt|ptr result   ; found? or number?
+    _zeroBranch interpNum
+    jr executeWord
+
+executeWord:                        ; ( ? xt -- ??? )
+    _nip                            ; xt
+    _call execute                   ; ?
     _rejoin
     _exit
 
-compileWord:
+interpNum:                          ; ( c-addr xt|ptr -- )
     _enter
     _unjoin
-    _dup                        ; c-addr c-addr
-    _call find                       ; c-addr xt result
-    _dup                        ; c-addr xt result result
-    _isZero                     ; c-addr xt result
-    jr z,compileNum
-    _onePlus                           ; c-addr xt result+1 ; is it -1?
-    _isZero                     ; c-addr xt 
-    _nip                        ; xt    
-    jr z,executeWord
-    _call callc    
+    _drop                           ; c-addr
+    _call count                     ; str len
+    _call toNumber                  ; num err
+    _zeroBranch interpError
     _rejoin
     _exit
 
-interpNum:
-    _enter
-    _unjoin
-    _drop                       ; c-addr
-    _call count                      ; str len
-    _call toNumber                   ; num err
-    _isZero
-    jr nz,interpError
-    _rejoin
-    _exit
-
-compileNum:
-    _enter
-    _unjoin
-    _drop                       ; c-addr xt 
-    _drop                       ; c-addr
-    _call count                      ; str len    
-    _call toNumber                   ; num err
-    _isZero
-    jr nz,interpError
-    _call literal
-    jr compileNum2
-compileNum1:
-    _drop                       ; --
-    _print "NOT FOUND!\r\n"
-compileNum2:
-    _rejoin
-    _exit
-
-interpError:
-    _drop                       ; --
+interpError:                        ; ( ? -- ) 
+    _drop
     _print "NOT FOUND!\r\n"
     _rejoin
     _exit
+    
+; compileWord:                        ; ( c-addr -- )
+;     _enter
+;     _unjoin
+;     _dup                            ; c-addr c-addr
+;     _call find                      ; c-addr xt result
+;     _dup                            ; c-addr xt result result ; found? or number?
+;     _zeroBranch compileNum
+;     _onePlus                        ; c-addr xt result+1 ; is it immediate -1?
+;     _zeroBranch executeWord
+;     _nip                            ; xt    
+;     _call callc    
+;     _rejoin
+;     _exit
+
+; compileNum:                         ; ( c-addr xt result -- )
+;     _enter
+;     _unjoin                          
+;     _drop                           ; c-addr xt 
+;     _drop                           ; c-addr
+;     _call count                     ; str len
+;     _call toNumber                  ; num err
+;     _zeroBranch interpError
+;     _call literal
+;     _rejoin                         
+;     _exit
 
