@@ -84,20 +84,35 @@ startForth:
 ; end header  ============================================================  
 
 startTests:
-    .include "stack.test.z80"
-    .include "control.test.z80"
-    .include "find.test.z80"
-    .include "kernel.test.z80"
-    .include "logic.test.z80"
-    .include "math.test.z80"
-    .include "memory.test.z80"
-    .include "parse.test.z80"
-    .include "string.test.z80"
-    .include "util.test.z80"
+    ; .include "stack.test.z80"
+    ; .include "control.test.z80"
+    ; .include "find.test.z80"
+    ; .include "kernel.test.z80"
+    ; .include "logic.test.z80"
+    ; .include "math.test.z80"
+    ; .include "memory.test.z80"
+    ; .include "parse.test.z80"
+    ; .include "string.test.z80"
+    ; .include "util.test.z80"
     
-    .include "print.test.z80"
+    ; .include "print.test.z80"
 
 ; inline tests ============================================================  
+
+; .macro _testInterp,str1,result1
+;     _test
+;         _setInputText str1
+;         _call interpret
+;     _end
+;         _push result1
+;     _expect {str1," should return result1"}
+; .endm
+
+_setInputText "3"
+_call interpret
+_call dots
+
+
 
 
 ; inline tests ============================================================  

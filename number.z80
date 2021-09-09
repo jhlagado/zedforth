@@ -1,73 +1,73 @@
-; toNumber ( str len -- num err )
-toNumber:                               
-    _enter
-    _unjoin
-    _dup                                ; str len len
-    _zeroBranch toNumber1x              
-toNumber1:
-    _swap                               ; len str
-    LD BC,HL                            ; len str           ; BC = str
-    _swap                               ; str len           ; BC = str
-    ld A,(BC)                           ; str len           ; A = char
-    cp '-'                              ;                   ; is A negative?
-    jr nz,toNumber2x                    
-    inc BC                              ;
-    dec HL                              ; str len
-    _dup                                ; str len len
-    _zeroBranch toNumber1xx
-    ld A,(BC)                           ; str len ; A = char
-toNumber2x:
-    _push 0                             ; str len num:0
-toNumber21:
-    _dup                                ; str len num num
-    ld L,A                              ; str len num char
-    ld H,0
-    _call charToDigit                   ; str len num nib
-    _dup                                ; str len num nib nib
-    _call isValidDigit                  ; str len num nib bool
-    _zeroBranch toNumber99x             
-    _plus                               ; str len num           ; num += digit
-    _swap                               ; str num len
-    _oneMinus                           ; str num len           ; len--
-    _dup                                ; str num len len
-    _isZero                             ; str num len
-    jr z, toNumber22
-    _swap                               ; str len num
-    _fetch var_base                     ; str len num base
-    _call uMultiply                     ; str len num num2      ; num *= var_base
-    _drop                               ; str len num
-    inc BC
-    ld A,(BC)                                                   ; a = next char
-    jr toNumber21
+; ; toNumber ( str len -- num err )
+; toNumber:                               
+;     _enter
+;     _unjoin
+;     _dup                                ; str len len
+;     _zeroBranch toNumber1x              
+; toNumber1:
+;     _swap                               ; len str
+;     LD BC,HL                            ; len str           ; BC = str
+;     _swap                               ; str len           ; BC = str
+;     ld A,(BC)                           ; str len           ; A = char
+;     cp '-'                              ;                   ; is A negative?
+;     jr nz,toNumber2x                    
+;     inc BC                              ;
+;     dec HL                              ; str len
+;     _dup                                ; str len len
+;     _zeroBranch toNumber1xx
+;     ld A,(BC)                           ; str len ; A = char
+; toNumber2x:
+;     _push 0                             ; str len num:0
+; toNumber21:
+;     _dup                                ; str len num num
+;     ld L,A                              ; str len num char
+;     ld H,0
+;     _call charToDigit                   ; str len num nib
+;     _dup                                ; str len num nib nib
+;     _call isValidDigit                  ; str len num nib bool
+;     _zeroBranch toNumber99x             
+;     _plus                               ; str len num           ; num += digit
+;     _swap                               ; str num len
+;     _oneMinus                           ; str num len           ; len--
+;     _dup                                ; str num len len
+;     _isZero                             ; str num len
+;     jr z, toNumber22
+;     _swap                               ; str len num
+;     _fetch var_base                     ; str len num base
+;     _call uMultiply                     ; str len num num2      ; num *= var_base
+;     _drop                               ; str len num
+;     inc BC
+;     ld A,(BC)                                                   ; a = next char
+;     jr toNumber21
 
-toNumber22:
-    _drop                               ; str num
-    _swap                               ; num str
-    ld A,(HL)                   
-    _drop                               ; num
-    cp "-"
-    jr nz,toNumber3
-    _call negate                        ; num
-toNumber3:
-    _push 0                             ; num 0
-    jr toNumber1y
+; toNumber22:
+;     _drop                               ; str num
+;     _swap                               ; num str
+;     ld A,(HL)                   
+;     _drop                               ; num
+;     cp "-"
+;     jr nz,toNumber3
+;     _call negate                        ; num
+; toNumber3:
+;     _push 0                             ; num 0
+;     jr toNumber1y
     
-toNumber1x:
-    _nip                                ; str 0
-    _dup                                ; 0 0
-    jr toNumber1y
+; toNumber1x:
+;     _nip                                ; str 0
+;     _dup                                ; 0 0
+;     jr toNumber1y
 
-toNumber1xx:
-    _nip                                ; 0 
-    jr toNumber1z
+; toNumber1xx:
+;     _nip                                ; 0 
+;     jr toNumber1z
     
-toNumber99x:                            
-    _twoDrop                            ; str len
-    _twoDrop                             
-    _push 0                             ; 0
-toNumber1z:
-    _push 1                             ; 0 1
-toNumber1y:
-    _rejoin
-    _exit
+; toNumber99x:                            
+;     _twoDrop                            ; str len
+;     _twoDrop                             
+;     _push 0                             ; 0
+; toNumber1z:
+;     _push 1                             ; 0 1
+; toNumber1y:
+;     _rejoin
+;     _exit
     

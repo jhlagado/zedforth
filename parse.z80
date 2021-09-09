@@ -6,18 +6,15 @@ word:
     _unjoin
     
     _call skipDelims                        ; delim
-    
     _fetch var_here                         ; delim ptr
-    _onePlus                                ; delim ptr'    ; fill in length later
+    _onePlus                                ; delim ptr'        ; fill in length later
     _push $40                               ; delim ptr' maxlen
     _call wordRead                          ; ptr len
     _swap                                   ; len ptr'
     _oneMinus                               ; len ptr
-    _dup
-    ld HL,DE                                ; len ptr   HL: ptr
-    _cbang                                  ;           HL: ptr  ; store length
-    ld DE,HL                                ; ptr
-    
+    _tuck                                   ; ptr len ptr   
+    _cbang                                  ; ptr               ; store length
+
     _rejoin
     _exit                                     
 
@@ -31,7 +28,7 @@ skipd1:
     ld A,L                                  ; delim key    
     _drop                                   ; delim
     cp L                                    ; delim             ; compare with delim
-    jr z,skipd1                            ; delim             ; if delim then loop
+    jr z,skipd1                             ; delim             ; if delim then loop
     cp $1F                                  ; delim             ; whitespace
     jr c,skipd1
     cp $5C                                  ; delim             ; \ start of a comment?

@@ -10,13 +10,13 @@ _code plusBang
 _code cmove
 
 
-; call,       ( adr -- )
-; Assemble a call instruction to adr
-callc:
-    _enter
-    _unjoin
-    _push CALL_OPCODE
-    _call ccomma
-    _call comma
-    _rejoin
-    _exit
+; ; call,       ( adr -- )
+; ; Assemble a call instruction to adr
+; callc:
+;     _enter
+;     _unjoin
+;     _push CALL_OPCODE
+;     _call ccomma
+;     _call comma
+;     _rejoin
+;     _exit

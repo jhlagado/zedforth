@@ -7,56 +7,50 @@ interpret:
     _enter
     _unjoin
 interpret0:
+
     _push $20                       ; str maxlen delim
     _call word                      ; c-addr                 
     _dup                            ; c-addr c-addr
     _cat                            ; c-addr len
     _zeroBranch interpret2          ; is it zero length?          
     ; _fetch var_state
-    ; _zeroBranch interpret1          ; are we interpreting or compiling?
+    ; _zeroBranch interpWord          ; are we interpreting or compiling?
     ; _call compileWord      
     ; jr interpret0
-interpret1:
-    _call interpWord                 
+interpWord:                         ; ( c-addr -- )
+    _dup                            ; c-addr c-addr
+    _call find                      ; c-addr xt|ptr result   ; found? or number?
+    _zeroBranch interpNum
+executeWord:                        ; ( ? xt -- ??? )
+    _nip                            ; xt
+    _call execute                   ; ?
     jr interpret0
-interpret2:
+interpNum:                          ; ( c-addr xt|ptr -- )
+    _drop                           ; c-addr
+    _call count                     ; str len
+    
+    ; _call toNumber                  ; num err
+    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; 
+    _drop
+    _drop
+    _push $1234  ; temporary hack!
+    _push 0
+    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    
+    _nott
+    _zeroBranch interpError
+    jr interpret0
+
+interpError:                        ; ( ? -- ) 
+    _print "NOT FOUND!\r\n"
+
+interpret2:                         ; ( ? -- ) 
     _drop  
     _rejoin
     _exit
 
-interpWord:                         ; ( c-addr -- )
-    _enter
-    _unjoin
-    _dup                            ; c-addr c-addr
-    _call find                      ; c-addr xt|ptr result   ; found? or number?
-    _zeroBranch interpNum
-    jr executeWord
 
-executeWord:                        ; ( ? xt -- ??? )
-    _nip                            ; xt
-    _call execute                   ; ?
-    _rejoin
-    _exit
-
-interpNum:                          ; ( c-addr xt|ptr -- )
-    _enter
-    _unjoin
-    _drop                           ; c-addr
-    _call count                     ; str len
-    _call toNumber                  ; num err
-    _zeroBranch interpError
-    _rejoin
-    _exit
-
-interpError:                        ; ( ? -- ) 
-    _drop
-    _print "NOT FOUND!\r\n"
-    _rejoin
-    _exit
-    
 ; compileWord:                        ; ( c-addr -- )
-;     _enter
-;     _unjoin
 ;     _dup                            ; c-addr c-addr
 ;     _call find                      ; c-addr xt result
 ;     _dup                            ; c-addr xt result result ; found? or number?
@@ -65,18 +59,14 @@ interpError:                        ; ( ? -- )
 ;     _zeroBranch executeWord
 ;     _nip                            ; xt    
 ;     _call callc    
-;     _rejoin
-;     _exit
+    ; jr interpret0
 
 ; compileNum:                         ; ( c-addr xt result -- )
-;     _enter
-;     _unjoin                          
 ;     _drop                           ; c-addr xt 
 ;     _drop                           ; c-addr
 ;     _call count                     ; str len
 ;     _call toNumber                  ; num err
 ;     _zeroBranch interpError
 ;     _call literal
-;     _rejoin                         
-;     _exit
+    ; jr interpret0
 
