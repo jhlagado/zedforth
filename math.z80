@@ -1,3 +1,4 @@
+_code negate                   
 _code plus                   
 _code minus                         
 
@@ -14,6 +15,8 @@ _code twoSlash
 _code eq                           
 _code zeroLT
 _code zeroEq
+
+; num -- -num
 
 ;   <           ( n1 n2 -- t )
 ;               is less than

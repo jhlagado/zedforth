@@ -1,0 +1,19 @@
+_initKernel
+
+.macro _testCharToDigit,char1,result1
+    _test
+        _pushc char1
+        _call charToDigit
+    _end
+        _push result1
+    _expect {"should result1"}
+.endm
+
+_push 16
+_store var_base
+_testCharToDigit "0",0
+_testCharToDigit "/",-1
+_testCharToDigit "9",9
+_testCharToDigit ":",-1
+_testCharToDigit "A",$0A
+_testCharToDigit "F",$0F

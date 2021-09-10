@@ -1,3 +1,8 @@
+.macro _negate                         
+    _nott
+    _onePlus
+.endm
+
 .macro _plus            ; 21t             
     pop DE		            ; 10t
     add HL,DE               ; 11t
