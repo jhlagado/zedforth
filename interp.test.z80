@@ -1,0 +1,19 @@
+_test
+    _push 3
+    _setInputText "1+"
+    _call interpret
+    _call dots
+_end
+    _push 4
+_expect {"should increase by 1"}
+
+_test
+    _push 3
+    _setInputText "dup"
+    _call interpret
+    _call dots
+_end
+    _push 3
+    _push 3
+_expect {"should dup top of stack"}
+

@@ -6,11 +6,12 @@ _code unnip
 ; x y -- z x y   N: z --
 _code twoUnnip		
 
-_code dup
 ; x1 --  
+_head "dup",3
+_code dup
 
-_code drop                
 ; x1 x2 -- x2 x1
+_code drop                
 
 _code swap                
 

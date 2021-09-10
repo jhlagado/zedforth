@@ -1,6 +1,10 @@
 _code plus                   
 _code minus                         
+
+; n -- n
+_head "1+",2
 _code onePlus
+
 _code oneMinus
 _code twoPlus
 _code twoMinus
