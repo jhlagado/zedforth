@@ -1,7 +1,9 @@
 ; negate        ( num -- -num )
 _code negate 
 
+_head "+",1
 _code plus                   
+
 _code minus                         
 
 ; n -- n

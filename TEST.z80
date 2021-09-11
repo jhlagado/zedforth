@@ -97,7 +97,7 @@ startTests:
     .include "string.test.z80"
     .include "util.test.z80"
     
-    ; .include "print.test.z80"
+    .include "print.test.z80"
 
 ; inline tests ============================================================  
 

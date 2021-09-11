@@ -17,3 +17,31 @@ _end
     _push 3
 _expect {"should dup top of stack"}
 
+_test
+    _setInputText ""
+    _call interpret
+_end
+_expect {"should be empty"}
+
+_test
+    _setInputText "10"
+    _call interpret
+_end
+    _push $10
+_expect {"should be 10"}
+
+_test
+    _setInputText "10 dup"
+    _call interpret
+_end
+    _push $10
+    _push $10
+_expect {"should dup 10"}
+
+_test
+    _setInputText "10 dup +"
+    _call interpret
+_end
+    _push $20
+_expect {"should be 20"}
+
