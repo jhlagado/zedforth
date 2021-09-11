@@ -34,12 +34,11 @@ toNumber21:
     jr z, toNumber22
     _swap                               ; str len num
     _fetch var_base                     ; str len num base
-    ; _call uMultiply                     ; str len num num2      ; num *= var_base
+    _call umstar                        ; str len num num2      ; num *= var_base
     _drop                               ; str len num
     inc BC
     ld A,(BC)                                                   ; a = next char
     jr toNumber21
-
 toNumber22:
     _drop                               ; str num
     _swap                               ; num str
@@ -54,8 +53,7 @@ toNumber3:
     
 toNumber1x:
     _nip                                ; str 0
-    _dup                                ; 0 0
-    jr toNumber1y
+    jr toNumber1z
 
 toNumber1xx:
     _nip                                ; 0 
@@ -66,7 +64,7 @@ toNumber99x:
     _twoDrop                             
     _push 0                             ; 0
 toNumber1z:
-    _push 1                             ; 0 1
+    _push -1                            ; 0 -1
 toNumber1y:
     _rejoin
     _exit
@@ -76,6 +74,10 @@ toNumber1y:
 charToDigit:                            
     exx
     ld A,L
+    cp 'a'
+    jr c,charToDigit0
+    sub ('a' - 'A')
+charToDigit0:
     sub '0'                             ; < '0'?
     jr c,charToDigit2
     cp 10                                ; <= '9'?

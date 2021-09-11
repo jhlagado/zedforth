@@ -1,4 +1,6 @@
-_code negate                   
+; negate        ( num -- -num )
+_code negate 
+
 _code plus                   
 _code minus                         
 
@@ -16,7 +18,36 @@ _code eq
 _code zeroLT
 _code zeroEq
 
-; num -- -num
+; UM* ( u1 u2 -- plo phi )
+; unsigned multiply
+umstar:                         
+    exx
+    ex DE,HL                            ; DE = u2
+    _drop                               ; HL = u1
+    push BC                             ; preserve BC
+    ld BC,DE                            ; BC = u2
+    ex DE,HL                            ; DE = u1, BC = u2
+    ld HL,0                             ; HLDE = 0 0 u1hi u1lo
+    ld A,17                             ; loop counter
+    or A                                ; clear carry
+umul1:
+    rr H
+    rr L
+    rr D
+    rr E
+    jr nc,umul2
+    add HL,BC
+umul2:
+    dec A
+    jr nz, umul1
+    pop BC                              ; restore BC
+    ex DE,HL                            ; plo phi
+    _dup                                ; plo plo
+    ex DE,HL                            ; plo phi
+    exx
+    _next
+
+
 
 ;   <           ( n1 n2 -- t )
 ;               is less than

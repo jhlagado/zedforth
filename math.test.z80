@@ -99,3 +99,20 @@ _end
     _push FALSE
 _expect "should not be equal"
 
+.macro _testUMStar,n1,n2,rlo,rhi
+    _test
+        _push n1
+        _push n2
+        _call umstar
+    _end
+        _push rlo
+        _push rhi
+    _expect {"n1 * n2 should be r1 r2"}
+.endm
+
+_push 16
+_store var_base
+_testUMStar $23,$100,$2300,$0
+_testUMStar $23,$1000,$3000,$2
+_testUMStar $2300,$1000,$0,$230
+_testUMStar $1234,$1234,$014B,$5A90

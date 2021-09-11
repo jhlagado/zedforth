@@ -1,4 +1,6 @@
 _initKernel
+_push 16
+_store var_base
 
 .macro _testCharToDigit,char1,result1
     _test
@@ -9,11 +11,30 @@ _initKernel
     _expect {"should result1"}
 .endm
 
-_push 16
-_store var_base
 _testCharToDigit "0",0
 _testCharToDigit "/",-1
 _testCharToDigit "9",9
 _testCharToDigit ":",-1
 _testCharToDigit "A",$0A
 _testCharToDigit "F",$0F
+_testCharToDigit "G",-1
+_testCharToDigit "`",-1
+_testCharToDigit "a",$0A
+_testCharToDigit "f",$0F
+_testCharToDigit "g",-1
+
+.macro _testToNumber,str1,res1,err1
+    _test
+        _pushString str1
+        _call toNumber
+    _end
+        _push res1
+        _push err1
+    _expect {"should be res1 and err1"}
+.endm
+
+_testToNumber "",0,-1
+_testToNumber "123",$123,0
+_testToNumber "123X",0,-1
+_testToNumber "-1",-1,0
+
