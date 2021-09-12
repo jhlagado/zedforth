@@ -5,13 +5,14 @@ padBuf:             ds PAD_BUFSIZE
 dStack:                                     ; grows down          
                     ds RSTACK_SIZE
 rStack:                                     ; grows down          
+tib:                ds TIB_SIZE
 
-var_serInPtr:
+var_serBufUsed: 
+serBufUsed:         dw 0
+var_serInPtr: 
 serInPtr:           dw 0
 var_serRdPtr:
 serRdPtr:           dw 0
-var_serBufUsed: 
-serBufUsed:         dw 0
 
 lineBufStart        dw 0
 lineBufSize         dw 0

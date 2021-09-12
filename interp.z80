@@ -28,15 +28,7 @@ executeWord:                        ; ( ? xt -- ??? )
 interpNum:                          ; ( c-addr xt|ptr -- )
     _drop                           ; c-addr
     _call count                     ; str len
-    
     _call toNumber                  ; num err
-    ; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; 
-    ; _drop
-    ; _drop
-    ; _push $1234  ; temporary hack!
-    ; _push 0
-    ; ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    
     _nott
     _zeroBranch interpError
     jr interpret0

@@ -4,6 +4,7 @@ SER_BUFSIZE     equ     $80                 ; must be a power of two
 PAD_BUFSIZE     equ     $80
 DSTACK_SIZE     equ     $80                 ; parameter stack
 RSTACK_SIZE     equ     $80                 ; return stack
+TIB_SIZE        equ     $80
 
 LINE_BUFSIZE    equ     $80
 

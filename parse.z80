@@ -63,6 +63,8 @@ wordRead:
 wordRead1:
     _swap                                   ; ptr len delim
     _call key                               ; ptr len delim key
+    _dup
+    _call emit
     ld A,L
     _drop                                   ; ptr len delim
     cp L                                                            ; key = delim?

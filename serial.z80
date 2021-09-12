@@ -17,39 +17,38 @@ serialInt:
     jr z,serialInt1
     in A,(IO_DATA)
     call serialInt2
+    ld A,(serBufUsed)
+    ld (serBufUsed),A
 serialInt1:
     pop HL
     pop AF
     ei
     ret
-
-; destroys: HL
 serialInt2:
     push AF
     ld A,(serBufUsed)
     cp SER_BUFSIZE
-    jr nz,serialInt21
+    jr nz,serialInt3
     pop AF
     ret
-serialInt21:
+serialInt3:
     ld HL,(serInPtr)
-    inc HL
-    ld A,L             ; Only need to check low byte becasuse lineBuf<256 bytes
-    cp (serBuf + SER_BUFSIZE) & $FF
-    jr nz,serialInt22
-    ld HL,serBuf
-serialInt22:
+    ld A,L
+    inc A
+    and SER_BUFSIZE-1               ; Only mask low byte
+    ld L,A
     ld (serInPtr),HL
+
     pop AF
     ld (HL),A
     ld A,(serBufUsed)
     inc A
     ld (serBufUsed),A
     cp SER_FULLSIZE
-    jr c, serialInt23
+    jr c, serialInt45
     ld A,RTS_HIGH
     out (IO_CTRL),A
-serialInt23:
+serialInt45:
     ret
 
 ; emit  ( c -- )
@@ -120,4 +119,52 @@ unkey:
     ei
     exx
     _next
+    
+; accept ptr max -- len    
+accept:
+    _enter
+    _unjoin
+    
+    _over                           ; ptr max ptr
+    _plus                           ; ptr ptr+max
+    _oneMinus                       ; ptr1 ptr2
+    _over                           ; ptr1 ptr2 ptr
+    ld BC,HL                        
+    _drop                           ; ptr1 ptr2             BC: ptr
+accept1:
+    _call key                       ; ptr1 ptr2 key
+    ld A,L
+    _call emit                      ; ptr1 ptr2
+    bit 7,A                                                         ; EOF? used by tests
+    jr nz,accept3
+    cp "\n"
+    jr z,accept3
+    cp "\b"
+    jr z,accept2
+    _dup                            ; ptr1 ptr2 ptr2
+    or a
+    sbc HL,BC                       ; ptr1 ptr2 ptr2-BC     c: BC > ptr2
+    _drop                           ; ptr1 ptr2                                                                                                                
+    jr c,accept1                    ; ignore key
+    ld (BC),A                       ; write key
+    inc BC                          ; ptr1 ptr2             BC: ptr+1
+    jr accept1
+accept2:    
+    _over                           ; ptr1 ptr2 ptr1    
+    or A
+    sbc HL,BC                       ; ptr1 ptr2 ptr1-BC     nc: BC < ptr1
+    _drop
+    jr nc,accept1                   ; ignore backspace
+    dec BC                          ; ptr1 ptr2             BC: ptr-1
+    jr accept1
+accept3:
+    _drop                           ; ptr1                  BC: ptr
+    ld DE,BC                        ; ptr ptr1
+    ex DE,HL
+    or A
+    sbc HL,DE                       ; len
+
+    _rejoin
+    _exit
+    
     

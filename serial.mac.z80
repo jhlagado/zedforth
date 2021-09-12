@@ -23,6 +23,6 @@ emit1%%M:
 ; serReady - check if there is input waiting to be read
 ; flags: NZ if input ready
 .macro _serReady
-    ld A,(serBufUsed)
+    ld A,(serRdUsed)
     cp $0
 .endm
