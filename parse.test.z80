@@ -3,17 +3,12 @@
         _setInputText s1
         _pushc d1
         _call skipDelims
-        _fetch serRdPtr
-        _onePlus
-        _push $FF00 + SER_BUFSIZE-1
-        _andd
+        _fetch var_tibPtr
+        _push tib
+        _minus
     _end
         _pushc d1
-        _push serBuf
-        _push i1
-        _plus
-        _push $FF00 + SER_BUFSIZE-1
-        _andd
+        _pushc i1
     _expect {s1," expected at i1"}
 .endm
 
@@ -22,20 +17,23 @@ _testSkipDelims "   Hello"," ",3
 _testSkipDelims "\t  Hello"," ",3
 _testSkipDelims "\\ comment \nHello"," ",11
 
-.macro _testWordRead,str1,delim1,len1
+.macro _testWord,str1,delim1,len1
     _test
         _setInputText str1
         _pushc delim1
-        _fetch var_here
-        _push $40
-        _call wordRead
+        _call word
+        _call count
     _end
         _fetch var_here
+        _onePlus
         _push len1
     _expect {"should be len1 long"}
 .endm
 
-_testWordRead "Hello"," ",5
-_testWordRead "Hello "," ",5
-_testWordRead "Hello\n"," ",5
+_testWord "\n Hello"," ",5
+_testWord " Hello"," ",5
+_testWord "Hello"," ",5
+_testWord "Hello "," ",5
+_testWord "Hello\n"," ",5
+
 

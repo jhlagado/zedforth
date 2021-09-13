@@ -1,13 +1,25 @@
 ; copy s1 into input stream
-.macro _setInputText, s1
+.macro _setSerialText, s1
     _pushString {s1,"\r\n",-1,"\r\n"}       ; psrc len
     _dup                                    ; psrc len len
     _store serBufUsed                       ; psrc len  
-    _push serBuf+SER_BUFSIZE-1              ; psrc len pdest+size-1
+    _push serBuf + SER_BUFSIZE - 1              ; psrc len pdest+size-1
     _store serRdPtr                         ; psrc len 
     _push serBuf                            ; psrc len pdest
     _swap                                   ; psrc pdest len
     _cmove                                   
+.endm
+
+; copy s1 into input stream
+.macro _setInputText, s1
+    _pushString {s1,"\r\n",-1,"\r\n"}       ; psrc len
+    _dup                                    ; psrc len len
+    _store tibUsed                          ; psrc len  
+    _push tib                               ; psrc len pdest
+    _swap                                   ; psrc pdest len
+    _cmove                                   
+    _push tib                               ; pdest+size
+    _store tibPtr                        
 .endm
 
 ; _test ... _end .... _expect reason

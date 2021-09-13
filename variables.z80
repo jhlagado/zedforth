@@ -7,6 +7,11 @@ dStack:                                     ; grows down
 rStack:                                     ; grows down          
 tib:                ds TIB_SIZE
 
+var_tibUsed:
+tibUsed:            dw 0
+var_tibPtr: 
+tibPtr:             dw 0
+
 var_serBufUsed: 
 serBufUsed:         dw 0
 var_serInPtr: 

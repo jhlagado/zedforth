@@ -1,4 +1,4 @@
-; accept ptr max -- len    
+; accept ( ptr max -- len )   
 accept:
     _enter
     _unjoin

@@ -19,10 +19,6 @@ TESTMODE equ 1
     .include "string.mac.z80"
     .include "tester.mac.z80"
     .include "util.mac.z80"
-    ; .include "macros-compiler.z80"
-    ; .include "macros-device.z80"
-    ; .include "macros-dict.z80"
-    ; .include "macros-input.z80"
 
 .org START_ROM
 RST00:                                      ; Reset
@@ -62,7 +58,9 @@ primPage:
 
 _head 'ok',2
     _enter
+    _unjoin
     _print "ok\r\n"
+    _rejoin
     _exit
 
 initialLatest:
@@ -97,16 +95,71 @@ startTests:
 
 ; inline tests ============================================================  
 
-    ; _setInputText "123\r\n"
-loop:
+; _test
+    _push 3
+    _setSerialText "2+"
     _push tib
     _dup
-    _push $20
+    _push $50
     _call accept
-    _print "\r\n"
-    _call type
-    _print "\r\n"
-    jr loop
+    _drop
+    _drop
+    _push tib
+    _store var_tibPtr
+    _call interpret
+    _call dots
+
+    ; _setInputText "2+"
+    ; _push 3
+    ; _call interpret
+    ; _call dots
+
+
+
+
+    ; _print "\r\n"
+    ; _call interpret
+    ; _call dots
+; _end
+    ; _push 4
+; _expect {"should increase by 1"}
+
+
+
+    ; _push tib
+    ; _dup
+    ; _push $50
+    ; _call accept
+    ; _print "\r\n"
+    ; _call dots
+    ; _call interpret
+
+
+    ; _setInputText "123\r\n"
+    ; _push tib
+    ; _fetch tibPtr
+    ; _fetch tibUsed
+    ; _call dots
+    ; _push tib
+    ; _dup
+    ; _push $20
+    ; _call accept
+    ; _print "\r\n"
+    ; _call type
+    ; _print "\r\n"
+    ; jr loop
+
+
+;     ; _setInputText "123\r\n"
+; loop:
+;     _push tib
+;     _dup
+;     _push $20
+;     _call accept
+;     _print "\r\n"
+;     _call type
+;     _print "\r\n"
+;     jr loop
 
 ; inline tests ============================================================  
 
