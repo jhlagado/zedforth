@@ -43,6 +43,7 @@ codePtr  .set $
 primPage:
     .include "bytecode.z80"
 
+    .include "accept.z80"
     .include "control.z80"
     .include "find.z80"
     .include "interp.z80"
@@ -58,11 +59,6 @@ primPage:
     .include "string.z80"
     .include "tester.z80"
     .include "util.z80"
-
-    ; .include "core-compiler.z80"
-    ; .include "core-control.z80"
-    ; .include "core-find.z80"
-    ; .include "core-parse.z80"
 
 _head 'ok',2
     _enter
@@ -101,14 +97,16 @@ startTests:
 
 ; inline tests ============================================================  
 
-    _setInputText "123\r\n"
+    ; _setInputText "123\r\n"
 loop:
     _push tib
     _dup
     _push $20
     _call accept
+    _print "\r\n"
     _call type
-    ; jr loop
+    _print "\r\n"
+    jr loop
 
 ; inline tests ============================================================  
 

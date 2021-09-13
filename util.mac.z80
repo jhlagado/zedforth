@@ -62,7 +62,7 @@ name1:
 
 .macro _print, s1
     _pushString s1
-    _type
+    _call type
 .endm    
 
 .macro _cr

@@ -1,6 +1,23 @@
 ; NOTE: a "digit" is 4 bits (a nibble)
 
-_code type
+; type  ( adr n -- )
+; Output n characters from adr.
+type:
+    exx
+    jr type2
+type1:          
+    _swap               ; 25t
+    _dup                ; 11t
+    _cAt                ; 18t
+    _emit
+    _onePlus            ; 6t
+    _swap
+type2:
+    _loopNext type1     ; 12t
+    _drop               ; 10t
+    exx
+    _next
+
 _code digitAscii
 _code shiftLeftDigit
 _code cr

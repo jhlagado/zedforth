@@ -1,21 +1,5 @@
 ; NOTE: a "digit" is 4 bits (a nibble)
 
-; type  ( adr n -- )
-; Output n characters from adr.
-.macro _type
-    jr type2%%M
-type1%%M:          
-    _swap               ; 25t
-    _dup                ; 11t
-    _cAt                ; 18t
-    _emit
-    _onePlus            ; 6t
-    _swap
-type2%%M:
-    _loopNext TYPE1%%M  ; 12t
-    _drop               ; 10t
-.endm
-
 ; n -- n1 n2
 ; rotate most significant bit into n2
 .macro _shiftLeftBit
