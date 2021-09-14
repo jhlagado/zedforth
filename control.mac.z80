@@ -1,3 +1,4 @@
+; A, H, L destroyed
 .macro _loopNext,label     ; 97t
     _dup                    ; 11t   ; ret idx idx
     _zeroBranch loopNext%%M ; 12t
@@ -7,6 +8,7 @@ loopNext%%M:
     _drop
 .endm
 
+; A, H, L destroyed
 .macro _zeroBranch,label    ; 97t
     _isZero                 ; 18t
     jr z,label             ; 12t

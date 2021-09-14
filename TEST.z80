@@ -1,4 +1,4 @@
-.engine mycomputer
+; .engine mycomputer
 
 TESTMODE equ 1
 
@@ -96,16 +96,14 @@ startTests:
 ; inline tests ============================================================  
 
 ; _test
-    _push 3
-    _setSerialText "2+"
-    _push tib
-    _dup
-    _push $50
-    _call accept
-    _drop
-    _drop
-    _push tib
-    _store var_tibPtr
+    _push 3                 ; 3
+    _setSerialText "2+"     ; 3
+    _push tib               ; 3 tib
+    _dup                    ; 3 tib tib
+    _push $50               ; 3 tib tib 50
+    _call accept            ; 3 tib 2
+    _store var_tibUsed      ; 3 tib
+    _store var_tibPtr       ; 3
     _call interpret
     _call dots
 

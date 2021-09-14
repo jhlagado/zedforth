@@ -5,12 +5,12 @@ word:
     _enter
     _unjoin
     
+    _dup                                    ; delim delim
     _call skipDelims                        ; delim
     _fetch var_here                         ; delim ptr
     _onePlus                                ; delim ptr'        ; fill in length later
     _push $40                               ; delim ptr' maxlen
     _call wordRead                          ; ptr len
-
     _swap                                   ; len ptr'
     _oneMinus                               ; len ptr
     _tuck                                   ; ptr len ptr   
@@ -22,32 +22,43 @@ word:
 ; delim -- delim
 skipDelims:                                 
     exx
-    ld BC,(var_tibPtr)
+    ld C,L                                  ; delim             ; C: delim
+    _drop
+    _fetch var_tibUsed                      ; used
+    ld DE,HL                                ; used              ; DE: used C: delim
+    _fetch var_tibPtr                       ; used ptr
+    _dup                                    ; used ptr ptr
+    jr skipd4
 skipd1:
-    ld A,(BC)                               ; delim     
-    cp L                                    ; delim             ; compare with delim
-    jr z,skipd1A                             ; delim            ; if delim then skip
-    cp $1F                                  ; delim             ; compare whitespace
-    jr c,skipd1A                                                ; if white space then skip
-    cp $5C                                  ; delim             ; \ start of a comment?
-    jr z,skipd2                                                 ; if \ then skip to EOL
-    bit 7,A                                 ; delim             ; EOF? used by tests
-    jr nz,skipd3
-    jr skipd3
-skipd1A:
-    inc BC
-    jr skipd1
-skipd2:                                                         ; skip to end of line
-    inc BC
-    ld A,(BC)                               ; delim     
+    ex DE,HL                                ; used ptr ptr'     ; DE: counter       
+    ld A,(HL)                               ; used ptr ptr'    
+    cp C                                                        ; compare with delim
+    jr z,skipd3                             ;                   ; if delim then skip
+    cp $1F                                  ;                   ; compare whitespace
+    jr c,skipd3                                                 ; if white space then skip
+    cp $5C                                  ;                   ; \ start of a comment?
+    jr nz,skipd5                                                ; if \ then skip to EOL
+skipd2:
+    inc HL                                  ; used ptr ptr'
+    ld A,(HL)                               ;      
     cp "\n"
     jr nz,skipd2                                                ; skip comment loop
-    bit 7,A                                 ; delim             ; EOF? used by tests
-    jr nz,skipd3
-    jr skipd1A                                                   ; main loop
+    bit 7,A                                 ;                   ; EOF? used by tests
+    jr nz,skipd5
 skipd3:
-    ld (var_tibPtr),BC 
-    exx
+    inc HL                                  ; used ptr ptr'
+skipd4:
+    ex DE,HL                                ; used ptr counter  ; DE: ptr'                                
+    _loopNext skipd1                        ; DE unharmed
+    ex DE,HL                                ; used ptr ptr'     ; DE: counter       
+skipd5:
+    _dup                                    ; used ptr ptr' ptr' 
+    _store var_tibPtr                       ; used ptr ptr'     ; update tibPtr
+    _swap                                   ; used ptr' ptr
+    _minus                                  ; used diff
+    _minus                                  ; used'
+    _store var_tibUsed                                          ; update tibUsed
+    _drop
     _next                                     
 
 ; ( delim ptr maxlen -- ptr len )
@@ -64,70 +75,27 @@ wordRead:
     _dup                                    ; dest src src    
     jr wordRead2
 wordRead1:
-    _dup                                    ; dest src src src
-    _at                                     ; dest src src char
-    ld A,L
-    _drop                                   ; dest src src
-    cp C                                    ;                   ; delim? 
+    ld A,(HL)                               ; dest src src
+    cp C                                                            ; delim? 
     jr z,wordRead3
-    cp " "                                                      ; < space? i.e. control chars
+    cp " "                                                          ; < space? i.e. control chars
     jr c,wordRead3
-    bit 7,A                                                     ; EOF? used by tests
+    bit 7,A                                                         ; EOF? used by tests
     jr nz,wordRead3
-    ld (DE),A                                                   ; write to dest                            
+    ld (DE),A                                                       ; write to dest                            
     _onePlus                                ; dest src src'
-    inc DE                                                      ; DE: dest'
+    inc DE                                                          ; DE: dest'
 wordRead2:
     djnz wordRead1
 wordRead3:
-    ld (tibPtr),HL                          ; dest src src'
-    _over                                   ; dest src src' src
-    _minus                                  ; dest src len
-    _nip                                    ; dest len
+    _dup                                    ; dest src src' src'
+    _store var_tibPtr                       ; dest src src'
+    _swap                                   ; dest src' src
+    _minus                                  ; dest len
+    _fetch var_tibUsed                      ; dest len used
+    _over                                   ; dest len used len
+    _minus                                  ; dest len used'
+    _store var_tibUsed                      ; dest len
     exx
     _next
 
-
-; ; delim ptr maxlen -- ptr len
-; wordRead:                                   
-;     _enter
-;     _unjoin
-    
-;     _swap                                   ; delim len ptr
-;     ld BC,HL                                ; delim len ptr         ; BC: ptr    
-;     _swap                                   ; delim ptr len
-;     _rot                                    ; ptr len delim 
-;     _swap                                   ; ptr delim len 
-;     jr wordRead2
-; wordRead1:
-;     _swap                                   ; ptr len delim
-;     _call key                               ; ptr len delim key
-;     _dup
-;     _call emit
-;     ld A,L
-;     _drop                                   ; ptr len delim
-;     cp L                                                            ; key = delim?
-;     jr z,wordRead3
-;     cp " "                                                          ; < space? i.e. control chars
-;     jr c,wordRead3
-;     bit 7,A                                                         ; EOF? used by tests
-;     jr nz,wordRead3
-;     ld (BC),A                            
-;     inc BC
-;     _swap                                   ; ptr delim len
-; wordRead2:
-;     _loopNext wordRead1                     ; ptr delim
-;     jr wordRead4
-; wordRead3:
-;     _drop                                   ; ptr len
-; wordRead4:
-;     _drop                                   ; ptr
-;     _dup
-;     ld HL,BC                                ; ptr ptr'
-;     _over                                   ; ptr ptr' ptr
-;     _minus                                  ; ptr len
-
-;     _rejoin
-;     _exit
-    
- 

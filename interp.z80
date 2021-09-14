@@ -3,6 +3,7 @@ repl:
     ld DE, interpret
     _next
 
+; interpret ( str maxlen
 interpret:
     _enter
     _unjoin
