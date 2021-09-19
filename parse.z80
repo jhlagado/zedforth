@@ -58,7 +58,7 @@ skipd5:
     _minus                                  ; used diff
     _minus                                  ; used'
     _store var_tibUsed                                          ; update tibUsed
-    _drop
+    exx
     _next                                     
 
 ; ( delim ptr maxlen -- ptr len )
@@ -83,7 +83,7 @@ wordRead1:
     bit 7,A                                                         ; EOF? used by tests
     jr nz,wordRead3
     ld (DE),A                                                       ; write to dest                            
-    _onePlus                                ; dest src src'
+    _onePlus                                 ; dest src src'
     inc DE                                                          ; DE: dest'
 wordRead2:
     djnz wordRead1

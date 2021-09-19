@@ -1,39 +1,51 @@
-.macro _testSkipDelims,s1,d1,i1
+.macro _testSkipDelims,str1,delim1,char1,used1
     _test
-        _setInputText s1
-        _pushc d1
+        _setInputText str1
+        _pushc delim1
         _call skipDelims
-        _fetch var_tibPtr
-        _push tib
-        _minus
+        
+        _fetch tibPtr
+        _cAt
+        _fetch tibUsed
     _end
-        _pushc d1
-        _pushc i1
-    _expect {s1," expected at i1"}
+        _pushc char1
+        _push used1
+    _expect {str1," expected chr1 and used1 used"}
 .endm
 
-_testSkipDelims "Hello"," ",0
-_testSkipDelims "   Hello"," ",3
-_testSkipDelims "\t  Hello"," ",3
-_testSkipDelims "\\ comment \nHello"," ",11
+_testSkipDelims "Hello"," ","H",$0A
+_testSkipDelims "   Hello"," ","H",$0A
+_testSkipDelims "\t  Hello"," ","H",$0A
+_testSkipDelims "\\ comment \nHello"," ","H",$0A
 
-.macro _testWord,str1,delim1,len1
+.macro _testWord0,str1,delim1,len1
     _test
         _setInputText str1
         _pushc delim1
         _call word
         _call count
+        _nip
     _end
-        _fetch var_here
-        _onePlus
         _push len1
-    _expect {"should be len1 long"}
+    _expect {str1," should length: len1"}
 .endm
 
-_testWord "\n Hello"," ",5
-_testWord " Hello"," ",5
-_testWord "Hello"," ",5
-_testWord "Hello "," ",5
-_testWord "Hello\n"," ",5
+_testWord0 ""," ",0
 
+.macro _testWord,str1,delim1,char1,len1
+    _test
+        _setInputText str1
+        _pushc delim1
+        _call word
+        _call count
+        _swap
+        _cAt
+    _end
+        _push len1
+        _pushc char1
+    _expect {str1," should start with: ",char1," be length: len1"}
+.endm
 
+_testWord "Hello"," ","H",5
+_testWord "Hello "," ","H",5
+_testWord "Hello\n"," ","H",5

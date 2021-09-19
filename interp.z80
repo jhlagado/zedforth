@@ -25,7 +25,7 @@ interpWord:                         ; ( c-addr -- )
 executeWord:                        ; ( ? xt -- ??? )
     _nip                            ; xt
     _call execute                   ; ?
-    _call dots
+    ; _call dots
     jr interpret0
 interpNum:                          ; ( c-addr xt|ptr -- )
     _drop                           ; c-addr
