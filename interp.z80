@@ -3,6 +3,23 @@ repl:
     ld DE, interpret
     _next
 
+; quit
+quit:
+    _enter
+    _unjoin
+quit1:
+    _push tib                       ; tib
+    _push TIB_SIZE                  ; tib tibmax
+    _call accept                    ; len
+    _store var_tibUsed              ;
+    _push tib                       ; tib
+    _store var_tibPtr               ;
+    _call interpret
+    _fetch var_quitting
+    _zeroBranch quit1
+    _rejoin
+    _exit
+
 ; interpret 
 interpret:
     _enter

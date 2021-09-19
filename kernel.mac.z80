@@ -10,6 +10,7 @@
     ld DE,startForth
     ld IY,next16
     ld HL, FALSE
+    ld (var_quitting),HL
     ld (var_state),HL
     ld HL, 16
     ld (var_base),HL

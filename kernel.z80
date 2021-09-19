@@ -30,8 +30,8 @@ mode16:
     ld IY,next16
     _next
 
-quit:
-    halt
+; quit:
+;     halt
 
 toR:
     _exPop
