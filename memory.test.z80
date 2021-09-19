@@ -1,4 +1,4 @@
-; ; cmove (psrc pdest len -- )
+_initKernel
 
 _test
     _pushc "A"

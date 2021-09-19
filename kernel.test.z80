@@ -1,3 +1,5 @@
+_initKernel
+
 _test
     _push 1
     _push 2

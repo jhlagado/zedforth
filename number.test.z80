@@ -1,6 +1,6 @@
 _initKernel
-_push 16
-_store var_base
+; _push 16
+; _store var_base
 
 .macro _testCharToDigit,char1,result1
     _test

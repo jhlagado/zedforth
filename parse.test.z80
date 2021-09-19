@@ -1,3 +1,5 @@
+_initKernel
+
 .macro _testSkipDelims,str1,delim1,char1,used1
     _test
         _setInputText str1

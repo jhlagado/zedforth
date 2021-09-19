@@ -1,3 +1,5 @@
+_initKernel
+
 .macro _testFind,str1,result1
     _test
         _pushCStr str1
