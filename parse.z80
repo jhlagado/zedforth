@@ -50,6 +50,7 @@ skipd3:
 skipd4:
     ex DE,HL                                ; used ptr counter  ; DE: ptr'                                
     _loopNext skipd1                        ; DE unharmed
+    _dup                                    ; used ptr ptr
     ex DE,HL                                ; used ptr ptr'     ; DE: counter       
 skipd5:
     _dup                                    ; used ptr ptr' ptr' 

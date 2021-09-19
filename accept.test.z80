@@ -1,0 +1,36 @@
+; _test
+    ; _push 3
+    _setSerialText "1+"
+    _push tib
+    _push TIB_SIZE
+    _call accept
+    _push tib
+    _swap
+    _call type
+    
+    ; _call interpret
+    ; _call dots
+; _end
+;     _push 4
+; _expect {"should increase by 1"}
+
+
+.macro _testAccept,str1,char1,len1
+    _test
+        _setSerialText str1
+        _push tib
+        _dup
+        _push TIB_SIZE
+        _call accept
+        _swap
+        _cAt
+    _end
+        _push len1
+        _pushc char1
+    _expect {str1," should start with: ",char1," be length: len1"}
+.endm
+
+_testAccept "Hello","H",5
+_testAccept "Hello ","H",6
+_testAccept "Hello\n","H",6
+

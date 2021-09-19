@@ -78,23 +78,42 @@ startForth:
 ; end header  ============================================================  
 
 startTests:
-    .include "stack.test.z80"
-    .include "control.test.z80"
-    .include "find.test.z80"
-    .include "interp.test.z80"
-    .include "kernel.test.z80"
-    .include "logic.test.z80"
-    .include "math.test.z80"
-    .include "memory.test.z80"
-    .include "number.test.z80"
-    .include "parse.test.z80"
-    .include "string.test.z80"
-    .include "util.test.z80"
+    ; .include "stack.test.z80"
+    ; .include "control.test.z80"
+    ; .include "find.test.z80"
+    ; .include "interp.test.z80"
+    ; .include "kernel.test.z80"
+    ; .include "logic.test.z80"
+    ; .include "math.test.z80"
+    ; .include "memory.test.z80"
+    ; .include "number.test.z80"
+    ; .include "parse.test.z80"
+    ; .include "string.test.z80"
+    ; .include "util.test.z80"
     
-    .include "print.test.z80"
+    ; .include "print.test.z80"
 
 ; inline tests ============================================================  
 
+; _test
+    _setSerialText "1+ "
+    _push tib
+    _dup
+    _push TIB_SIZE
+    _call accept
+    _store var_tibUsed
+    _store var_tibPtr
+
+    _push 3
+    ; _setInputText "1+"
+    ; _fetch var_tibPtr
+    ; _fetch var_tibUsed
+
+    _call interpret
+    _call dots
+; ; _end
+; ;     _push 4
+; ; _expect {"should increase by 1"}
 
 ; inline tests ============================================================  
 
