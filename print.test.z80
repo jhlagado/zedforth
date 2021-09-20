@@ -24,10 +24,10 @@ testPrint1:
 
     _pushString "Hello!"
     _call type
-    _cr
+    _call cr
     _pushString "There!"
     _call type
-    _cr
+    _call cr
     _pushc 'X'
     _call emit
     _push $0123

@@ -78,22 +78,25 @@ startForth:
 ; end header  ============================================================  
 
 startTests:
-    .include "stack.test.z80"
-    .include "control.test.z80"
-    .include "find.test.z80"
-    .include "interp.test.z80"
-    .include "kernel.test.z80"
-    .include "logic.test.z80"
-    .include "math.test.z80"
-    .include "memory.test.z80"
-    .include "number.test.z80"
-    .include "parse.test.z80"
-    .include "string.test.z80"
-    .include "util.test.z80"
+    ; .include "stack.test.z80"
+    ; .include "control.test.z80"
+    ; .include "find.test.z80"
+    ; .include "interp.test.z80"
+    ; .include "kernel.test.z80"
+    ; .include "logic.test.z80"
+    ; .include "math.test.z80"
+    ; .include "memory.test.z80"
+    ; .include "number.test.z80"
+    ; .include "parse.test.z80"
+    ; .include "string.test.z80"
+    ; .include "util.test.z80"
     
-    .include "print.test.z80"
+    ; .include "print.test.z80"
 
 ; inline tests ============================================================  
+
+    _print "ZedForth by John Hardy \r\n\r\n"
+    _call quit
 
 ; _test
 ;     _setSerialText "1+"
@@ -113,7 +116,7 @@ startTests:
 
 ; inline tests ============================================================  
 
-    _cr
+    _call cr
     _print "Done!"
     _call quit    
 

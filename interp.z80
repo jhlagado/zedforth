@@ -8,9 +8,12 @@ quit:
     _enter
     _unjoin
 quit1:
+    _call dots0
+    _print "> "
     _push tib                       ; tib
     _push TIB_SIZE                  ; tib tibmax
     _call accept                    ; len
+    _call cr
     _store var_tibUsed              ;
     _push tib                       ; tib
     _store var_tibPtr               ;

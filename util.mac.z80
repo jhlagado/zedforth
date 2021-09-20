@@ -65,11 +65,3 @@ name1:
     _call type
 .endm    
 
-.macro _cr
-    _print "\r\n"
-.endm    
-
-.macro _space
-    _pushc " "
-    _emit
-.endm    

@@ -20,7 +20,6 @@ type2:
 
 _code digitAscii
 _code shiftLeftDigit
-_code cr
 
 ; n --
 ; prints a digit
@@ -37,13 +36,18 @@ dot:
     dw shiftLeftDigit, dotDigit
     dw shiftLeftDigit, dotDigit
     dw shiftLeftDigit, dotDigit
-    dw drop
+    dw drop, space
     _exit
     
 ; .s    ( x... -- x... ) 
 ; print stack (non-destructively)
 _head ".s",2
-dots:                
+dots:   
+    _enter
+    dw dots0, cr
+    _exit
+
+dots0:
     _enter0
 
     _print "\r\n"
@@ -52,20 +56,39 @@ dots:
     _cellMinus              ; x... @x 
     _call depth             ; x... @x n 
     _oneMinus
+
+    ; bit 7,H
+    ; jr z,dots2
+    ; _drop
+    ; jr dots3
+
     jr dots2
 dots1:
     _swap                   ; x... n @x
     _dup                    ; x... n @x @x
     _at                     ; x... n @x x
     _call dot               ; x... n @x
-    _space
     _cellMinus              ; x... n @x'
     _swap                   ; x... @x' n
 dots2:
     _loopNext dots1         
+dots3:
     _drop                   ; x...
-    _print "\r\n"
-    
     _rejoin
     _exit
 
+cr:
+    exx
+    _pushc "\r"
+    _pushc "\n"
+    _emit
+    _emit
+    exx
+    _next    
+
+space:
+    exx
+    _pushc " "
+    _emit
+    exx
+    _next
